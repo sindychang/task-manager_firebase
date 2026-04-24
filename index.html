@@ -472,6 +472,30 @@
 </head>
 <body>
 
+<!-- ── 密碼鎖畫面 ── -->
+<div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);align-items:center;justify-content:center;flex-direction:column;padding:24px">
+  <div style="width:100%;max-width:340px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:64px;height:64px;background:rgba(255,255,255,.18);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <span class="material-symbols-outlined" style="font-size:32px;color:#fff">lock</span>
+      </div>
+      <h1 style="color:#fff;font-size:22px;font-weight:700;margin-bottom:6px">家務管理 App</h1>
+      <p style="color:rgba(255,255,255,.7);font-size:13px">請輸入房間密碼以繼續</p>
+    </div>
+    <div style="background:rgba(255,255,255,.12);border-radius:16px;padding:24px">
+      <div id="lock-error" style="display:none;background:rgba(220,38,38,.25);border:1px solid rgba(220,38,38,.4);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:#fca5a5;font-weight:600;text-align:center"></div>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-bottom:8px">房間密碼</label>
+      <input id="lock-pw-input" type="password" placeholder="輸入密碼…"
+        style="width:100%;padding:13px 16px;border-radius:10px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;font-size:16px;font-family:'Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;margin-bottom:14px"
+        onkeydown="if(event.key==='Enter')lockSubmit()">
+      <button onclick="lockSubmit()"
+        style="width:100%;padding:14px;background:#fff;color:#5b52e8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:opacity .15s"
+        onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">進入</button>
+      <p id="lock-first-hint" style="color:rgba(255,255,255,.55);font-size:11px;text-align:center;margin-top:12px;display:none">首次使用：輸入密碼後會自動設定為房間密碼</p>
+    </div>
+  </div>
+</div>
+
 <!-- ── LEFT DRAWER ── -->
 <div class="drawer-scrim" id="drawer-scrim" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
@@ -508,7 +532,12 @@
         <span class="material-symbols-outlined" style="font-size:18px">description</span> 下載庫存 CSV 範本
       </button>
     </div>
-    
+    <div class="drawer-divider" style="margin-top:12px"></div>
+    <div class="drawer-section">帳號</div>
+    <button class="drawer-item" onclick="lockLogout()">
+      <div class="di-icon" style="background:#fee2e2"><span class="material-symbols-outlined" style="font-size:18px;color:#dc2626">logout</span></div>
+      <div><div class="di-label" style="color:#dc2626">登出房間</div><div class="di-sub">清除密碼，返回鎖定畫面</div></div>
+    </button>
   </div>
 </div>
 
@@ -969,6 +998,66 @@ const firebaseConfig = {
 };
 let db = null; // 在底部 initFirebase() 後才賦值
 
+// ── 密碼 / 存取控制 ───────────────────────────────────────
+const ROOM_ID = 'shared';
+let _roomToken = null; // sha256(密碼)，作為資料路徑的一部分
+
+// 簡單的 SHA-256（用 Web Crypto API）
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function lockShow(firstTime=false){
+  const ls=document.getElementById('lock-screen');
+  if(ls){ls.style.display='flex';}
+  const hint=document.getElementById('lock-first-hint');
+  if(hint)hint.style.display=firstTime?'block':'none';
+  setTimeout(()=>document.getElementById('lock-pw-input')?.focus(),100);
+}
+function lockHide(){
+  const ls=document.getElementById('lock-screen');
+  if(ls)ls.style.display='none';
+}
+function lockShowError(msg){
+  const el=document.getElementById('lock-error');
+  if(el){el.textContent=msg;el.style.display='block';}
+  const inp=document.getElementById('lock-pw-input');
+  if(inp){inp.value='';inp.focus();}
+}
+
+async function lockSubmit(){
+  const pw=document.getElementById('lock-pw-input')?.value?.trim();
+  if(!pw){lockShowError('請輸入密碼');return;}
+  const token=await sha256(pw+'_housework_salt');
+  // 驗證：嘗試讀取 /rooms/{token}/meta
+  fbSetStatus('connecting');
+  db.ref('rooms/'+token+'/meta').once('value').then(snap=>{
+    if(snap.exists()||true){
+      // token 有效（首次使用時 snap 不存在，也允許進入並初始化）
+      _roomToken=token;
+      localStorage.setItem('app_room_token',token);
+      lockHide();
+      loadData(); // 開始載入此房間的資料
+    }
+  }).catch(err=>{
+    lockShowError('連線失敗，請稍後再試');
+    fbSetStatus('error');
+    console.error(err);
+  });
+}
+
+// 登出（清除 token）
+function lockLogout(){
+  localStorage.removeItem('app_room_token');
+  _roomToken=null;
+  _fbListening=false;
+  // 停止現有監聽
+  if(db)db.ref('rooms/'+_roomToken).off();
+  closeDrawer();
+  lockShow();
+}
+
 // ── 同步狀態指示器 ────────────────────────────────────────
 function fbSetStatus(state){
   const dot=document.getElementById('fb-status-dot'),txt=document.getElementById('fb-status-txt');
@@ -985,13 +1074,11 @@ function fbSetStatus(state){
 }
 
 // ── Firebase 讀寫封裝 ──────────────────────────────────────
-const ROOM_ID = 'shared'; // 所有人共用同一個房間的資料，之後可改成多房間
-
 function fbSave(key, data){
   fbSetStatus('saving');
   localStorage.setItem('app_'+key, JSON.stringify(data));
-  if(!db){ fbSetStatus('offline'); return Promise.resolve(); }
-  return db.ref(ROOM_ID+'/'+key).set(data)
+  if(!db||!_roomToken){ fbSetStatus('offline'); return Promise.resolve(); }
+  return db.ref('rooms/'+_roomToken+'/'+key).set(data)
     .then(()=>fbSetStatus('online'))
     .catch(err=>{console.error('Firebase save error:',err);fbSetStatus('error');});
 }
@@ -1021,17 +1108,21 @@ function loadData(){
 
   if(_fbListening) return;
   _fbListening = true;
-  if(!db){ console.warn('db not ready, skipping Firebase listener'); return; }
+  if(!db||!_roomToken){ console.warn('db/token not ready'); return; }
+
+  const roomRef = db.ref('rooms/'+_roomToken);
 
   // 監聽 Firebase 即時更新（自己或朋友修改都會觸發）
-  db.ref(ROOM_ID).on('value', snap => {
+  roomRef.on('value', snap => {
     const d = snap.val();
-    if(!d) {
+    if(!d||!d.tasks) {
       // Firebase 是空的：把本機資料上傳做初始化
       fbSave('tasks', tasks);
       fbSave('housework', housework);
       fbSave('inventory', inventory);
       fbSave('locations', locations);
+      // 寫入 meta 標記此房間已初始化
+      db.ref('rooms/'+_roomToken+'/meta').set({created: Date.now()});
       return;
     }
     // 更新記憶體資料
@@ -2908,7 +2999,19 @@ function appInit(){
     console.error('Firebase init error:', e);
     fbSetStatus('error');
   }
-  appInit();
+
+  // 檢查是否已有儲存的 token（已登入過）
+  const savedToken = localStorage.getItem('app_room_token');
+  if(savedToken){
+    _roomToken = savedToken;
+    lockHide();
+    appInit(); // 直接進入 app
+  } else {
+    // 沒有 token，顯示密碼鎖畫面
+    // 先 render 讓 DOM 就緒，再顯示鎖
+    appInit();
+    lockShow();
+  }
 })();
 </script>
 </body>
