@@ -1,2 +1,2 @@
-# task-manager_firebase
-家務管理app (同步版)
+# task-manager
+家事與任務管理應用程式

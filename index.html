@@ -1,0 +1,2915 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="apple-touch-icon" href="kanahei.png">
+  <link rel="icon" type="image/png" href="kanahei.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="家務管理App">
+  <meta name="theme-color" content="#5b52e8">
+  <title>家事與任務管理 App</title>
+  <!-- Firebase SDK (compat version, no bundler needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <style>
+    /* Tailwind utilities used in this app */
+    .flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}
+    .hidden{display:none}.block{display:block}
+    .flex-1{flex:1 1 0%}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}
+    .flex-shrink-0{flex-shrink:0}
+    .items-center{align-items:center}.items-start{align-items:flex-start}
+    .justify-center{justify-content:center}.justify-between{justify-content:space-between}
+    .gap-0{gap:0}.gap-0\.5{gap:0.125rem}.gap-1{gap:0.25rem}.gap-2{gap:0.5rem}
+    .gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}
+    .w-full{width:100%}.h-full{height:100%}
+    .min-w-0{min-width:0}.max-w-2xl{max-width:42rem}
+    .overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}
+    .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .whitespace-nowrap{white-space:nowrap}
+    .px-4{padding-left:1rem;padding-right:1rem}
+    .py-1{padding-top:0.25rem;padding-bottom:0.25rem}
+    .py-2{padding-top:0.5rem;padding-bottom:0.5rem}
+    .py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}
+    .py-3{padding-top:0.75rem;padding-bottom:0.75rem}
+    .py-6{padding-top:1.5rem;padding-bottom:1.5rem}
+    .p-4{padding:1rem}
+    .mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}
+    .mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}
+    .mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}
+    .mt-10{margin-top:2.5rem}.mx-auto{margin-left:auto;margin-right:auto}
+    .text-xs{font-size:0.75rem;line-height:1rem}
+    .text-sm{font-size:0.875rem;line-height:1.25rem}
+    .text-lg{font-size:1.125rem;line-height:1.75rem}
+    .text-white{color:#fff}
+    .font-bold{font-weight:700}.font-semibold{font-weight:600}
+    .text-gray-400{color:#9ca3af}.text-gray-500{color:#6b7280}
+    .text-gray-600{color:#4b5563}.text-gray-700{color:#374151}
+    .text-gray-800{color:#1f2937}
+    .line-through{text-decoration:line-through}
+    .rounded-2xl{border-radius:1rem}.rounded-xl{border-radius:0.75rem}
+    .shadow{box-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
+    .transition-transform{transition:transform .15s}
+    .active\:scale-95:active{transform:scale(.95)}
+    .border{border-width:1px}.border-none{border:none}
+    .border-bottom{border-bottom-width:1px}
+    .relative{position:relative}.absolute{position:absolute}.fixed{position:fixed}
+    .inset-0{inset:0}.top-0{top:0}.bottom-0{bottom:0}.left-0{left:0}.right-0{right:0}
+    .z-\[100\]{z-index:100}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#5b52e8;--primary-light:#ede9fe;--primary-dark:#4338ca;
+      --accent:#7c3aed;
+      --success:#10b981;--warning:#d97706;--danger:#dc2626;--danger-light:#fee2e2;
+      --surface:#fff;--bg:#f4f6fb;
+      --border:#e8edf5;--border-light:#f1f5f9;
+      --text-primary:#1e293b;--text-secondary:#475569;--text-muted:#94a3b8;
+      --shadow-sm:0 1px 4px rgba(0,0,0,.07);--shadow-lg:0 8px 32px rgba(0,0,0,.14);
+      --radius-sm:8px;--radius-md:14px;
+    }
+    *{font-family:'Noto Sans TC',sans-serif;-webkit-tap-highlight-color:transparent;box-sizing:border-box}
+    body{background:var(--bg);padding-bottom:84px;min-height:100vh;margin:0}
+    .page{display:none}.page.active{display:block}
+
+    /* ── NAV ── */
+    .nav-item{transition:all .2s;background:none;border:none;cursor:pointer;position:relative}
+    .nav-item.active .nav-icon{color:var(--primary)}
+    .nav-item.active .nav-label{color:var(--primary);font-weight:700}
+    .nav-item.active::after{content:'';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--primary);border-radius:50%}
+    .nav-item .nav-icon{color:#b0bbc8}.nav-item .nav-label{color:#b0bbc8}
+
+    /* ══ LOCATION FLOORPLAN ══ */
+    .loc-tab-bar{display:flex;gap:4px;overflow-x:auto;padding:10px 14px 0;max-width:640px;margin:0 auto}
+    .loc-tab-bar::-webkit-scrollbar{display:none}
+    .loc-tab{padding:6px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;display:flex;align-items:center;gap:4px}
+    .loc-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .loc-content{max-width:640px;margin:0 auto;padding:10px 16px}
+    .fp-wrap{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px}
+    .fp-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-light)}
+    .fp-room-sel{padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--text-primary);background:var(--surface);cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+    .fp-svg-area{width:100%;overflow-x:auto;padding:8px}
+    .fp-svg-area svg{display:block;margin:0 auto}
+    .fp-item-list{padding:8px 14px}
+    .fp-item-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border-light)}
+    .fp-item-row:last-child{border-bottom:none}
+    .fp-item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .fp-item-name{font-size:13px;font-weight:600;color:var(--text-primary);flex:1}
+    .fp-item-cnt{font-size:11px;color:var(--text-muted)}
+    .subloc-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:var(--primary-light);color:var(--primary);cursor:pointer;border:none;font-family:'Noto Sans TC',sans-serif;transition:background .15s}
+    .subloc-tag:hover{background:#ddd6fe}
+    .lmgr-tab-bar{display:flex;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px;margin-bottom:14px}
+    .lmgr-tab{flex:1;padding:7px 4px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--text-muted);border-radius:6px;transition:all .15s;font-family:'Noto Sans TC',sans-serif;text-align:center}
+    .lmgr-tab.on{background:var(--surface);color:var(--text-primary);box-shadow:0 0 0 1px var(--border)}
+    .lmgr-room-card{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .1s}
+    .lmgr-room-card:active{background:var(--bg)}
+    .lmgr-room-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .lmgr-subloc-row{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--border-light)}
+    .lmgr-subloc-row:last-child{border-bottom:none}
+    .lmgr-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .coord-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:6px}
+    .coord-inp{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text-primary)}
+    /* ── MODALS ── */
+    input[type="date"]{-webkit-appearance:none;appearance:auto}
+    /* 改為 align-items:center 讓視窗垂直置中，並加上 padding 避免貼齊邊緣 */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2100;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+    .modal-overlay.open{display:flex}
+    /* 將 border-radius 改為四周都是 24px，並縮減 max-height 確保高度不會被截斷 */
+    .modal-sheet{width:100%;max-width:480px;border-radius:24px;box-shadow:var(--shadow-lg);background:var(--surface);padding:24px 20px;max-height:80vh;overflow-y:auto}
+    /* 因為變成置中視窗了，不需要頂部的下拉把手，直接隱藏 */
+    .modal-handle{display:none}
+
+    /* ── CARDS / BADGES ── */
+    .card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border-light)}
+    .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+    .badge-urgent{background:#fee2e2;color:#dc2626}.badge-normal{background:#dbeafe;color:#2563eb}.badge-low{background:#d1fae5;color:#059669}
+    .section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .section-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .empty-state{text-align:center;padding:32px 16px;color:var(--text-muted)}
+    .empty-state .material-symbols-outlined{font-size:44px;display:block;margin-bottom:8px;opacity:.5}
+
+    /* ── FORMS ── */
+    select,input[type="text"],input[type="number"],input[type="date"],textarea{
+      width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary);transition:border-color .2s,box-shadow .2s}
+    select:focus,input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,82,232,.12)}
+    label{display:block;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
+    .form-group{margin-bottom:16px}
+    .btn-primary{background:var(--primary);color:#fff;padding:13px 24px;border-radius:var(--radius-sm);font-weight:700;border:none;cursor:pointer;font-size:15px;transition:background .15s,transform .1s}
+    .btn-primary:active{transform:scale(.97);background:var(--primary-dark)}
+    .btn-secondary{background:var(--border-light);color:var(--text-secondary);padding:13px 24px;border-radius:var(--radius-sm);font-weight:600;border:none;cursor:pointer;font-size:15px}
+    .btn-secondary:active{background:#e2e8f0}
+
+    /* ── ANIMATION ── */
+    .animate-in{animation:fadeIn .25s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .safe-bottom{padding-bottom:env(safe-area-inset-bottom,0px)}
+
+    /* ── POPUP MENU ── */
+    .popup-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);border:1px solid var(--border);z-index:500;min-width:150px;overflow:hidden;display:none}
+    .popup-menu.show{display:block}
+    .popup-menu.flip-up{top:auto;bottom:calc(100% + 4px)}
+    .popup-menu button{display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border:none;background:none;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-primary);text-align:left}
+    .popup-menu button:hover{background:var(--bg)}
+    .popup-menu button.danger{color:var(--danger)}
+
+    /* ── TO DO ── */
+    .filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .filter-row+.filter-row{margin-top:8px}
+    .filter-chip{padding:5px 12px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--border);background:var(--surface);color:#64748b;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .filter-chip:hover:not(.active){background:var(--border-light)}
+    .hw-row{display:grid;grid-template-columns:34px 1fr 90px auto;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--border-light)}
+    .hw-row:last-child{border-bottom:none}
+    .hw-row.task-row{grid-template-columns:34px 1fr 90px}
+    .hw-row .hw-date-col{text-align:right;justify-self:end}
+    .hw-row .hw-area-col{justify-self:end}
+    .date-tag{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--border-light);color:#64748b;white-space:nowrap;min-width:78px;justify-content:center;transition:background .15s}
+    .date-tag:hover{background:#e2e8f0}.date-tag.overdue{background:#fee2e2;color:#dc2626}.date-tag.today-tag{background:var(--primary-light);color:var(--primary)}
+
+    /* ── SETTINGS CARD ── */
+    .settings-card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border-light);padding:20px;margin-bottom:14px}
+    .settings-card h3{font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .settings-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-light)}
+    .settings-item:last-child{border-bottom:none}
+    .settings-item label{margin-bottom:0;font-size:14px;font-weight:500;color:var(--text-secondary);letter-spacing:0;text-transform:none}
+    .settings-item .desc{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .toggle{position:relative;width:50px;height:28px;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
+    .toggle.on{background:var(--primary)}
+    .toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+    .toggle.on::after{transform:translateX(22px)}
+
+    /* ── DELAY MODAL ── */
+    .delay-custom-section{display:none;margin-top:12px;padding:14px;background:var(--bg);border-radius:var(--radius-sm);border:1.5px solid var(--border)}
+    .delay-custom-section.show{display:block}
+    .delay-day-btn{border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .15s;padding:10px 0}
+    .delay-day-btn:hover{border-color:var(--primary);background:var(--primary-light)}
+    .delay-day-btn:active{transform:scale(.96)}
+
+    /* ── HOUSEWORK ── */
+    .badge-weekend{background:#fef3c7;color:#b45309;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+    .last-done-info{font-size:11px;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;gap:3px}
+    .hw-compact-row{display:grid;grid-template-columns:28px 1fr auto auto;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border-light);transition:background .1s;position:relative}
+    .hw-compact-row:last-child{border-bottom:none}
+    .hw-compact-row:active{background:var(--bg)}
+    .hw-cb{width:22px;height:22px;border-radius:6px;border:2px solid #d1d5db;background:var(--surface);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .hw-cb.checked{background:var(--primary);border-color:var(--primary)}
+    .hw-cb.checked::after{content:'';width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg) translateY(-1px);display:block}
+    .float-batch-bar{position:fixed;bottom:90px;left:0;right:0;z-index:200;display:flex;justify-content:center;pointer-events:auto}
+    .float-batch-bar.show{pointer-events:all}
+    .float-batch-inner{background:#1e293b;border-radius:18px;padding:10px 6px 10px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 8px 32px rgba(0,0,0,.32);transform:translateY(24px);opacity:0;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .22s ease;max-width:calc(100vw - 24px);overflow-x:auto}
+    .float-batch-bar.show .float-batch-inner{transform:translateY(0);opacity:1}
+    .float-batch-count{color:#94a3b8;font-size:12px;font-weight:700;white-space:nowrap;padding-right:4px;border-right:1px solid rgba(255,255,255,.15);margin-right:2px}
+    .fba{background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .13s;white-space:nowrap;flex-shrink:0}
+    .fba:active{transform:scale(.95)}
+    .fba-weekend{background:rgba(251,191,36,.18);color:#fde68a}
+    .fba-custom{background:rgba(99,102,241,.25);color:#c7d2fe}
+    .fba-close{background:none;color:#64748b}
+    .area-tab-bar{display:flex;gap:0;overflow-x:auto;margin-bottom:14px;background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);padding:4px}
+    .area-tab-bar::-webkit-scrollbar{display:none}
+    .area-tab{padding:7px 14px;border-radius:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--text-muted);white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px}
+    .area-tab.active{background:var(--primary);color:#fff}
+    .area-tab .cnt{background:rgba(0,0,0,.08);border-radius:99px;padding:1px 6px;font-size:10px}
+    .area-tab.active .cnt{background:rgba(255,255,255,.25)}
+    .overdue-notice{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#fff5f5;border:1px solid #fecaca;border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;font-weight:600;color:#dc2626}
+    .weekend-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--bg);border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-bottom:16px}
+    .weekend-row.active{background:#fffbeb;border-color:#fbbf24}
+
+    /* ── TASKS / WEEK CALENDAR ── */
+    .week-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .week-cal-nav-btn{background:var(--border-light);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0}
+    .week-cal-nav-btn:active{transform:scale(.93)}
+    .week-range-label{font-size:13px;font-weight:700;color:var(--text-primary)}
+    .week-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+    .day-col-header{text-align:center;padding:4px 0}
+    .day-col-header .dow{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.04em}
+    .day-col-header .dom{font-size:15px;font-weight:800;color:var(--text-secondary);line-height:1.2;margin-top:1px}
+    .day-col-header.is-today .dom{background:var(--primary);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;margin:1px auto 0}
+    .day-col-header.is-today .dow{color:var(--primary)}
+    .day-col-header.is-past .dom{color:#cbd5e1}
+    .day-col-header.is-past .dow{color:#e2e8f0}
+    .day-tasks-col{min-height:60px;padding:0 2px}
+    .day-task-pill{background:var(--primary-light);border-left:3px solid var(--primary);border-radius:0 6px 6px 0;padding:4px 6px;margin-bottom:4px;cursor:pointer;transition:background .15s}
+    .day-task-pill.done-pill{background:#f1f5f9;border-left-color:#cbd5e1;opacity:.6}
+    .day-task-pill p{font-size:11px;font-weight:600;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+    .day-task-pill.done-pill p{color:var(--text-muted);text-decoration:line-through}
+    .day-task-pill.overdue-pill{background:#fee2e2;border-left-color:#dc2626}
+    .day-task-pill.overdue-pill p{color:#dc2626}
+    .day-add-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:4px 0;border:1.5px dashed var(--border);border-radius:6px;background:none;cursor:pointer;color:var(--text-muted);font-size:11px;gap:2px;transition:border-color .15s,color .15s;margin-top:2px}
+    .day-add-btn:hover{border-color:var(--primary);color:var(--primary)}
+    .day-assign-dropdown{position:relative}
+    .day-assign-menu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);z-index:300;max-height:220px;overflow-y:auto;min-width:180px}
+    .day-assign-menu button{display:block;width:100%;text-align:left;padding:10px 14px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text-primary);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .day-assign-menu button:hover{background:var(--bg)}
+    .day-assign-menu .empty-opt{padding:10px 14px;font-size:12px;color:var(--text-muted)}
+    .week-overdue-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#fff5f5;border:1px solid #fecaca;border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;color:#dc2626;font-weight:600}
+    .task-db-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border-light)}
+    .task-db-row:last-child{border-bottom:none}
+    .freq-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:#ede9fe;color:#7c3aed;white-space:nowrap}
+
+    /* ── LEFT DRAWER ── */
+    .drawer-scrim{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(1px)}
+    .drawer-scrim.open{opacity:1;pointer-events:all}
+    .drawer{position:fixed;top:0;left:0;bottom:0;width:min(300px,85vw);background:var(--surface);z-index:900;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg);overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,0px)}
+    .drawer.open{transform:translateX(0)}
+    .drawer-header{background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:20px 18px 18px;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+    .drawer-header h2{color:#fff;font-size:18px;font-weight:700}
+    .drawer-header p{color:rgba(255,255,255,.65);font-size:12px;margin-top:2px}
+    .drawer-section{padding:14px 18px 6px;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
+    .drawer-item{display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left}
+    .drawer-item:hover{background:var(--bg)}
+    .drawer-item .di-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .drawer-item .di-label{font-size:14px;font-weight:600;color:var(--text-primary)}
+    .drawer-item .di-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+    .drawer-divider{height:1px;background:var(--border-light);margin:4px 0}
+
+    /* ── INVENTORY PAGE ── */
+    .inv-tab-bar{display:flex;gap:4px;overflow-x:auto;padding:10px 14px 0;max-width:640px;margin:0 auto}
+    .inv-tab-bar::-webkit-scrollbar{display:none}
+    .inv-tab{padding:6px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;display:flex;align-items:center;gap:4px}
+    .inv-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .inv-tab .tcnt{background:rgba(0,0,0,.07);border-radius:999px;padding:1px 6px;font-size:10px;margin-left:2px}
+    .inv-tab.active .tcnt{background:rgba(255,255,255,.22)}
+    /* alert strip */
+    .inv-alert-strip{max-width:640px;margin:8px auto 0;padding:0 16px;display:none}
+    .inv-alert-strip.show{display:flex;flex-direction:column;gap:5px}
+    .inv-alert-line{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+    .inv-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    /* collapsible filter panel */
+    .inv-filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-top:8px}
+    .inv-filter-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;border:none;background:none;width:100%;font-family:'Noto Sans TC',sans-serif;gap:8px}
+    .inv-filter-toggle-left{display:flex;align-items:center;gap:7px;min-width:0}
+    .inv-filter-summary{font-size:11px;color:var(--primary);font-weight:600;flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .inv-filter-arrow{font-size:20px;color:var(--text-muted);transition:transform .2s;flex-shrink:0}
+    .inv-filter-arrow.open{transform:rotate(180deg)}
+    .inv-filter-body{display:none;padding:0 14px 10px;border-top:1px solid var(--border-light)}
+    .inv-filter-body.open{display:block}
+    .inv-filter-row{display:flex;align-items:center;gap:5px;overflow-x:auto;padding:6px 0 2px}
+    .inv-filter-row::-webkit-scrollbar{display:none}
+    .inv-filter-row-label{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;flex-shrink:0;min-width:28px}
+    .inv-chip{flex-shrink:0;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif}
+    .inv-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .inv-filter-clear{font-size:11px;color:var(--text-muted);cursor:pointer;border:none;background:none;padding:3px 6px;font-family:'Noto Sans TC',sans-serif;margin-top:4px}
+    .inv-filter-clear:hover{color:var(--danger)}
+    /* content */
+    .inv-content{max-width:640px;margin:0 auto;padding:10px 16px}
+    .inv-sec-head{display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px}
+    .inv-sec-title{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+    .inv-sec-title.red{color:#dc2626}.inv-sec-title.orange{color:#c2410c}
+    .inv-list{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:10px}
+    .inv-item-wrap{position:relative}
+    .inv-row{display:flex;align-items:center;gap:8px;padding:11px 10px 11px 13px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .1s;border-left:3px solid transparent}
+    .inv-row:last-child{border-bottom:none}
+    .inv-row:active{background:var(--bg)}
+    .inv-row.row-danger{border-left-color:#dc2626}
+    .inv-row.row-warn{border-left-color:#f59e0b}
+    .inv-dot-item{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0}
+    .inv-info{flex:1;min-width:0}
+    .inv-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .inv-sub{display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap}
+    .inv-loc-label{font-size:11px;color:var(--text-secondary)}
+    .inv-right{display:flex;align-items:center;gap:5px;flex-shrink:0}
+    /* right controls */
+    .qty-stepper{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;width:108px}
+    .qty-btn{width:27px;height:28px;border:none;background:var(--bg);cursor:pointer;font-size:14px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;transition:background .1s;font-family:'Noto Sans TC',sans-serif;flex-shrink:0}
+    .qty-btn:active{background:var(--border)}
+    .qty-inp{flex:1;min-width:0;text-align:center;font-size:12px;font-weight:700;color:var(--text-primary);border-left:1px solid var(--border);border-right:1px solid var(--border);height:28px;background:var(--bg);outline:none;padding:0;font-family:'Noto Sans TC',sans-serif;-moz-appearance:textfield}
+    .qty-inp::-webkit-outer-spin-button,.qty-inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    .qty-inp.low{color:#dc2626}.qty-inp.warn{color:#c2410c}
+    .ratio-ctl{display:flex;align-items:center;gap:5px;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);flex-shrink:0;width:108px;justify-content:flex-end}
+    .ratio-track{flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden}
+    .ratio-fill{height:100%;border-radius:99px}
+    .ratio-pct{font-size:11px;font-weight:700}
+    .expiry-chip-row{display:flex;align-items:center;gap:3px;height:28px;padding:0 9px;border-radius:var(--radius-sm);font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+    .expiry-chip-row.red{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+    .expiry-chip-row.amber{background:#fffbeb;border-color:#fde68a;color:#d97706}
+    /* detail */
+    .inv-detail{display:none;padding:8px 13px 10px 21px;background:#fafaf8;border-bottom:1px solid var(--border-light);border-left:3px solid transparent}
+    .inv-detail.open{display:block}
+    .inv-detail.row-danger{border-left-color:#dc2626}.inv-detail.row-warn{border-left-color:#f59e0b}
+    .drow{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-light)}
+    .drow:last-child{border-bottom:none}
+    .dlabel{font-size:11px;color:var(--text-muted)}
+    .dvalue{font-size:11px;font-weight:600;color:var(--text-primary)}
+    .inv-bar{height:4px;background:var(--border-light);border-radius:99px;overflow:hidden;margin-top:6px}
+    .inv-bar-fill{height:100%;border-radius:99px;transition:width .3s}
+    .inv-warn-box{display:flex;align-items:center;gap:6px;margin-top:8px;padding:7px 9px;background:#fef2f2;border-radius:6px;border:1px solid #fecaca}
+    .inv-warn-box span{font-size:11px;font-weight:600;color:#dc2626}
+    /* location-index tab */
+    .inv-loc-group-head{display:flex;align-items:center;gap:8px;padding:10px 0 4px}
+    /* modal */
+    .itype-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+    .itype-opt{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s}
+    .itype-opt.sel{border-color:var(--primary);background:var(--primary-light)}
+    .itype-icon{width:28px;height:28px;border-radius:8px;background:var(--border-light);display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+    .itype-opt.sel .itype-icon{background:rgba(91,82,232,.15)}
+    .itype-lbl{font-size:11px;font-weight:700;color:var(--text-secondary)}
+    .itype-opt.sel .itype-lbl{color:var(--primary)}
+    .icond{display:none}.icond.show{display:block}
+    .inv-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--border-light)}
+    .inv-toggle-label p{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px}
+    .inv-toggle-label small{font-size:11px;color:var(--text-muted)}
+    .inv-sub-panel{display:none;margin-top:10px;padding:12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border-light)}
+    .inv-sub-panel.show{display:block}
+    .mode-seg{display:flex;background:var(--border-light);border-radius:var(--radius-sm);padding:2px;gap:2px;margin-bottom:12px}
+    .mode-seg-btn{flex:1;padding:7px 4px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--text-muted);border-radius:6px;transition:all .15s;font-family:'Noto Sans TC',sans-serif;text-align:center}
+    .mode-seg-btn.on{background:var(--surface);color:var(--text-primary);box-shadow:0 0 0 1px var(--border)}
+    .import-zone{border:1.5px dashed var(--border);border-radius:var(--radius-md);padding:22px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:14px;background:var(--bg)}
+    .import-zone:hover{border-color:var(--primary)}
+    .import-zone input{display:none}
+    .import-result{padding:12px;background:var(--bg);border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px;display:none}
+    .import-result.show{display:block}
+
+    /* ══ TO DO WEEKLY (page-todo) ══ */
+    .tw-pg{max-width:600px;margin:0 auto;padding:12px 14px 0}
+    .tw-wnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .tw-wnbtn{background:var(--surface);border:1px solid var(--border);width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm)}
+    .tw-wnbtn:active{transform:scale(.93)}
+    .tw-wnc{text-align:center}
+    .tw-wnl{font-size:14px;font-weight:700;color:var(--text-primary)}
+    .tw-wns{font-size:11px;color:var(--text-muted);margin-top:2px}
+    /* Progress card */
+    .tw-prog{background:#fffef9;border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+    .tw-prog-ring{width:44px;height:44px;flex-shrink:0;position:relative}
+    .tw-prog-ring svg{transform:rotate(-90deg)}
+    .tw-prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--primary)}
+    .tw-prog-info{flex:1;min-width:0}
+    .tw-prog-t{font-size:13px;font-weight:700;color:var(--text-primary)}
+    .tw-prog-s{font-size:11px;color:var(--text-muted);margin-top:1px}
+    .tw-prog-chips{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+    .tw-chip{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+    /* Day cards */
+    .tw-wlist{display:flex;flex-direction:column;gap:6px}
+    .tw-dc{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:visible;transition:box-shadow .15s,border-color .15s}
+    .tw-dc.tw-today{border-color:var(--primary);box-shadow:0 0 0 1.5px var(--primary),var(--shadow-sm)}
+    .tw-dc.tw-past{opacity:.72}
+    .tw-dc.tw-has-ov{border-left:3px solid var(--danger)}
+    .tw-dc.tw-drag-over{background:#f0effe;border-color:var(--primary);box-shadow:0 0 0 2px var(--primary)!important}
+    /* Day header */
+    .tw-dhdr{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;user-select:none;transition:background .1s;border-radius:var(--radius-md)}
+    .tw-dhdr:active{background:var(--bg)}
+    .tw-ddate{flex-shrink:0;width:42px;text-align:center}
+    .tw-ddate .tw-dow{font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase}
+    .tw-ddate .tw-dom{font-size:22px;font-weight:800;color:var(--text-secondary);line-height:1.05;margin-top:1px}
+    .tw-dc.tw-today .tw-dow{color:var(--primary)}
+    .tw-dc.tw-today .tw-dom{color:var(--primary)}
+    .tw-dc.tw-past .tw-dom{color:#cbd5e1}
+    .tw-dc.tw-past .tw-dow{color:#d1d5db}
+    /* Pills */
+    .tw-pstrip{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+    .tw-mp{display:inline-flex;align-items:center;gap:3px;padding:3px 8px 3px 5px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;border-left:2.5px solid transparent;line-height:1.3;cursor:grab;transition:opacity .15s,transform .15s;user-select:none;touch-action:none}
+    .tw-mp.tw-task-p{background:var(--primary-light);color:var(--primary);border-left-color:var(--primary)}
+    .tw-mp.tw-hw-p{background:#fffbeb;color:#d97706;border-left-color:#d97706}
+    .tw-mp.tw-done-p{background:#f1f5f9;color:var(--text-muted);border-left-color:#d1d5db;text-decoration:line-through;opacity:.55;cursor:default;touch-action:auto}
+    .tw-mp.tw-ov-p{background:var(--danger-light);color:var(--danger);border-left-color:var(--danger)}
+    .tw-mp.tw-dragging{opacity:.35;transform:scale(.95)}
+    .tw-morep{padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:var(--border-light);color:var(--text-muted)}
+    .tw-emptyp{font-size:11px;color:var(--text-muted);font-style:italic}
+    /* Day right */
+    .tw-dright{display:flex;align-items:center;gap:4px;flex-shrink:0}
+    .tw-dawrap{position:relative}
+    .tw-dabtn{width:28px;height:28px;border-radius:7px;border:1.5px dashed var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all .15s}
+    .tw-dabtn:hover,.tw-dabtn.open{border-color:var(--primary);color:var(--primary);background:var(--primary-light);border-style:solid}
+    .tw-dchev{color:#b0bbc8;font-size:20px;transition:transform .22s;display:flex;align-items:center}
+    .tw-dchev.open{transform:rotate(180deg)}
+    /* Detail */
+    .tw-ddet{display:none;border-top:1px solid var(--border-light);background:#fafafa;border-radius:0 0 var(--radius-md) var(--radius-md);overflow:hidden}
+    .tw-ddet.open{display:block}
+    .tw-det-empty{padding:14px 13px;text-align:center;font-size:12px;color:var(--text-muted)}
+    /* Item row */
+    .tw-irow{display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border-light)}
+    .tw-irow:last-child{border-bottom:none}
+    .tw-icb{width:22px;height:22px;border-radius:6px;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+    .tw-icb.tw-done{background:var(--primary);border-color:var(--primary)}
+    .tw-icb.tw-done::after{content:'';width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg) translateY(-1px);display:block}
+    .tw-icb.tw-hw-done{background:#d97706;border-color:#d97706}
+    .tw-iinfo{flex:1;min-width:0}
+    .tw-iname{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tw-iname.tw-done-t{text-decoration:line-through;color:var(--text-muted)}
+    .tw-imeta{display:flex;align-items:center;gap:5px;margin-top:2px}
+    .tw-idot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .tw-ilbl{font-size:10px;font-weight:600;color:var(--text-muted)}
+    .tw-ovbadge{font-size:10px;font-weight:700;color:var(--danger);background:var(--danger-light);padding:1px 6px;border-radius:4px}
+    .tw-ibtns{display:flex;align-items:center;gap:2px;flex-shrink:0}
+    .tw-ib{width:28px;height:28px;border-radius:7px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s}
+    .tw-ib:hover{background:var(--border-light)}
+    .tw-ib.tw-dly{color:#d97706}
+    .tw-ib.tw-del{color:#d1d5db}
+    .tw-ib.tw-del:hover{background:var(--danger-light);color:var(--danger)}
+    /* Add dropdown */
+    .tw-adrop{position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:400;min-width:180px;max-height:290px;overflow-y:auto}
+    .tw-adrop.flip{top:auto;bottom:calc(100% + 4px)}
+    .tw-dgh{padding:6px 13px 2px;font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;background:var(--surface);position:sticky;top:0}
+    .tw-adrop button{display:flex;align-items:center;gap:6px;width:100%;padding:9px 13px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text-primary);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .1s}
+    .tw-adrop button:hover{background:var(--bg)}
+    .tw-adrop button.tw-hwo{color:#d97706}
+    .tw-adrop button.tw-alr{opacity:.4;pointer-events:none}
+    .tw-adrop .tw-anote{font-size:10px;color:var(--text-muted);margin-left:auto}
+    /* Drag ghost */
+    .tw-drag-ghost{position:fixed;pointer-events:none;z-index:9999;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;box-shadow:0 8px 28px rgba(0,0,0,.22);transform:translate(-50%,-50%) rotate(3deg);white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+    .tw-drag-ghost.tw-task-g{background:var(--primary);color:#fff}
+    .tw-drag-ghost.tw-hw-g{background:#d97706;color:#fff}
+    /* Drag hint */
+    .tw-drag-hint{display:flex;align-items:center;gap:6px;padding:8px 13px;background:var(--primary-light);border-radius:var(--radius-sm);margin-bottom:10px;font-size:11px;color:var(--primary);font-weight:600}
+    /* Delay sheet */
+    .tw-scrim{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:700;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(1px)}
+    .tw-scrim.show{opacity:1;pointer-events:all}
+    .tw-dlysh{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:22px 22px 0 0;padding:20px 16px calc(84px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 40px rgba(0,0,0,.16);z-index:800;transform:translateY(100%);transition:transform .26s cubic-bezier(.4,0,.2,1)}
+    .tw-dlysh.show{transform:translateY(0)}
+    .tw-dlyh{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+    .tw-dlygrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+    .tw-dlyopt{padding:12px 0;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .15s;font-family:'Noto Sans TC',sans-serif}
+    .tw-dlyopt:hover{border-color:var(--primary);background:var(--primary-light)}
+    .tw-dlyopt:active{transform:scale(.96)}
+    .tw-dlyopt .tw-dn{font-size:20px;font-weight:800;color:var(--primary)}
+    .tw-dlyopt .tw-du{font-size:10px;color:var(--text-muted);font-weight:600;margin-top:2px}
+    .tw-dlycancel{margin-top:12px;width:100%;padding:12px;border-radius:var(--radius-sm);border:none;background:var(--border-light);font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--text-secondary)}
+  </style>
+</head>
+<body>
+
+<!-- ── LEFT DRAWER ── -->
+<div class="drawer-scrim" id="drawer-scrim" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2>設定</h2>
+    <p>個人資料與頁面設定</p>
+  </div>
+  <div>
+    <div class="drawer-section">個人資料</div>
+    <div style="padding:0 18px 14px">
+      <div class="form-group"><label>暱稱</label><input type="text" id="set-name" placeholder="輸入暱稱" onchange="saveSetting('userName',this.value)"></div>
+      <div class="form-group"><label>Email</label><input type="text" id="set-email" placeholder="輸入 Email" onchange="saveSetting('userEmail',this.value)"></div>
+    </div>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section">資料匯出入</div>
+    <button class="drawer-item" onclick="exportData()">
+      <div class="di-icon" style="background:#d1fae5"><span class="material-symbols-outlined" style="font-size:18px;color:#059669">upload</span></div>
+      <div><div class="di-label">匯出資料</div><div class="di-sub">下載 JSON 備份</div></div>
+    </button>
+    <button class="drawer-item" onclick="document.getElementById('importFile').click()">
+      <div class="di-icon" style="background:#dbeafe"><span class="material-symbols-outlined" style="font-size:18px;color:#2563eb">download</span></div>
+      <div><div class="di-label">匯入資料</div><div class="di-sub">從 JSON 備份還原</div></div>
+    </button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="drawer-item" onclick="copyShareLink()">
+      <div class="di-icon" style="background:#f5f3ff"><span class="material-symbols-outlined" style="font-size:18px;color:#5b52e8">link</span></div>
+      <div><div class="di-label">複製分享連結</div><div class="di-sub">含所有資料</div></div>
+    </button>
+
+    <div style="height:1px; background:var(--border-light); margin:4px 18px 12px;"></div>
+    <div style="padding:0 18px;">
+      <button onclick="invDownloadTemplate()" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text-primary);width:100%;transition:all 0.15s;">
+        <span class="material-symbols-outlined" style="font-size:18px">description</span> 下載庫存 CSV 範本
+      </button>
+    </div>
+    
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header style="background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:18px 16px 14px;padding-top:calc(18px + env(safe-area-inset-top,0px));box-shadow:0 2px 16px rgba(91,82,232,.25)">
+  <div class="max-w-2xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button onclick="openDrawer()" style="background:rgba(255,255,255,.15);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+        <span class="material-symbols-outlined" style="font-size:22px;color:#fff">menu</span>
+      </button>
+      <div>
+        <h1 class="text-white font-bold" id="pageTitle" style="font-size:17px;letter-spacing:.01em">To Do List</h1>
+        <p style="color:rgba(255,255,255,.7);font-size:11px;margin-top:1px" id="pageSubtitle">管理您的每日任務</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <!-- Firebase 同步狀態指示器 -->
+      <div id="fb-status" title="雲端同步狀態" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 9px;cursor:default">
+        <span id="fb-status-dot" style="width:7px;height:7px;border-radius:50%;background:#fbbf24;flex-shrink:0;transition:background .3s"></span>
+        <span id="fb-status-txt" style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600">連線中</span>
+      </div>
+      <button id="global-import-btn" onclick="invOpenImport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;padding:8px 12px;align-items:center;gap:5px;cursor:pointer" title="匯入物品資料">
+        <span class="material-symbols-outlined" style="font-size:18px">upload_file</span>
+      </button>
+      <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;align-items:center;gap:5px;cursor:pointer">
+        <span class="material-symbols-outlined" style="font-size:17px">send_to_mobile</span>傳送至 iPhone
+      </button>
+      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:pointer">
+        <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ── PAGES ── -->
+<div id="page-todo" class="page active">
+  <div class="tw-pg">
+    <div class="tw-wnav">
+      <button class="tw-wnbtn" onclick="twShiftW(-1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_left</span></button>
+      <div class="tw-wnc">
+        <div class="tw-wnl" id="tw-wnl"></div>
+        <div class="tw-wns" id="tw-wns"></div>
+      </div>
+      <button class="tw-wnbtn" onclick="twShiftW(1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_right</span></button>
+    </div>
+    <div class="tw-prog" id="tw-prog"></div>
+    <div class="tw-wlist" id="tw-wlist"></div>
+  </div>
+</div>
+<!-- TW Delay sheet -->
+<div class="tw-scrim" id="tw-scrim" onclick="twCloseDelay()"></div>
+<div class="tw-dlysh" id="tw-dlysh">
+  <div class="tw-dlyh"></div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:34px;height:34px;background:#fef3c7;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span class="material-symbols-outlined" style="color:#d97706;font-size:19px">schedule</span>
+    </div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary)">延後項目</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="tw-dly-name"></div>
+    </div>
+  </div>
+  <div class="tw-dlygrid" style="grid-template-columns:repeat(5,1fr)">
+    <button class="tw-dlyopt" onclick="twApplyDelay(1)"><div class="tw-dn">1</div><div class="tw-du">天</div></button>
+    <button class="tw-dlyopt" onclick="twApplyDelay(2)"><div class="tw-dn">2</div><div class="tw-du">天</div></button>
+    <button class="tw-dlyopt" onclick="twApplyDelay(3)"><div class="tw-dn">3</div><div class="tw-du">天</div></button>
+    <button class="tw-dlyopt" onclick="twApplyDelay(7)"><div class="tw-dn">7</div><div class="tw-du">天</div></button>
+    <button class="tw-dlyopt" onclick="twToggleCustomDate()"><div class="tw-dn"><span class="material-symbols-outlined" style="font-size:20px;margin-top:2px">calendar_month</span></div><div class="tw-du">自選</div></button>
+  </div>
+  
+  <div class="delay-custom-section" id="twCustomDateSection">
+    <label style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">選擇日期</label>
+    <input type="date" id="twCustomDelayDate" style="width:100%; margin-bottom:10px;">
+    <button onclick="twApplyCustomDelay()" class="btn-primary w-full" style="font-size:14px;padding:11px">確認延後</button>
+  </div>
+
+  <button class="tw-dlycancel" onclick="twCloseDelay()">取消</button>
+</div>
+
+<div id="page-tasks" class="page max-w-2xl mx-auto px-4 py-6">
+  <section>
+    <div class="section-header">
+      <div class="section-icon" style="background:#f5f3ff"><span class="material-symbols-outlined" style="color:#5b52e8">table_rows</span></div>
+      <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">任務資料庫</h2><p class="text-gray-400 text-xs">所有任務總覽</p></div>
+      <button onclick="openTaskModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px">
+        <span class="material-symbols-outlined" style="font-size:16px">add</span>新增
+      </button>
+    </div>
+    <div class="card" style="overflow:hidden">
+      <div style="display:flex;border-bottom:1px solid var(--border-light)">
+        <button id="db-tab-recurring" onclick="switchDbTab('recurring')" style="flex:1;padding:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--primary);color:var(--primary)">定期任務</button>
+        <button id="db-tab-once" onclick="switchDbTab('once')" style="flex:1;padding:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted)">一次性任務</button>
+      </div>
+      <div id="task-db-recurring" class="px-4 py-1"></div>
+      <div id="task-db-once" class="px-4 py-1" style="display:none"></div>
+    </div>
+  </section>
+</div>
+
+<div id="page-housework" class="page max-w-2xl mx-auto px-4 py-6">
+  <div class="section-header mb-3">
+    <div class="section-icon" style="background:#fef3c7"><span class="material-symbols-outlined" style="color:#d97706">cleaning_services</span></div>
+    <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">家事管理</h2><p style="color:var(--text-muted);font-size:11px">勾選可批次延後</p></div>
+    <button onclick="openHouseworkModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0">
+      <span class="material-symbols-outlined" style="font-size:16px">add</span>新增家事
+    </button>
+  </div>
+  <div class="area-tab-bar" id="hw-area-tab-bar"></div>
+  <div id="hw-overdue-notice"></div>
+  <div class="card" style="overflow:hidden"><div id="housework-list"></div></div>
+</div>
+
+<div id="page-inventory" class="page">
+  <div class="inv-tab-bar">
+    <button class="inv-tab active" onclick="invSwitchTab('all',this)"><span class="material-symbols-outlined" style="font-size:13px">apps</span>全部<span class="tcnt" id="inv-cnt-all"></span></button>
+    <button class="inv-tab" onclick="invSwitchTab('expiry',this)"><span class="material-symbols-outlined" style="font-size:13px">event</span>有效期限<span class="tcnt" id="inv-cnt-expiry"></span></button>
+    <button class="inv-tab" onclick="invSwitchTab('restock',this)"><span class="material-symbols-outlined" style="font-size:13px">shopping_bag</span>補貨追蹤<span class="tcnt" id="inv-cnt-restock"></span></button>
+    <button class="inv-tab" id="inv-tab-location" onclick="invSwitchTab('location',this)"><span class="material-symbols-outlined" style="font-size:13px">place</span>位置<span class="tcnt" id="inv-cnt-loc"></span></button>
+    <button class="inv-tab" onclick="invSwitchTab('locmgr',this)"><span class="material-symbols-outlined" style="font-size:13px">settings</span>位置管理</button>
+  </div>
+  <!-- 位置子模式切換列（只在 location tab 時顯示） -->
+  <div id="inv-loc-mode-bar" style="display:none;padding:8px 14px 0;max-width:640px;margin:0 auto">
+    <div style="display:flex;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px">
+      <button id="locmode-btn-list" class="lmgr-tab on" onclick="invSwitchLocMode('list')">
+        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:-3px">list</span> 清單模式
+      </button>
+      <button id="locmode-btn-fp" class="lmgr-tab" onclick="invSwitchLocMode('fp')">
+        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:-3px">map</span> 平面圖模式
+      </button>
+    </div>
+  </div>
+  <div class="inv-alert-strip" id="inv-alert-strip" style="display:none"></div>
+  <div style="padding:0 14px;max-width:640px;margin:0 auto">
+  <!-- collapsible filter panel -->
+  <div class="inv-filter-panel" id="inv-filter-panel">
+    <button class="inv-filter-toggle" onclick="invToggleFilters()">
+      <div class="inv-filter-toggle-left">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted)">tune</span>
+        <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">篩選</span>
+        <span class="inv-filter-summary" id="inv-filter-summary"></span>
+      </div>
+      <span class="material-symbols-outlined inv-filter-arrow" id="inv-filter-arrow">expand_more</span>
+    </button>
+    <div class="inv-filter-body" id="inv-filter-body">
+      <div class="inv-filter-row" id="inv-filter-loc-row"><span class="inv-filter-row-label">位置</span></div>
+      <div class="inv-filter-row" id="inv-filter-cat-row"><span class="inv-filter-row-label">類別</span></div>
+      <div class="inv-filter-row" id="inv-filter-third-row"><span class="inv-filter-row-label">來源</span></div>
+      <button class="inv-filter-clear" id="inv-filter-clear-btn" onclick="invClearFilters()" style="display:none">✕ 清除篩選</button>
+    </div>
+  </div>
+  <!-- location-index: collapsible filter panel with search + chips -->
+  <div class="inv-filter-panel" id="inv-loc-filter-panel" style="display:none">
+    <button class="inv-filter-toggle" onclick="invToggleLocFilters()">
+      <div class="inv-filter-toggle-left">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted)">tune</span>
+        <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">搜尋 / 篩選</span>
+        <span class="inv-filter-summary" id="inv-loc-filter-summary"></span>
+      </div>
+      <span class="material-symbols-outlined inv-filter-arrow" id="inv-loc-filter-arrow">expand_more</span>
+    </button>
+    <div class="inv-filter-body" id="inv-loc-filter-body">
+      <div style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;margin-bottom:2px">
+        <span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted)">search</span>
+        <input type="text" id="inv-search-input" placeholder="搜尋物品名稱…" oninput="renderInventoryPage()" style="flex:1;border:none;outline:none;font-size:12px;color:var(--text-primary);background:none;font-family:'Noto Sans TC',sans-serif">
+      </div>
+      <div class="inv-filter-row" id="inv-loc-row"></div>
+      <div class="inv-filter-row" id="inv-cat-row" style="margin-top:2px"></div>
+    </div>
+  </div>
+  </div>
+  <div class="inv-content" id="inv-content"></div>
+</div>
+
+<!-- ── BATCH + FLOATING ── -->
+<div class="float-batch-bar" id="float-batch-bar">
+  <div class="float-batch-inner">
+    <span class="float-batch-count" id="batch-count-label">已選 0</span>
+    <button class="fba" onclick="batchDelay(1)">+1天</button>
+    <button class="fba" onclick="batchDelay(3)">+3天</button>
+    <button class="fba" onclick="batchDelay(7)">+7天</button>
+    <button class="fba fba-weekend" onclick="batchToWeekend()"><span class="material-symbols-outlined" style="font-size:14px">weekend</span>週末</button>
+    <button class="fba fba-custom" onclick="showBatchCustomDate()"><span class="material-symbols-outlined" style="font-size:14px">calendar_month</span>指定</button>
+    <button class="fba fba-close" onclick="clearSelection()"><span class="material-symbols-outlined" style="font-size:16px">close</span></button>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav class="safe-bottom" style="position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);border-top:1px solid #e8edf5;z-index:100;backdrop-filter:blur(12px)">
+
+<!-- ── GLOBAL TOAST ── -->
+<div id="app-toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e293b;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;z-index:3000;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
+  <span class="material-symbols-outlined" id="app-toast-icon" style="font-size:16px">check_circle</span>
+  <span id="app-toast-msg"></span>
+</div>
+
+<!-- ── CONFIRM MODAL ── -->
+<div id="app-confirm-overlay" style="display:none;position:fixed;inset:0;z-index:2500;pointer-events:none">
+  <div id="app-confirm-card" style="position:fixed;bottom:200%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 48px);max-width:340px;background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 12px 48px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);max-height:80vh;overflow-y:auto;pointer-events:all">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <div id="app-confirm-icon-wrap" style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fee2e2">
+        <span class="material-symbols-outlined" id="app-confirm-icon" style="font-size:20px;color:#dc2626">warning</span>
+      </div>
+      <h3 id="app-confirm-title" style="font-size:16px;font-weight:700;color:#1e293b"></h3>
+    </div>
+    <p id="app-confirm-msg" style="font-size:13px;color:#64748b;margin-bottom:20px;padding-left:52px"></p>
+    <div style="display:flex;gap:10px">
+      <button onclick="appConfirmCancel()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#f1f5f9;color:#475569;font-size:14px;font-weight:600;cursor:pointer">取消</button>
+      <button id="app-confirm-ok" onclick="appConfirmOk()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#dc2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">確定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── INPUT MODAL ── -->
+<div id="app-input-overlay" style="display:none;position:fixed;inset:0;z-index:2500;pointer-events:none">
+  <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 48px);max-width:340px;background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 12px 48px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);pointer-events:all">
+    <h3 id="app-input-title" style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:12px"></h3>
+    <input id="app-input-field" type="number" min="0" style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;color:#1e293b;margin-bottom:16px">
+    <div style="display:flex;gap:10px">
+      <button onclick="appInputCancel()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#f1f5f9;color:#475569;font-size:14px;font-weight:600;cursor:pointer">取消</button>
+      <button onclick="appInputOk()" style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer">確定</button>
+    </div>
+  </div>
+</div>
+  <div class="max-w-2xl mx-auto flex">
+    <button class="nav-item active flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('todo',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">checklist</span><span class="nav-label text-xs">To Do</span>
+    </button>
+    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('tasks',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">assignment</span><span class="nav-label text-xs">任務</span>
+    </button>
+    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('housework',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">cottage</span><span class="nav-label text-xs">家事</span>
+    </button>
+    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('inventory',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">inventory_2</span><span class="nav-label text-xs">物品</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── TASK MODAL ── -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-5">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="taskModalTitle">新增任務</h2>
+      <button onclick="closeModal('taskModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="taskEditId">
+    <div class="form-group"><label>任務名稱 *</label><input type="text" id="task-title" placeholder="輸入任務名稱"></div>
+    <div class="form-group"><label>描述</label><textarea id="task-desc" placeholder="選填" rows="2" style="resize:none"></textarea></div>
+    <div class="form-group"><label>計畫日期</label><input type="date" id="task-date"></div>
+    <div class="form-group"><label>緊急程度</label><select id="task-priority"><option value="緊急">🔴 緊急</option><option value="普通" selected>🔵 普通</option><option value="低">🟢 低</option></select></div>
+    <div class="form-group"><label>頻率</label><select id="task-freq-type" onchange="onTaskFreqTypeChange()"><option value="none">不重複</option><option value="days">每 N 天</option><option value="monthly">每月 X 號</option></select></div>
+    <div class="form-group" id="task-freq-val-group" style="display:none"><label id="task-freq-val-label">天數</label><input type="number" id="task-freq-val" min="1" max="365" placeholder="輸入數字"></div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('taskModal')">取消</button><button class="btn-primary flex-1" onclick="saveTask()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ── HOUSEWORK MODAL ── -->
+<div class="modal-overlay" id="houseworkModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-5">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="hwModalTitle">新增家事</h2>
+      <button onclick="closeModal('houseworkModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="hwEditId">
+    <div class="form-group"><label>家事名稱 *</label><input type="text" id="hw-name" placeholder="例：拖地板"></div>
+    <div class="form-group"><label>區域</label><select id="hw-area" onchange="onHwAreaChange()"><option value="所有空間">🏠 所有空間</option><option value="臥室">🛏 臥室</option><option value="浴室">🚿 浴室</option><option value="廚房">🍳 廚房</option><option value="__custom__">✏️ 自訂區域…</option></select></div>
+    <div class="form-group" id="hw-custom-area-group" style="display:none"><label>自訂區域名稱</label><input type="text" id="hw-custom-area" placeholder="輸入區域名稱"></div>
+    <div class="form-group"><label>頻率（天數）</label><input type="number" id="hw-frequency" placeholder="例：7" min="1" max="365"></div>
+    <div class="form-group"><label>上次完成日期</label><input type="date" id="hw-last-date" onchange="autoCalcReminder()"></div>
+    <div class="form-group"><label style="display:flex;align-items:center;gap:6px">提醒日期<span style="font-size:11px;color:#5b52e8;font-weight:400">(自動計算，可手動改)</span></label><input type="date" id="hw-reminder"></div>
+    <div class="form-group"><label>備註</label><textarea id="hw-notes" placeholder="選填" rows="2" style="resize:none"></textarea></div>
+    <div class="weekend-row" id="hw-weekend-row">
+      <div><p style="font-size:14px;font-weight:600;color:var(--text-primary)">週末執行模式</p><p style="font-size:11px;color:var(--text-muted);margin-top:2px">提醒日自動對齊到最近的週六或週日</p></div>
+      <button class="toggle" id="hw-weekend-toggle" onclick="toggleWeekendRow(this)"></button>
+    </div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('houseworkModal')">取消</button><button class="btn-primary flex-1" style="background:#d97706" onclick="saveHousework()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ── DELAY MODAL ── -->
+<div class="modal-overlay" id="delayModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:36px;height:36px;background:#fef3c7;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="color:#d97706;font-size:20px">schedule</span></div>
+      <div><h2 style="font-size:17px;font-weight:700;color:#1e293b">延後項目</h2><p style="color:#94a3b8;font-size:13px" id="delay-item-name"></p></div>
+    </div>
+    <input type="hidden" id="delay-type"><input type="hidden" id="delay-id">
+    <p style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.06em;margin:16px 0 10px">選擇延後天數</p>
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <button onclick="doDelay(1)" class="delay-day-btn text-center"><p style="font-size:22px;font-weight:800;color:var(--primary)">1</p><p style="font-size:11px;color:#94a3b8;font-weight:600">天</p></button>
+      <button onclick="doDelay(2)" class="delay-day-btn text-center"><p style="font-size:22px;font-weight:800;color:var(--primary)">2</p><p style="font-size:11px;color:#94a3b8;font-weight:600">天</p></button>
+      <button onclick="doDelay(3)" class="delay-day-btn text-center"><p style="font-size:22px;font-weight:800;color:var(--primary)">3</p><p style="font-size:11px;color:#94a3b8;font-weight:600">天</p></button>
+      <button onclick="doDelay(7)" class="delay-day-btn text-center"><p style="font-size:22px;font-weight:800;color:var(--primary)">7</p><p style="font-size:11px;color:#94a3b8;font-weight:600">天</p></button>
+      <button onclick="doDelay(14)" class="delay-day-btn text-center"><p style="font-size:22px;font-weight:800;color:var(--primary)">14</p><p style="font-size:11px;color:#94a3b8;font-weight:600">天</p></button>
+      <button onclick="toggleCustomDateSection()" class="delay-day-btn text-center"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">calendar_month</span><p style="font-size:11px;color:#94a3b8;font-weight:600">自選日期</p></button>
+    </div>
+    <div class="delay-custom-section" id="customDateSection">
+      <label style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">選擇日期</label>
+      <input type="date" id="customDelayDateInline" style="width:100%">
+      <button onclick="doDelayCustomInline()" class="btn-primary w-full" style="margin-top:10px;font-size:14px;padding:11px">確認延後</button>
+    </div>
+    <button class="btn-secondary w-full" style="margin-top:10px" onclick="closeModal('delayModal')">取消</button>
+  </div>
+</div>
+
+<!-- ── BATCH DATE MODAL ── -->
+<div class="modal-overlay" id="batchDateModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <h2 style="font-size:17px;font-weight:700;color:#1e293b;margin-bottom:4px">指定延後日期</h2>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px" id="batch-date-subtitle"></p>
+    <div class="form-group"><label>選擇新提醒日期</label><input type="date" id="batch-custom-date-input"></div>
+    <div class="flex gap-3 mt-2"><button class="btn-secondary flex-1" onclick="closeModal('batchDateModal')">取消</button><button class="btn-primary flex-1" onclick="applyBatchCustomDate()">確認延後</button></div>
+  </div>
+</div>
+
+<!-- ── INVENTORY: ADD/EDIT MODAL ── -->
+<div class="modal-overlay" id="invItemModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="inv-modal-title">新增物品</h2>
+      <button onclick="closeModal('invItemModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="inv-edit-id">
+    <div class="form-group"><label>物品類型</label>
+      <div class="itype-grid">
+        <div class="itype-opt sel" id="inv-type-item" onclick="invSelectType('item',this)"><div class="itype-icon"><span class="material-symbols-outlined" style="font-size:16px;color:#6b7280">category</span></div><div class="itype-lbl">一般物品</div></div>
+        <div class="itype-opt" id="inv-type-expiry" onclick="invSelectType('expiry',this)"><div class="itype-icon"><span class="material-symbols-outlined" style="font-size:16px;color:#6b7280">event</span></div><div class="itype-lbl">有效期限</div></div>
+      </div>
+    </div>
+    <div class="form-group"><label>物品名稱 *</label><input type="text" id="inv-f-name" placeholder="例：感冒藥、洗碗精"></div>
+    <div class="form-group"><label>存放位置</label><select id="inv-f-location" onchange="invOnLocationChange()"><option>廚房</option><option>浴室</option><option>臥室</option><option>客廳</option><option>陽台</option><option>其他</option></select></div>
+    <div class="form-group" id="inv-f-subloc-group"><label>細分位置 <span style="font-size:10px;color:var(--text-muted);font-weight:400">（選填）</span></label><select id="inv-f-subloc"><option value="">未設定</option></select></div>
+    <div class="form-group"><label>物品類別</label>
+      <select id="inv-f-category" onchange="invOnCatChange()">
+        <option>日常用品</option><option>保養品</option><option>糧食/飲品</option>
+        <option>藥品保健</option><option>清潔用品</option><option>文具工具</option>
+        <option>調味料</option><option>其他</option>
+        <option value="__custom">✏️ 自訂…</option>
+      </select>
+      <input type="text" id="inv-f-category-custom" placeholder="輸入自訂類別" style="display:none;margin-top:8px">
+    </div>
+    <div class="form-group"><label>備註</label><input type="text" id="inv-f-note" placeholder="品牌、規格…（選填）"></div>
+    <!-- 有效期限 -->
+    <div class="icond" id="inv-g-expiry">
+      <div class="form-group"><label>到期日</label><input type="date" id="inv-f-expiry"><p style="font-size:11px;color:var(--text-muted);margin-top:5px">到期前 14 天自動提醒</p></div>
+    </div>
+    <!-- 補貨追蹤開關 -->
+    <div class="inv-toggle-row">
+      <div class="inv-toggle-label"><p>需要補貨追蹤</p><small>開啟後可追蹤數量或剩餘比例</small></div>
+      <button class="toggle" id="inv-tgl-restock" onclick="invToggleRestock(this)"></button>
+    </div>
+    <div class="inv-sub-panel" id="inv-g-restock">
+      <div style="margin-bottom:10px"><label>追蹤方式</label>
+        <div class="mode-seg">
+          <button class="mode-seg-btn on" id="inv-mode-qty" onclick="invSetMode('qty',this)">數量（個／瓶）</button>
+          <button class="mode-seg-btn" id="inv-mode-ratio" onclick="invSetMode('ratio',this)">剩餘比例（%）</button>
+        </div>
+      </div>
+      <div id="inv-g-qty">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group" style="margin:0"><label>目前數量</label><input type="number" id="inv-f-qty" min="0" placeholder="0"></div>
+          <div class="form-group" style="margin:0"><label>補貨門檻</label><input type="number" id="inv-f-threshold" min="0" value="1" placeholder="1"><p style="font-size:10px;color:var(--text-muted);margin-top:4px">低於此數量時提醒</p></div>
+        </div>
+      </div>
+      <div id="inv-g-ratio" style="display:none">
+        <div class="form-group" style="margin-bottom:10px">
+          <label>目前剩餘 <b id="inv-ratio-disp" style="color:var(--primary)">50%</b></label>
+          <input type="range" id="inv-f-ratio" min="0" max="100" step="5" value="50" style="width:100%;accent-color:var(--primary)" oninput="document.getElementById('inv-ratio-disp').textContent=this.value+'%'">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:2px"><span>空</span><span>25%</span><span>50%</span><span>75%</span><span>滿</span></div>
+        </div>
+        <div class="form-group" style="margin-bottom:0"><label>提醒門檻（低於此比例時）</label>
+          <select id="inv-f-ratio-thr"><option value="10">10%（快空才提醒）</option><option value="25" selected>25%（剩 1/4 時提醒）</option><option value="33">33%（剩 1/3 時提醒）</option><option value="50">50%（剩一半時提醒）</option></select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:10px;margin-bottom:0"><label>補貨來源</label>
+        <select id="inv-f-source" onchange="invOnSourceChange()">
+          <option value="">不指定</option><option>蝦皮</option><option>酷澎</option><option>全聯</option><option>Costco</option><option>淘寶</option><option>家裡</option><option>藥局</option><option value="__custom">自訂…</option>
+        </select>
+        <input type="text" id="inv-f-source-custom" placeholder="輸入來源名稱" style="display:none;margin-top:8px">
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('invItemModal')">取消</button><button class="btn-primary flex-1" onclick="invSaveItem()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ── INVENTORY: IMPORT MODAL ── -->
+<div class="modal-overlay" id="invImportModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b">匯入物品資料</h2>
+      <button onclick="closeModal('invImportModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">請先下載範本，填妥後再上傳。支援 CSV 與 Excel 格式。</p>
+    <button onclick="invDownloadTemplate()" style="display:flex;align-items:center;gap:8px;background:var(--primary-light);color:var(--primary);padding:11px 16px;border-radius:var(--radius-sm);font-weight:700;font-size:14px;border:none;cursor:pointer;width:100%;margin-bottom:14px">
+      <span class="material-symbols-outlined" style="font-size:18px">download</span>下載 CSV 範本
+    </button>
+    <div class="import-zone" onclick="document.getElementById('inv-xlsx-file').click()">
+      <input type="file" id="inv-xlsx-file" accept=".xlsx,.xls,.csv" onchange="invHandleImport(event)">
+      <span class="material-symbols-outlined" style="font-size:36px;color:var(--text-muted);display:block;margin-bottom:8px">upload_file</span>
+      <p style="font-size:14px;font-weight:600;color:var(--text-secondary)">點擊上傳 Excel / CSV 檔案</p>
+    </div>
+    <div class="import-result" id="inv-import-result"></div>
+    <div class="flex gap-3 mt-2">
+      <button class="btn-secondary flex-1" onclick="closeModal('invImportModal')">關閉</button>
+      <button class="btn-primary flex-1" id="inv-import-confirm-btn" onclick="invConfirmImport()" style="display:none">確認匯入</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="locRoomModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="loc-room-modal-title">新增房間</h2>
+      <button onclick="closeModal('locRoomModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="loc-room-edit-id">
+    <div class="form-group"><label>房間名稱 *</label><input type="text" id="loc-room-name" placeholder="例：客廳、臥室"></div>
+    <div class="form-group"><label>Emoji Icon</label><input type="text" id="loc-room-icon" placeholder="例：🏠" style="font-size:20px;width:80px"></div>
+    <div class="form-group"><label>背景顏色</label><div style="display:flex;align-items:center;gap:10px"><input type="color" id="loc-room-bg" value="#E1F5EE" style="width:48px;height:36px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer"><input type="text" id="loc-room-bg-txt" placeholder="#E1F5EE" style="flex:1" oninput="document.getElementById('loc-room-bg').value=this.value"></div></div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('locRoomModal')">取消</button><button class="btn-primary flex-1" onclick="locSaveRoom()">儲存</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="locSubModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="loc-sub-modal-title">新增細分位置</h2>
+      <button onclick="closeModal('locSubModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="loc-sub-edit-id">
+    <input type="hidden" id="loc-sub-room-id">
+    <div class="form-group"><label>位置名稱 *</label><input type="text" id="loc-sub-name" placeholder="例：沙發下、衣櫃一層"></div>
+    <div class="form-group"><label>顏色</label><div style="display:flex;align-items:center;gap:10px"><input type="color" id="loc-sub-color" value="#5b52e8" style="width:48px;height:36px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer"><span style="font-size:11px;color:var(--text-muted)">用於平面圖顯示</span></div></div>
+    <div class="form-group">
+      <label>SVG 座標 <span style="font-size:10px;font-weight:400;color:var(--text-muted)">（平面圖上的位置與大小）</span></label>
+      <div class="coord-grid">
+        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">X</div><input type="number" class="coord-inp" id="loc-sub-x" value="50" min="0" max="600"></div>
+        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">Y</div><input type="number" class="coord-inp" id="loc-sub-y" value="50" min="0" max="400"></div>
+        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">寬</div><input type="number" class="coord-inp" id="loc-sub-w" value="120" min="20" max="600"></div>
+        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">高</div><input type="number" class="coord-inp" id="loc-sub-h" value="80" min="20" max="400"></div>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('locSubModal')">取消</button><button class="btn-primary flex-1" onclick="locSaveSubLoc()">儲存</button></div>
+  </div>
+</div>
+
+<script>
+// ── FIREBASE 設定（物件先定義，initializeApp 在 body 底部執行）────
+const firebaseConfig = {
+  apiKey: "AIzaSyBN8V3wZOp9vaJFkIN9rDWTNELK9UHOB8I",
+  authDomain: "my-housework-73a32.firebaseapp.com",
+  databaseURL: "https://my-housework-73a32-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "my-housework-73a32",
+  storageBucket: "my-housework-73a32.firebasestorage.app",
+  messagingSenderId: "792978110342",
+  appId: "1:792978110342:web:8dde74d7ca02af00561e07"
+};
+let db = null; // 在底部 initFirebase() 後才賦值
+
+// ── 同步狀態指示器 ────────────────────────────────────────
+function fbSetStatus(state){
+  const dot=document.getElementById('fb-status-dot'),txt=document.getElementById('fb-status-txt');
+  if(!dot||!txt)return;
+  const MAP={
+    connecting:{color:'#fbbf24',label:'連線中'},
+    online:{color:'#34d399',label:'已同步'},
+    saving:{color:'#60a5fa',label:'儲存中'},
+    offline:{color:'#f87171',label:'離線'},
+    error:{color:'#f87171',label:'錯誤'},
+  };
+  const m=MAP[state]||MAP.connecting;
+  dot.style.background=m.color; txt.textContent=m.label;
+}
+
+// ── Firebase 讀寫封裝 ──────────────────────────────────────
+const ROOM_ID = 'shared'; // 所有人共用同一個房間的資料，之後可改成多房間
+
+function fbSave(key, data){
+  fbSetStatus('saving');
+  localStorage.setItem('app_'+key, JSON.stringify(data));
+  if(!db){ fbSetStatus('offline'); return Promise.resolve(); }
+  return db.ref(ROOM_ID+'/'+key).set(data)
+    .then(()=>fbSetStatus('online'))
+    .catch(err=>{console.error('Firebase save error:',err);fbSetStatus('error');});
+}
+
+// ── DATA ─────────────────────────────────────────────────
+let tasks=[],housework=[],inventory=[];
+let hwAreaFilter=null,todoDateFilter='all',todoAreaFilter=null;
+let hwBatchMode=false,hwSelected=new Set();
+let currentDbTab='recurring',calendarWeekOffset=0,openAssignDay=null;
+let todoFilterOpen=false;
+
+// 新的 save 函數，全部走 Firebase
+function saveData(){fbSave('tasks',tasks);fbSave('housework',housework);}
+function saveInv(){fbSave('inventory',inventory);}
+function saveLocations(){fbSave('locations',locations);}
+
+// 從 Firebase 讀取資料，並設定即時監聽（多人協作的核心）
+let _fbListening = false;
+function loadData(){
+  // 先用 localStorage 快取讓畫面馬上出現（避免白畫面）
+  const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
+  const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
+  tasks    = t ? JSON.parse(t) : JSON.parse(JSON.stringify(DT));
+  housework= h ? JSON.parse(h) : JSON.parse(JSON.stringify(DH));
+  inventory= i ? JSON.parse(i) : JSON.parse(JSON.stringify(DI));
+  locations= l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL));
+
+  if(_fbListening) return;
+  _fbListening = true;
+  if(!db){ console.warn('db not ready, skipping Firebase listener'); return; }
+
+  // 監聽 Firebase 即時更新（自己或朋友修改都會觸發）
+  db.ref(ROOM_ID).on('value', snap => {
+    const d = snap.val();
+    if(!d) {
+      // Firebase 是空的：把本機資料上傳做初始化
+      fbSave('tasks', tasks);
+      fbSave('housework', housework);
+      fbSave('inventory', inventory);
+      fbSave('locations', locations);
+      return;
+    }
+    // 更新記憶體資料
+    if(d.tasks)     tasks     = d.tasks;
+    if(d.housework) housework = d.housework;
+    if(d.inventory) inventory = d.inventory;
+    if(d.locations) locations = d.locations;
+    // 同步到 localStorage 快取
+    localStorage.setItem('app_tasks',     JSON.stringify(tasks));
+    localStorage.setItem('app_housework', JSON.stringify(housework));
+    localStorage.setItem('app_inventory', JSON.stringify(inventory));
+    localStorage.setItem('app_locations', JSON.stringify(locations));
+    // 重新渲染
+    renderAll();
+    if(currentPage==='inventory') renderInventoryPage();
+    fbSetStatus('online');
+  }, err => {
+    console.error('Firebase listen error:', err);
+    fbSetStatus('error');
+  });
+}
+function toLD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function addD(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return toLD(d)}
+const NOW=new Date(),todayStr=toLD(NOW),weekEndStr=addD(todayStr,7);
+function nextWeekend(fromStr){const d=new Date(fromStr+'T00:00:00');const dow=d.getDay();if(dow===6||dow===0)return toLD(d);d.setDate(d.getDate()+(6-dow));return toLD(d)}
+function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)}
+function fmtFull(d){if(!d)return '';const p=d.split('-');return p[0]+'/'+p[1]+'/'+p[2]}
+function fmtD(d){if(!d)return '';const p=d.split('-');return p[1]+'/'+p[2]}
+function fmtDF(d){if(!d)return '';return d.replace(/-/g,'/')}
+function dtCls(r){if(!r)return '';return r<todayStr?'overdue':r===todayStr?'today-tag':''}
+function dtLbl(r){if(!r)return '';return r<todayStr?'逾期 '+fmtD(r):r===todayStr?'今天':fmtD(r)}
+
+// ── IPHONE SHORTCUT ─────────────────────────────────────
+function sendAllProgressToShortcut(){
+  const today=new Date().toISOString().split('T')[0];
+  const pendingHousework=housework.filter(h=>!h.reminderDate||h.reminderDate<=today).length;
+  const pendingTasks=tasks.filter(t=>t.status!=='已完成').length;
+  const message=`今日進度摘要：\n🏠 待辦家事：${pendingHousework} 件\n📝 待辦任務：${pendingTasks} 件`;
+  window.location.href=`shortcuts://run-shortcut?name=${encodeURIComponent('家事進度回報')}&input=text&text=${encodeURIComponent(message)}`;
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────
+function exportData(){
+  // 確保 locations 也被包含在導出的物件中
+  const data=JSON.stringify({tasks, housework, inventory, locations, settings:appSettings}, null, 2);
+  const blob=new Blob([data], {type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='家事任務管理_完整備份_'+todayStr+'.json';
+  a.click();
+}
+function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.tasks) tasks=d.tasks;
+      if(d.housework) housework=d.housework;
+      if(d.locations) locations=d.locations; // 載入位置圖資料
+      
+      if(d.inventory){
+        d.inventory.forEach(it=>{
+          // 智慧建置：匯入時若發現新房間或位置，自動在平面圖生成預設方塊
+          if(it.location){
+            let room=locations.find(r=>r.name===it.location);
+            if(!room){
+              room={id:locGenId('room'),name:it.location,icon:'🏠',bgColor:'#F8FAFC',subLocations:[]};
+              locations.push(room);
+            }
+            const slName = it.subLocationName || it.subLocation;
+            if(slName && !it.subLocationId){
+              let subloc=room.subLocations.find(sl=>sl.name===slName);
+              if(!subloc){
+                subloc={id:locGenId('subloc'),name:slName,color:'#5b52e8',x:50,y:50,w:100,h:80};
+                room.subLocations.push(subloc);
+              }
+              it.subLocationId=subloc.id; 
+            }
+          }
+        });
+        inventory=d.inventory;
+      }
+      
+      if(d.settings) appSettings={...appSettings,...(d.settings||{})};
+      
+      // 儲存所有資料到 LocalStorage
+      saveData(); saveInv(); saveLocations(); 
+      renderAll(); 
+      showToast('資料已完整匯入');
+    }catch(err){
+      showToast('匯入失敗，格式不正確','error');
+    }
+  };
+  reader.readAsText(file); e.target.value=''; closeDrawer();
+}
+
+function downloadInvSample(){
+  const sample = {
+    "inventory": [
+      {
+        "id": "item-" + Date.now(),
+        "type": "item",
+        "name": "範例物品：衛生紙",
+        "location": "客廳",
+        "subLocationName": "電視櫃", 
+        "category": "日常用品",
+        "note": "這是一個自動建置的範例",
+        "qtyMode": "qty",
+        "qty": 5,
+        "threshold": 2,
+        "restock": true
+      }
+    ]
+  };
+  const data = JSON.stringify(sample, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '物品匯入樣本(含細分位置).json';
+  a.click();
+}
+
+// ── DRAWER ───────────────────────────────────────────────
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawer-scrim').classList.add('open');renderSettingsPage()}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawer-scrim').classList.remove('open')}
+
+// ── NAV / PAGE SWITCH ─────────────────────────────────────
+let currentPage='todo';
+const PT={
+  todo:{title:'To Do List',sub:'管理您的每日任務'},
+  tasks:{title:'任務清單',sub:'檢視所有任務資料'},
+  housework:{title:'家事管理',sub:'管理家事項目與頻率'},
+  inventory:{title:'物品庫存',sub:'家中物品 · 庫存追蹤 · 補貨提醒'},
+};
+function switchPage(p,b){
+  const addBtn=document.getElementById('global-add-btn');
+  const importBtn=document.getElementById('global-import-btn');
+  const iphoneBtn=document.getElementById('global-iphone-btn');
+  if(p==='tasks'){
+    if(addBtn)addBtn.style.setProperty('display','none','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
+  } else if(p==='housework'){
+    if(addBtn)addBtn.style.setProperty('display','none','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display','flex','important');
+  } else if(p==='inventory'){
+    if(addBtn)addBtn.style.setProperty('display','flex','important');
+    if(importBtn)importBtn.style.setProperty('display','flex','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
+  } else {
+    if(addBtn)addBtn.style.setProperty('display','flex','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
+  }
+  if(hwSelected.size>0&&p!=='housework')clearSelection();
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  if(b)b.classList.add('active');
+  currentPage=p;
+  const pg=PT[p];
+  document.getElementById('pageTitle').textContent=pg.title;
+  document.getElementById('pageSubtitle').textContent=pg.sub;
+  closeAllPopups();
+  if(p==='inventory')renderInventoryPage();
+  else if(p==='todo'){twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
+  else renderAll();
+}
+function openAddModal(){
+  if(currentPage==='housework')openHouseworkModal();
+  else if(currentPage==='inventory')invOpenAdd();
+  else if(currentPage==='todo'){twOpenDropDay=todayStr;twRender();}
+  else openTaskModal();
+}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function closeAllPopups(){document.querySelectorAll('.popup-menu').forEach(p=>p.classList.remove('show','flip-up'));document.getElementById('inv-global-popup')?.remove();}
+
+// ── TASK MODAL ────────────────────────────────────────────
+function onTaskFreqTypeChange(){
+  const v=document.getElementById('task-freq-type').value,g=document.getElementById('task-freq-val-group'),l=document.getElementById('task-freq-val-label');
+  if(v==='none'){g.style.display='none'}else{g.style.display='block';l.textContent=v==='days'?'每幾天':'每月幾號';document.getElementById('task-freq-val').placeholder=v==='days'?'例：7':'例：15'}
+}
+function openTaskModal(id){
+  document.getElementById('taskEditId').value=id||'';
+  document.getElementById('taskModalTitle').textContent=id?'修改任務':'新增任務';
+  if(id){const t=tasks.find(x=>x.id==id);if(!t)return;
+    document.getElementById('task-title').value=t.title||'';document.getElementById('task-desc').value=t.description||'';
+    document.getElementById('task-date').value=t.plannedDate||'';document.getElementById('task-priority').value=t.priority||'普通';
+    document.getElementById('task-freq-type').value=t.freqType||'none';document.getElementById('task-freq-val').value=t.freqVal||'';
+  }else{
+    document.getElementById('task-title').value='';document.getElementById('task-desc').value='';
+    document.getElementById('task-date').value='';document.getElementById('task-priority').value='普通';
+    document.getElementById('task-freq-type').value='none';document.getElementById('task-freq-val').value='';
+  }
+  onTaskFreqTypeChange();document.getElementById('taskModal').classList.add('open');
+}
+
+// ── HOUSEWORK MODAL ───────────────────────────────────────
+function onHwAreaChange(){const v=document.getElementById('hw-area').value;document.getElementById('hw-custom-area-group').style.display=v==='__custom__'?'block':'none';}
+function toggleWeekendRow(btn){btn.classList.toggle('on');document.getElementById('hw-weekend-row').classList.toggle('active',btn.classList.contains('on'));}
+function openHouseworkModal(id){
+  document.getElementById('hwEditId').value=id||'';document.getElementById('hwModalTitle').textContent=id?'修改家事':'新增家事';
+  rebuildAreaOptions(id?housework.find(x=>x.id==id)?.area:null);
+  const wToggle=document.getElementById('hw-weekend-toggle'),wRow=document.getElementById('hw-weekend-row');
+  if(id){const h=housework.find(x=>x.id==id);if(!h)return;
+    document.getElementById('hw-name').value=h.name||'';setAreaSelect(h.area);
+    document.getElementById('hw-frequency').value=h.frequency||'';document.getElementById('hw-last-date').value=h.lastCompleted||'';
+    document.getElementById('hw-reminder').value=h.reminderDate||'';document.getElementById('hw-notes').value=h.notes||'';
+    const wm=!!h.weekendMode;wToggle.classList.toggle('on',wm);wRow.classList.toggle('active',wm);
+  }else{
+    document.getElementById('hw-name').value='';document.getElementById('hw-area').value='所有空間';
+    document.getElementById('hw-frequency').value='';document.getElementById('hw-last-date').value='';
+    document.getElementById('hw-reminder').value='';document.getElementById('hw-notes').value='';
+    document.getElementById('hw-custom-area-group').style.display='none';wToggle.classList.remove('on');wRow.classList.remove('active');
+  }
+  document.getElementById('houseworkModal').classList.add('open');
+}
+function rebuildAreaOptions(currentArea){
+  const sel=document.getElementById('hw-area');const defaults=['所有空間','臥室','浴室','廚房'];
+  const icons={'所有空間':'🏠','臥室':'🛏','浴室':'🚿','廚房':'🍳'};
+  const customAreas=[...new Set(housework.map(h=>h.area).filter(a=>!defaults.includes(a)))];
+  let html=defaults.map(a=>`<option value="${a}">${icons[a]||'📍'} ${a}</option>`).join('');
+  customAreas.forEach(a=>{html+=`<option value="${a}">📍 ${a}</option>`});
+  html+=`<option value="__custom__">✏️ 自訂區域…</option>`;sel.innerHTML=html;
+}
+function setAreaSelect(area){
+  const sel=document.getElementById('hw-area');const opts=[...sel.options].map(o=>o.value);
+  if(opts.includes(area)){sel.value=area;document.getElementById('hw-custom-area-group').style.display='none'}
+  else{sel.value='__custom__';document.getElementById('hw-custom-area-group').style.display='block';document.getElementById('hw-custom-area').value=area}
+}
+function autoCalcReminder(){
+  const ld=document.getElementById('hw-last-date').value,f=parseInt(document.getElementById('hw-frequency').value);
+  if(ld&&f>0){let r=addD(ld,f);if(document.getElementById('hw-weekend-toggle').classList.contains('on'))r=nextWeekend(r);document.getElementById('hw-reminder').value=r;}
+}
+document.getElementById('hw-frequency').addEventListener('input',autoCalcReminder);
+document.getElementById('hw-weekend-toggle').addEventListener('click',()=>setTimeout(autoCalcReminder,0));
+
+// ── SAVE / ACTIONS ────────────────────────────────────────
+function saveTask(){
+  const title=document.getElementById('task-title').value.trim();if(!title){showToast('請輸入任務名稱','error');return}
+  const id=document.getElementById('taskEditId').value,ex=id?tasks.find(x=>x.id==id):null;
+  const ft=document.getElementById('task-freq-type').value,fv=ft!=='none'?parseInt(document.getElementById('task-freq-val').value)||0:0;
+  const obj={id:id||Date.now().toString(),title,description:document.getElementById('task-desc').value.trim(),plannedDate:document.getElementById('task-date').value,priority:document.getElementById('task-priority').value,freqType:ft,freqVal:fv,status:ex?ex.status:'待辦',createdAt:ex?ex.createdAt:new Date().toISOString()};
+  if(id)tasks=tasks.map(x=>x.id==id?obj:x);else tasks.push(obj);
+  saveData();closeModal('taskModal');renderAll();
+}
+function saveHousework(){
+  const name=document.getElementById('hw-name').value.trim();if(!name){showToast('請輸入家事名稱','error');return}
+  const id=document.getElementById('hwEditId').value;let area=document.getElementById('hw-area').value;
+  if(area==='__custom__')area=document.getElementById('hw-custom-area').value.trim()||'其他';
+  const weekendMode=document.getElementById('hw-weekend-toggle').classList.contains('on');
+  let reminderDate=document.getElementById('hw-reminder').value;
+  if(weekendMode&&reminderDate)reminderDate=nextWeekend(reminderDate);
+  const obj={id:id||Date.now().toString(),name,area,frequency:parseInt(document.getElementById('hw-frequency').value)||0,lastCompleted:document.getElementById('hw-last-date').value,reminderDate,notes:document.getElementById('hw-notes').value.trim(),weekendMode};
+  if(id)housework=housework.map(x=>x.id==id?obj:x);else housework.push(obj);
+  saveData();closeModal('houseworkModal');renderAll();
+}
+function deleteTask(id){appConfirm('刪除任務','確定要刪除這個任務嗎？',()=>{tasks=tasks.filter(x=>x.id!=id);saveData();renderAll()})}
+function deleteHousework(id){appConfirm('刪除家事','確定要刪除這個家事嗎？',()=>{housework=housework.filter(x=>x.id!=id);saveData();renderAll()})}
+function markTaskDone(id){tasks=tasks.map(x=>x.id==id?{...x,status:x.status==='已完成'?'待辦':'已完成'}:x);saveData();renderAll()}
+function markHouseworkDone(id){
+  housework=housework.map(h=>{
+    if(h.id!=id)return h;
+    let nr=h.frequency>0?addD(todayStr,h.frequency):h.reminderDate;
+    if(h.weekendMode&&nr)nr=nextWeekend(nr);
+    
+    // 將目前的提醒日加入歷史紀錄
+    const history = h.history || [];
+    if(h.reminderDate && !history.includes(h.reminderDate)) history.push(h.reminderDate);
+    
+    return{...h,lastCompleted:todayStr,reminderDate:nr, history};
+  });
+  saveData();renderAll();
+}
+
+// ── DELAY / POPUP ─────────────────────────────────────────
+function openDelayModal(type,id){
+  document.getElementById('delay-type').value=type;document.getElementById('delay-id').value=id;
+  const item=type==='task'?tasks.find(x=>x.id==id):housework.find(x=>x.id==id);
+  document.getElementById('delay-item-name').textContent=item?(item.title||item.name):'';
+  const sec=document.getElementById('customDateSection');if(sec)sec.classList.remove('show');
+  document.getElementById('delayModal').classList.add('open');closeAllPopups();
+}
+function doDelay(days){
+  const type=document.getElementById('delay-type').value,id=document.getElementById('delay-id').value;
+  if(type==='task')tasks=tasks.map(t=>t.id==id?{...t,status:'延後',plannedDate:addD(t.plannedDate||todayStr,days)}:t);
+  else housework=housework.map(h=>h.id==id?{...h,reminderDate:addD(h.reminderDate||todayStr,days)}:h);
+  saveData();closeModal('delayModal');renderAll();
+}
+function toggleCustomDateSection(){
+  const sec=document.getElementById('customDateSection');sec.classList.toggle('show');
+  if(sec.classList.contains('show')){const inp=document.getElementById('customDelayDateInline');inp.value=todayStr;inp.min=todayStr;setTimeout(()=>inp.focus(),100);}
+}
+function doDelayCustomInline(){
+  const val=document.getElementById('customDelayDateInline').value;if(!val){showToast('請選擇日期','error');return}
+  const type=document.getElementById('delay-type').value,id=document.getElementById('delay-id').value;if(!id||!type)return;
+  if(type==='task')tasks=tasks.map(t=>t.id==id?{...t,status:'延後',plannedDate:val}:t);
+  else housework=housework.map(h=>h.id==id?{...h,reminderDate:val}:h);
+  saveData();closeModal('delayModal');renderAll();
+}
+function togglePopup(id,e){
+  e&&e.stopPropagation();closeAllPopups();
+  const el=document.getElementById('popup-'+id);if(!el)return;
+  el.classList.add('show');
+  requestAnimationFrame(()=>{const r=el.getBoundingClientRect();if(r.bottom>window.innerHeight-80)el.classList.add('flip-up');});
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function priorityBadge(p){return `<span class="badge ${p==='緊急'?'badge-urgent':p==='低'?'badge-low':'badge-normal'}">${p}</span>`}
+function areaColor(a){const m={'臥室':{bg:'#f5f3ff',dot:'#8b5cf6',icon:'🛏'},'所有空間':{bg:'#eff6ff',dot:'#3b82f6',icon:'🏠'},'浴室':{bg:'#ecfeff',dot:'#06b6d4',icon:'🚿'},'廚房':{bg:'#fffbeb',dot:'#f59e0b',icon:'🍳'}};return m[a]||{bg:'#f1f5f9',dot:'#6b7280',icon:'📍'}}
+function emptyS(m){return `<div class="empty-state"><span class="material-symbols-outlined">inbox</span><p>${m}</p></div>`}
+function freqLabel(t){if(!t||t.freqType==='none'||!t.freqVal)return '';return t.freqType==='days'?`每${t.freqVal}天`:`每月${t.freqVal}號`}
+
+// ── RENDER: TO DO ─────────────────────────────────────────
+
+// ── RENDER: TASKS / WEEK CALENDAR ─────────────────────────
+function switchDbTab(tab){
+  currentDbTab=tab;
+  const dbRec=document.getElementById('task-db-recurring'),dbOnce=document.getElementById('task-db-once');
+  const rBtn=document.getElementById('db-tab-recurring'),oBtn=document.getElementById('db-tab-once');
+  if(dbRec)dbRec.style.display=tab==='recurring'?'block':'none';
+  if(dbOnce)dbOnce.style.display=tab==='once'?'block':'none';
+  if(rBtn){rBtn.style.borderBottomColor=tab==='recurring'?'var(--primary)':'transparent';rBtn.style.color=tab==='recurring'?'var(--primary)':'var(--text-muted)';}
+  if(oBtn){oBtn.style.borderBottomColor=tab==='once'?'var(--primary)':'transparent';oBtn.style.color=tab==='once'?'var(--primary)':'var(--text-muted)';}
+}
+function renderDbRow(t){
+  const fl=freqLabel(t);
+  const pc={'緊急':'#dc2626','普通':'#2563eb','低':'#5b52e8'}[t.priority]||'#6b7280';
+  return `<div class="task-db-row">
+    <div style="min-width:0">
+      <p style="font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.title}</p>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+        ${fl?`<span class="freq-badge"><span class="material-symbols-outlined" style="font-size:11px">repeat</span>${fl}</span>`:''}
+        ${t.description?`<span style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px">${t.description}</span>`:''}
+      </div>
+    </div>
+    <div style="width:10px;height:10px;border-radius:50%;background:${pc};flex-shrink:0" title="${t.priority}"></div>
+    <div style="display:flex;gap:4px;flex-shrink:0">
+      <button onclick="openTaskModal('${t.id}')" style="background:none;border:none;cursor:pointer;padding:4px"><span class="material-symbols-outlined" style="font-size:18px;color:#b0bbc8">edit</span></button>
+      <button onclick="deleteTask('${t.id}')" style="background:none;border:none;cursor:pointer;padding:4px"><span class="material-symbols-outlined" style="font-size:18px;color:#d1d5db">delete</span></button>
+    </div>
+  </div>`;
+}
+function shiftWeek(delta){calendarWeekOffset+=delta;openAssignDay=null;renderTasksPage()}
+function getWeekDays(offset){
+  const base=new Date(NOW);base.setDate(base.getDate()+offset*7);
+  const dow=base.getDay(),monday=new Date(base);monday.setDate(base.getDate()-(dow===0?6:dow-1));
+  return Array.from({length:7},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);return toLD(d);});
+}
+function assignTaskToDay(tid,dateStr){
+  // Find the template task
+  const tpl=tasks.find(t=>t.id===tid);if(!tpl)return;
+  // Check if there's already an instance on this day
+  const existing=tasks.find(t=>t.templateId===tid&&t.plannedDate===dateStr);
+  if(existing){showToast('此任務已排在該日','warn');openAssignDay=null;renderTasksPage();return;}
+  // Create a new instance (copy) for this day
+  const instance={
+    ...tpl,
+    id:Date.now().toString()+'_'+Math.random().toString(36).slice(2,6),
+    templateId:tid,   // link back to the template
+    plannedDate:dateStr,
+    status:'待辦',
+    createdAt:new Date().toISOString()
+  };
+  tasks.push(instance);
+  saveData();openAssignDay=null;renderTasksPage();
+}
+function toggleAssignDropdown(dateStr){openAssignDay=(openAssignDay===dateStr)?null:dateStr;renderTasksPage()}
+const DOW_LABELS=['一','二','三','四','五','六','日'];
+function renderTasksPage(){
+  // 濾出資料庫內的任務
+  const activeTasks=tasks.filter(t=>!t.templateId); 
+  const recurring=activeTasks.filter(t=>t.freqType&&t.freqType!=='none');
+  const once=activeTasks.filter(t=>!t.freqType||t.freqType==='none');
+  const emptyRow='<p style="padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px">目前沒有任務</p>';
+  
+  // 抓取 HTML 元素並渲染資料
+  const dbRec=document.getElementById('task-db-recurring');
+  const dbOnce=document.getElementById('task-db-once');
+  
+  if(dbRec) dbRec.innerHTML=recurring.length?recurring.map(renderDbRow).join(''):emptyRow;
+  if(dbOnce) dbOnce.innerHTML=once.length?once.map(renderDbRow).join(''):emptyRow;
+  
+  // 維持目前的頁籤狀態
+  switchDbTab(currentDbTab);
+}
+
+// ── HOUSEWORK BATCH ───────────────────────────────────────
+function toggleHwSelect(id,e){if(e)e.stopPropagation();if(hwSelected.has(id))hwSelected.delete(id);else hwSelected.add(id);updateFloatBar();const cb=document.getElementById('hwcb-'+id);if(cb)cb.classList.toggle('checked',hwSelected.has(id));}
+function clearSelection(){hwSelected.clear();updateFloatBar();document.querySelectorAll('.hw-cb').forEach(cb=>cb.classList.remove('checked'));}
+function updateFloatBar(){const bar=document.getElementById('float-batch-bar'),label=document.getElementById('batch-count-label');if(!bar)return;if(hwSelected.size>0){bar.classList.add('show');if(label)label.textContent=`已選 ${hwSelected.size}`;}else{bar.classList.remove('show');}}
+function batchDelay(days){housework=housework.map(h=>hwSelected.has(h.id)?{...h,reminderDate:addD(h.reminderDate||todayStr,days)}:h);saveData();clearSelection();renderHouseworkPage();}
+function batchToWeekend(){const target=nextWeekend(todayStr);housework=housework.map(h=>hwSelected.has(h.id)?{...h,reminderDate:target}:h);saveData();clearSelection();renderHouseworkPage();}
+function showBatchCustomDate(){const sub=document.getElementById('batch-date-subtitle');if(sub)sub.textContent=`將 ${hwSelected.size} 個項目延後到指定日期`;const inp=document.getElementById('batch-custom-date-input');if(inp){inp.value=nextWeekend(todayStr);inp.min=todayStr;}document.getElementById('batchDateModal').classList.add('open');}
+function applyBatchCustomDate(){const val=document.getElementById('batch-custom-date-input').value;if(!val){showToast('請選擇日期','error');return}housework=housework.map(h=>hwSelected.has(h.id)?{...h,reminderDate:val}:h);saveData();closeModal('batchDateModal');clearSelection();renderHouseworkPage();}
+function exitBatchMode(){clearSelection();}
+
+// ── RENDER: HOUSEWORK ─────────────────────────────────────
+function renderHouseworkRow(h){
+  const col=areaColor(h.area),dc=dtCls(h.reminderDate),isSelected=hwSelected.has(h.id);
+  const days=h.lastCompleted?daysBetween(h.lastCompleted,todayStr):null;
+  const lastDoneText=days===null?'':(days===0?'今天完成':days===1?'昨天完成':`${days}天前`);
+  const weekendBadge=h.weekendMode?`<span class="badge-weekend">週末</span>`:'';
+  
+  // 🌟 變更 1：新增備註 HTML。如果有備註，顯示在名稱下方，並使用灰階文字 (var(--text-muted))
+  const notesHtml = h.notes ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.notes}</div>` : '';
+  
+  // 🌟 變更 2：將「上次完成天數」的樣式調整，準備跟右側的提醒日期放在同一排
+  const historyHtml = lastDoneText ? `<div class="last-done-info" style="margin-top:0;margin-right:10px;white-space:nowrap;"><span class="material-symbols-outlined" style="font-size:13px">history</span>${lastDoneText}</div>` : '';
+
+  return `<div class="hw-compact-row">
+    <div class="hw-cb ${isSelected?'checked':''}" id="hwcb-${h.id}" onclick="toggleHwSelect('${h.id}',event)"></div>
+    <div style="min-width:0">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><p style="font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${h.name}</p>${weekendBadge}</div>
+      ${notesHtml}
+    </div>
+    <div style="display:flex;align-items:center;">
+      ${historyHtml}
+      ${h.reminderDate
+        ?`<button class="date-tag ${dc}" onclick="openDelayModal('hw','${h.id}')" style="font-size:11px"><span class="material-symbols-outlined" style="font-size:11px">${dc==='overdue'?'warning':dc==='today-tag'?'check':'event'}</span>${dtLbl(h.reminderDate)}</button>`
+        :`<button class="date-tag" onclick="openHouseworkModal('${h.id}')" style="font-size:11px;color:var(--text-muted)">未設定</button>`}
+    </div>
+    <div style="position:relative">
+      <button onclick="togglePopup('${h.id}',event)" style="background:none;border:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8">more_vert</span>
+      </button>
+      <div class="popup-menu" id="popup-${h.id}">
+        <button onclick="markHouseworkDone('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#10b981">check_circle</span>標為完成</button>
+        <button onclick="openHouseworkModal('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#5b52e8">edit</span>修改</button>
+        <button onclick="openDelayModal('hw','${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b">schedule</span>延後</button>
+        <button class="danger" onclick="deleteHousework('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>
+      </div>
+    </div>
+  </div>`;
+}
+function renderHouseworkPage(){
+  const allAreas=[...new Set(housework.map(h=>h.area))];
+  const tabBar=document.getElementById('hw-area-tab-bar');
+  if(tabBar)tabBar.innerHTML=[null,...allAreas].map(a=>{const isAll=a===null,sel=(isAll&&!hwAreaFilter)||(hwAreaFilter===a),cnt=isAll?housework.length:housework.filter(h=>h.area===a).length,col=isAll?null:areaColor(a);
+    return `<button class="area-tab ${sel?'active':''}" onclick="toggleAreaFilter(${a===null?'null':`'${a}'`})" style="${sel&&!isAll?`background:${col.dot};`:''}">
+      ${isAll?'全部':`${areaColor(a).icon} ${a}`}<span class="cnt">${cnt}</span>
+    </button>`;}).join('');
+  const overdueHW=housework.filter(h=>h.reminderDate&&h.reminderDate<todayStr);
+  const notice=document.getElementById('hw-overdue-notice');
+  if(notice)notice.innerHTML=overdueHW.length>0?`<div class="overdue-notice"><span class="material-symbols-outlined" style="font-size:15px">warning</span>${overdueHW.length} 件逾期 — 勾選後可批次延後</div>`:'';
+  const filtered=(hwAreaFilter?housework.filter(h=>h.area===hwAreaFilter):housework).slice().sort((a,b)=>{if(!a.reminderDate&&!b.reminderDate)return 0;if(!a.reminderDate)return 1;if(!b.reminderDate)return -1;return a.reminderDate.localeCompare(b.reminderDate);});
+  const listEl=document.getElementById('housework-list');
+  if(listEl)listEl.innerHTML=filtered.length?filtered.map(renderHouseworkRow).join(''):`<div style="padding:32px 16px;text-align:center;color:var(--text-muted);font-size:13px">此區域無家事項目</div>`;
+}
+function toggleAreaFilter(a){hwAreaFilter=hwAreaFilter===a?null:a;renderHouseworkPage()}
+
+// ── INVENTORY HELPERS ─────────────────────────────────────
+const LOC_META={'廚房':{icon:'🍳'},'浴室':{icon:'🚿'},'臥室':{icon:'🛏'},'客廳':{icon:'🛋'},'陽台':{icon:'📦'},'其他':{icon:'📍'}};
+function lm(loc){return LOC_META[loc]||{icon:'📍'}}
+function fmtDateFull(s){if(!s)return '';return s.replace(/-/g,'/')}
+const INV_SOURCES={'蝦皮':'','酷澎':'','全聯':'','大潤發':'','家樂福':'','momo':'','藥局':''};
+function invSrcIcon(s){return s&&INV_SOURCES[s]?INV_SOURCES[s]+' ':''}
+
+function invExpiryStatus(it){
+  // 🌟 判斷：如果是效期物品，卻沒有填寫日期，直接回傳紅色緊急狀態
+  if(it.type === 'expiry' && !it.expiryDate) return {cls:'red', urgent:true, rowCls:'row-danger'};
+  
+  if(!it.expiryDate)return null;
+  const d=daysBetween(todayStr,it.expiryDate);
+  if(d<0)return{cls:'red',urgent:true,rowCls:'row-danger'};
+  if(d<=7)return{cls:'red',urgent:true,rowCls:'row-danger'};
+  if(d<=14)return{cls:'orange',urgent:false,rowCls:'row-warn'};
+  return{cls:'muted',urgent:false,rowCls:''};
+}
+function invRestockStatus(it){
+  if(!it.restock)return null;
+  if(it.qtyMode==='ratio'){
+    const r=it.ratio??100,t=it.ratioThr??25;
+    if(r===0)return{cls:'red',urgent:true,rowCls:'row-danger'};
+    if(r<=t)return{cls:'orange',urgent:false,rowCls:'row-warn'};
+    return{cls:'muted',urgent:false,rowCls:''};
+  }
+  const qty=it.qty??0,thr=it.threshold??1;
+  if(qty===0)return{cls:'red',urgent:true,rowCls:'row-danger'};
+  if(qty<=thr)return{cls:'orange',urgent:false,rowCls:'row-warn'};
+  return{cls:'muted',urgent:false,rowCls:''};
+}
+function invWorstCls(es,rs){
+  const rank=s=>s?.rowCls==='row-danger'?0:s?.rowCls==='row-warn'?1:2;
+  return rank(es)<=rank(rs)?es?.rowCls:rs?.rowCls;
+}
+
+// ── INVENTORY STATE ────────────────────────────────────────
+let invCurrentTab='all',invCurrentType='item',invEditingId=null;
+let invLocFilter=null,invCatFilter=null,invSrcFilter=null,invDateFrom=null,invDateTo=null;
+let invQtyMode='qty',invRestockOn=false,invFilterOpen=false,invLocFilterOpen=false,invPendingImport=[];
+
+let invLocMode='list'; // 'list' or 'fp'
+
+function invSwitchTab(tab,btn){
+  invCurrentTab=tab;invLocFilter=null;invCatFilter=null;invSrcFilter=null;invDateFrom=null;invDateTo=null;
+  document.querySelectorAll('.inv-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  const si=document.getElementById('inv-search-input');if(si)si.value='';
+  // 子模式列只在 location tab 時顯示
+  const modeBar=document.getElementById('inv-loc-mode-bar');
+  if(modeBar)modeBar.style.display=tab==='location'?'block':'none';
+  if(tab==='location'){
+    invLocMode='list'; // 預設進入清單模式
+    _syncLocModeBtns();
+    renderInventoryPage();return;
+  }
+  if(tab==='locmgr'){renderLocMgrPage();return;}
+  renderInventoryPage();
+}
+
+function invSwitchLocMode(mode){
+  invLocMode=mode;
+  _syncLocModeBtns();
+  if(mode==='fp'){
+    // 隱藏 filter panels，渲染平面圖
+    const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='none';
+    const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
+    renderFloorplanPage();
+  } else {
+    renderInventoryPage();
+  }
+}
+
+function _syncLocModeBtns(){
+  const lb=document.getElementById('locmode-btn-list'),fb=document.getElementById('locmode-btn-fp');
+  if(lb){lb.classList.toggle('on',invLocMode==='list');}
+  if(fb){fb.classList.toggle('on',invLocMode==='fp');}
+}
+
+// ── INVENTORY FILTER PANEL ─────────────────────────────────
+function invToggleFilters(){
+  invFilterOpen=!invFilterOpen;
+  document.getElementById('inv-filter-body').classList.toggle('open',invFilterOpen);
+  document.getElementById('inv-filter-arrow').classList.toggle('open',invFilterOpen);
+}
+function invToggleLocFilters(){
+  invLocFilterOpen=!invLocFilterOpen;
+  document.getElementById('inv-loc-filter-body').classList.toggle('open',invLocFilterOpen);
+  document.getElementById('inv-loc-filter-arrow').classList.toggle('open',invLocFilterOpen);
+}
+function invClearFilters(){invLocFilter=null;invCatFilter=null;invSrcFilter=null;invDateFrom=null;invDateTo=null;renderInventoryPage()}
+function invSetLoc(l){invLocFilter=l;renderInventoryPage()}
+function invSetCat(c){invCatFilter=c;renderInventoryPage()}
+function invSetSrc(s){invSrcFilter=s;renderInventoryPage()}
+function invSetDateFrom(v){invDateFrom=v||null;renderInventoryPage()}
+function invSetDateTo(v){invDateTo=v||null;renderInventoryPage()}
+
+function invRenderFilterPanel(){
+  const pool=invFilterByTab();
+  const locs=[...new Set(pool.map(it=>it.location))].sort();
+  const cats=[...new Set(pool.map(it=>it.category||'其他'))].sort();
+  const srcs=[...new Set(pool.filter(it=>it.source).map(it=>it.source))].sort();
+
+  const locRow=document.getElementById('inv-filter-loc-row');
+  const catRow=document.getElementById('inv-filter-cat-row');
+  const thirdRow=document.getElementById('inv-filter-third-row');
+  if(!locRow||!catRow||!thirdRow)return;
+
+  let lh=`<span class="inv-filter-row-label">位置</span>`;
+  [null,...locs].forEach(l=>{const a=(invLocFilter===null&&l===null)||(invLocFilter===l&&l!==null);lh+=`<button class="inv-chip${a?' active':''}" onclick="invSetLoc(${l===null?'null':`'${l}'`})">${l||'全部'}</button>`;});
+
+  let ch=`<span class="inv-filter-row-label">類別</span>`;
+  [null,...cats].forEach(c=>{const a=(invCatFilter===null&&c===null)||(invCatFilter===c&&c!==null);ch+=`<button class="inv-chip${a?' active':''}" onclick="invSetCat(${c===null?'null':`'${c}'`})">${c||'全部'}</button>`;});
+
+  let th='';
+  if(invCurrentTab==='expiry'){
+    th=`<span class="inv-filter-row-label">效期</span>
+      <input type="date" value="${invDateFrom||''}" onchange="invSetDateFrom(this.value)" style="height:26px;font-size:11px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;outline:none;flex-shrink:0;max-width:130px">
+      <span style="font-size:11px;color:var(--text-muted);flex-shrink:0">至</span>
+      <input type="date" value="${invDateTo||''}" onchange="invSetDateTo(this.value)" style="height:26px;font-size:11px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;outline:none;flex-shrink:0;max-width:130px">`;
+  }else{
+    th=`<span class="inv-filter-row-label">來源</span>`;
+    if(srcs.length){[null,...srcs].forEach(s=>{const a=(invSrcFilter===null&&s===null)||(invSrcFilter===s&&s!==null);th+=`<button class="inv-chip${a?' active':''}" onclick="invSetSrc(${s===null?'null':`'${s}'`})">${s?invSrcIcon(s)+s:'全部'}</button>`;});}
+    else{th+=`<span style="font-size:11px;color:var(--text-muted)">（無補貨來源）</span>`;}
+  }
+
+  locRow.innerHTML=lh; catRow.innerHTML=ch; thirdRow.innerHTML=th;
+
+  const active=[];
+  if(invLocFilter)active.push(invLocFilter);
+  if(invCatFilter)active.push(invCatFilter);
+  if(invSrcFilter)active.push(invSrcIcon(invSrcFilter)+invSrcFilter);
+  if(invDateFrom||invDateTo)active.push((invDateFrom?fmtDateFull(invDateFrom):'…')+' ~ '+(invDateTo?fmtDateFull(invDateTo):'…'));
+  const summary=document.getElementById('inv-filter-summary');
+  const clearBtn=document.getElementById('inv-filter-clear-btn');
+  if(summary)summary.textContent=active.length?active.join(' · '):'';
+  if(clearBtn)clearBtn.style.display=active.length?'block':'none';
+}
+
+// ── INVENTORY FILTER / POOL ────────────────────────────────
+function invFilterByTab(){
+  if(invCurrentTab==='all')return inventory;
+  if(invCurrentTab==='expiry')return inventory.filter(it=>it.type==='expiry');
+  if(invCurrentTab==='restock')return inventory.filter(it=>it.restock);
+  if(invCurrentTab==='location')return inventory;
+  return inventory;
+}
+function invFilterPool(){
+  let pool=invFilterByTab();
+  if(invLocFilter)pool=pool.filter(it=>it.location===invLocFilter);
+  if(invCatFilter)pool=pool.filter(it=>(it.category||'其他')===invCatFilter);
+  if(invSrcFilter)pool=pool.filter(it=>it.source===invSrcFilter);
+  if(invDateFrom)pool=pool.filter(it=>it.expiryDate&&it.expiryDate>=invDateFrom);
+  if(invDateTo)pool=pool.filter(it=>it.expiryDate&&it.expiryDate<=invDateTo);
+  return pool;
+}
+
+// ── INVENTORY RENDER ───────────────────────────────────────
+function renderInventoryPage(){
+  const strip=document.getElementById('inv-alert-strip'),content=document.getElementById('inv-content');
+  if(!strip||!content)return;
+  document.getElementById('inv-cnt-all').textContent=inventory.length;
+  document.getElementById('inv-cnt-expiry').textContent=inventory.filter(i=>i.type==='expiry').length;
+  document.getElementById('inv-cnt-restock').textContent=inventory.filter(i=>i.restock).length;
+  document.getElementById('inv-cnt-loc').textContent=inventory.length;
+
+  invRenderFilterPanel();
+
+  // Alert strip — hidden (removed per user request)
+  strip.innerHTML='';strip.classList.remove('show');
+
+  // Location tab
+  if(invCurrentTab==='location'){
+    if(invLocMode==='fp'){renderFloorplanPage();return;}
+    const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='none';
+    const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='block';
+    const q=(document.getElementById('inv-search-input')?.value||'').toLowerCase();
+    const locs=[...new Set(inventory.map(it=>it.location))];
+    const locRow=document.getElementById('inv-loc-row');
+    if(locRow)locRow.innerHTML=[null,...locs].map(l=>{const a=(l===null&&invLocFilter===null)||(invLocFilter===l);const m=l?lm(l):null;return`<button class="inv-chip${a?' active':''}" onclick="invSetLocFilter2(${l===null?'null':`'${l}'`})">${m?m.icon+' ':''}${l||'全部'}</button>`;}).join('');
+    const cats=[...new Set(inventory.map(it=>it.category||'其他'))].sort();
+    const catRow=document.getElementById('inv-cat-row');
+    if(catRow)catRow.innerHTML=[null,...cats].map(c=>{const a=(c===null&&invCatFilter===null)||(invCatFilter===c);return`<button class="inv-chip${a?' active':''}" onclick="invSetCatFilter2(${c===null?'null':`'${c}'`})">${c||'全部'}</button>`;}).join('');
+    // update loc panel summary
+    const locSummary=document.getElementById('inv-loc-filter-summary');
+    const locActive=[];if(invLocFilter)locActive.push(invLocFilter);if(invCatFilter)locActive.push(invCatFilter);
+    if(locSummary)locSummary.textContent=locActive.length?locActive.join(' · '):'';
+    let pool=inventory.filter(it=>(!invLocFilter||it.location===invLocFilter)&&(!invCatFilter||(it.category||'其他')===invCatFilter)&&(q===''||it.name.toLowerCase().includes(q)||it.note?.toLowerCase().includes(q)));
+    let html='';
+    if(invLocFilter){html=`<div class="inv-list">${pool.map(it=>invRenderRow(it,false)).join('')}</div>`;}
+    else{locs.forEach(loc=>{const grp=pool.filter(it=>it.location===loc);if(!grp.length)return;const m=lm(loc);html+=`<div class="inv-loc-group-head"><span style="font-size:16px">${m.icon}</span><span style="font-size:13px;font-weight:700;color:var(--text-secondary)">${loc}</span><span style="font-size:11px;color:var(--text-muted);margin-left:auto">${grp.length} 件</span></div><div class="inv-list">${grp.map(it=>invRenderRow(it,false)).join('')}</div>`;});}
+    content.innerHTML=html||'<p style="text-align:center;padding:32px 0;color:var(--text-muted)">找不到符合的物品</p>';return;
+  }
+  const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='block';
+  const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
+
+  let pool=invFilterPool();
+  pool.sort((a,b)=>{
+    function s(it){if(invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent)return 0;if(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange')return 1;return 2;}
+    return s(a)-s(b)||a.name.localeCompare(b.name);
+  });
+  const urgent=pool.filter(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
+  const warn=pool.filter(it=>!urgent.includes(it)&&(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange'));
+  const normal=pool.filter(it=>!urgent.includes(it)&&!warn.includes(it));
+  let html='';
+  if(urgent.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title red">需要注意</span><span style="font-size:11px;color:var(--text-muted)">${urgent.length}</span></div><div class="inv-list">${urgent.map(it=>invRenderRow(it)).join('')}</div>`;
+  if(warn.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title orange">即將到期 / 快用完</span><span style="font-size:11px;color:var(--text-muted)">${warn.length}</span></div><div class="inv-list">${warn.map(it=>invRenderRow(it)).join('')}</div>`;
+  if(normal.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title">其他</span><span style="font-size:11px;color:var(--text-muted)">${normal.length}</span></div><div class="inv-list">${normal.map(it=>invRenderRow(it)).join('')}</div>`;
+  if(!pool.length)html='<p style="text-align:center;padding:32px 0;color:var(--text-muted)">目前沒有項目</p>';
+  content.innerHTML=html;
+}
+function invSetLocFilter2(l){invLocFilter=l;renderInventoryPage()}
+function invSetCatFilter2(c){invCatFilter=c;renderInventoryPage()}
+
+function invRenderRow(it,showLoc=true){
+  const es=invExpiryStatus(it),rs=invRestockStatus(it);
+  const rowCls=invWorstCls(es,rs)||'';
+
+  let rightHtml='';
+  if(it.type==='expiry'){
+    if(it.expiryDate){
+      const d=daysBetween(todayStr,it.expiryDate);
+      if(d<0)rightHtml+=`<div class="expiry-chip-row red">已過期</div>`;
+      else if(d<=7)rightHtml+=`<div class="expiry-chip-row red">${d} 天後到期</div>`;
+      else if(d<=14)rightHtml+=`<div class="expiry-chip-row amber">${d} 天後到期</div>`;
+    } else {
+      // 🌟 顯示明顯的虛線警告標籤
+      rightHtml+=`<div class="expiry-chip-row red" style="border-style:dashed">⚠️ 未填效期</div>`;
+    }
+  }
+  if(it.restock){
+    if(it.qtyMode==='ratio'){
+      const r=it.ratio??100,thr=it.ratioThr??25;
+      const fc=r===0?'#dc2626':r<=thr?'#d97706':'#059669';
+      rightHtml+=`<div class="ratio-ctl" onclick="event.stopPropagation()"><div class="ratio-track"><div class="ratio-fill" style="width:${r}%;background:${fc}"></div></div><span class="ratio-pct" style="color:${fc}">${r}%</span></div>`;
+    }else{
+      const qty=it.qty??0,thr=it.threshold??1;
+      const vc=qty===0?'low':qty<=thr?'warn':'';
+      rightHtml+=`<div class="qty-stepper"><button class="qty-btn" onclick="invChQty('${it.id}',-1,event)">−</button><input class="qty-inp ${vc}" type="number" min="0" value="${qty}" onclick="event.stopPropagation()" onchange="invSetQtyDirect('${it.id}',this.value,event)"><button class="qty-btn" onclick="invChQty('${it.id}',+1,event)">+</button></div>`;
+    }
+  }
+  rightHtml+=`<button style="background:none;border:none;cursor:pointer;width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);flex-shrink:0" onclick="invTogglePopup('${it.id}',event)"><span class="material-symbols-outlined" style="font-size:18px">more_vert</span></button>`;
+
+  let detailHtml='';
+  if(it.type==='expiry'){
+    if(it.expiryDate){
+      const d=daysBetween(todayStr,it.expiryDate),pct=Math.max(0,Math.min(100,Math.round(d/365*100)));
+      const bc=d<0?'#dc2626':d<=14?'#d97706':'#059669';
+      const expiryStatus=d<0?'已過期':d===0?'今天到期':d+' 天後到期';
+      detailHtml+=`<div class="drow"><span class="dlabel">到期日</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><input type="date" value="${it.expiryDate}" style="border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:11px;font-weight:600;color:${bc};background:var(--bg);font-family:'Noto Sans TC',sans-serif;outline:none;cursor:pointer" onchange="invUpdateExpiry('${it.id}',this.value)"><span style="font-size:11px;font-weight:600;color:${bc}">${expiryStatus}</span></div></div>`;
+      detailHtml+=`<div class="drow"><span class="dlabel">效期剩餘</span><span class="dvalue"><span style="display:inline-block;width:80px;height:4px;background:var(--border-light);border-radius:99px;overflow:hidden;vertical-align:middle"><span style="display:block;width:${pct}%;height:100%;background:${bc};border-radius:99px"></span></span></span></div>`;
+    } else {
+      // 🌟 當沒填日期時，顯示紅色的輸入框提示補填
+      detailHtml+=`<div class="drow"><span class="dlabel" style="color:#dc2626;font-weight:700">⚠️ 尚未填寫到期日</span><div style="display:flex;align-items:center;gap:6px" onclick="event.stopPropagation()"><input type="date" style="border:1.5px dashed #fca5a5;border-radius:6px;padding:3px 7px;font-size:11px;font-weight:600;color:#dc2626;background:#fef2f2;outline:none;cursor:pointer" onchange="invUpdateExpiry('${it.id}',this.value)"></div></div>`;
+    }
+  }
+  if(it.restock){
+    if(it.qtyMode==='ratio'){
+      const r=it.ratio??100,thr=it.ratioThr??25;const fc=r===0?'#dc2626':r<=thr?'#d97706':'#059669';
+      detailHtml+=`<div class="drow"><span class="dlabel">剩餘比例</span><span class="dvalue" id="ratio-disp-${it.id}" style="color:${fc}">${r}%</span></div><div style="padding:8px 0 4px" onclick="event.stopPropagation()"><input type="range" min="0" max="100" step="5" value="${r}" style="width:100%;accent-color:${fc}" oninput="invUpdateRatioSlider('${it.id}',this.value)" onchange="invSetRatioDirect('${it.id}',this.value,event)"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:1px"><span>空</span><span>25%</span><span>50%</span><span>75%</span><span>滿</span></div></div><div class="drow"><span class="dlabel">提醒門檻</span><span class="dvalue">低於 ${thr}% 時提醒</span></div>`;
+    }else{
+      detailHtml+=`<div class="drow"><span class="dlabel">目前數量</span><span class="dvalue">${it.qty??0} 個（門檻：${it.threshold??1}）</span></div>`;
+    }
+    if(it.source)detailHtml+=`<div class="drow"><span class="dlabel">補貨來源</span><span class="dvalue">${invSrcIcon(it.source)}${it.source}</span></div>`;
+  }
+  if(it.note)detailHtml+=`<div class="drow"><span class="dlabel">備註</span><span class="dvalue">${it.note}</span></div>`;
+  if(!detailHtml)detailHtml=`<div class="drow"><span class="dlabel" style="color:var(--text-muted)">無其他資訊</span></div>`;
+  let warnBox='';
+  if(it.type==='expiry'&&it.restock&&es?.urgent&&(rs?.urgent||rs?.cls==='orange'))warnBox=`<div class="inv-warn-box"><span class="material-symbols-outlined" style="font-size:13px;flex-shrink:0">warning</span><span>效期將至且存量低 — 到期後請丟棄並補購</span></div>`;
+
+  const subloc=it.subLocationId?locFindSubloc(it.subLocationId):null;
+  const sublocTag=subloc?`<button class="subloc-tag" onclick="event.stopPropagation();invGoToFloorplan('${it.subLocationId}')" title="查看平面圖"># ${subloc.name}</button>`:'';
+  if(subloc)detailHtml=`<div class="drow"><span class="dlabel">細分位置</span><span class="dvalue"><button class="subloc-tag" onclick="invGoToFloorplan('${it.subLocationId}')"># ${subloc.name}</button></span></div>`+detailHtml;
+
+  const locLine=showLoc?`<span class="inv-loc-label">${it.location}</span>`:'';
+  const catLine=it.category&&it.category!=='其他'?`<span class="inv-loc-label">${it.category}</span>`:'';
+  const subSep=locLine&&catLine?`<span style="color:var(--text-muted);font-size:10px;margin:0 1px">·</span>`:'';
+  return `<div class="inv-item-wrap">
+    <div class="inv-row ${rowCls}" onclick="invToggleDetail('${it.id}')">
+      <div class="inv-dot-item"></div>
+      <div class="inv-info">
+        <div class="inv-name">${it.name}</div>
+        <div class="inv-sub">${locLine}${subSep}${catLine}</div>
+      </div>
+      <div class="inv-right" onclick="event.stopPropagation()">${rightHtml}</div>
+    </div>
+    <div class="inv-detail ${rowCls}" id="inv-detail-${it.id}">${detailHtml}${warnBox}</div>
+  </div>`;
+}
+function invToggleDetail(id){const d=document.getElementById('inv-detail-'+id);if(d)d.classList.toggle('open')}
+function invUpdateExpiry(id,val){
+  if(!val)return;
+  inventory=inventory.map(it=>it.id===id?{...it,expiryDate:val}:it);
+  saveInv();
+  // Re-render just this item's detail without closing it
+  renderInventoryPage();
+  // Re-open the detail panel
+  setTimeout(()=>{const d=document.getElementById('inv-detail-'+id);if(d)d.classList.add('open');},10);
+}
+function invChQty(id,delta,e){
+  e.stopPropagation();
+  inventory=inventory.map(it=>{
+    if(it.id!==id)return it;
+    if(it.qtyMode==='ratio')return{...it,ratio:Math.max(0,Math.min(100,(it.ratio??100)+delta*5))};
+    return{...it,qty:Math.max(0,(it.qty??0)+delta)};
+  });
+  saveInv();renderInventoryPage();
+}
+function invSetQtyDirect(id,val,e){
+  e.stopPropagation();
+  const n=parseInt(val);if(isNaN(n)||n<0)return;
+  inventory=inventory.map(it=>it.id!==id?it:{...it,qty:n});
+  saveInv();renderInventoryPage();
+}
+function invSetRatioDirect(id,val,e){
+  if(e)e.stopPropagation();
+  const n=Math.max(0,Math.min(100,parseInt(val)||0));
+  inventory=inventory.map(it=>it.id!==id?it:{...it,ratio:n});
+  saveInv();renderInventoryPage();
+}
+function invUpdateRatioSlider(id,val){
+  const n=parseInt(val)||0;
+  const it=inventory.find(x=>x.id===id);if(!it)return;
+  const thr=it.ratioThr??25;
+  const fc=n===0?'#dc2626':n<=thr?'#d97706':'#059669';
+  const disp=document.getElementById('ratio-disp-'+id);
+  if(disp){disp.textContent=n+'%';disp.style.color=fc;}
+  // update mini bar on the right side
+  const row=document.querySelector(`.inv-row [onclick*="invSetRatioDirect('${id}"]`);
+  if(row){const fill=row.closest('.inv-row')?.querySelector('.ratio-fill');const pct=row.closest('.inv-row')?.querySelector('.ratio-pct');if(fill){fill.style.width=n+'%';fill.style.background=fc;}if(pct){pct.textContent=n+'%';pct.style.color=fc;}}
+}
+function invDelete(id){document.getElementById('inv-global-popup')?.remove();appConfirm('刪除物品','確定要刪除這個物品嗎？',()=>{inventory=inventory.filter(x=>x.id!==id);saveInv();renderInventoryPage()})}
+function invTogglePopup(id,e){
+  e.stopPropagation();
+  const existing=document.getElementById('inv-global-popup');
+  if(existing){const curId=existing.dataset.itemId;existing.remove();if(curId===String(id))return;}
+  const it=inventory.find(x=>x.id===String(id));if(!it)return;
+  const btn=e.currentTarget,rect=btn.getBoundingClientRect();
+  const popup=document.createElement('div');
+  popup.id='inv-global-popup';popup.dataset.itemId=String(id);
+  popup.style.cssText=`position:fixed;z-index:2000;background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);border:1px solid var(--border);min-width:160px;overflow:hidden;right:${window.innerWidth-rect.right}px;`;
+  popup.innerHTML=`<button onclick="invOpenEdit('${it.id}')" style="display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border:none;background:none;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-primary);text-align:left"><span class="material-symbols-outlined" style="font-size:16px;color:var(--primary)">edit</span>修改資料</button>
+    <button onclick="invDelete('${it.id}')" style="display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border:none;background:none;font-size:14px;font-weight:500;cursor:pointer;color:#dc2626;text-align:left"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>`;
+  const spaceBelow=window.innerHeight-rect.bottom;
+  if(spaceBelow<120)popup.style.bottom=`${window.innerHeight-rect.top}px`;else popup.style.top=`${rect.bottom+4}px`;
+  document.body.appendChild(popup);
+  setTimeout(()=>document.addEventListener('click',_invPopupClose,{once:true}),0);
+}
+function _invPopupClose(){const p=document.getElementById('inv-global-popup');if(p)p.remove();}
+
+// ── INVENTORY MODAL ───────────────────────────────────────
+function invSelectType(type,el){
+  invCurrentType=type;
+  document.querySelectorAll('.itype-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');
+  document.getElementById('inv-g-expiry').classList.toggle('show',type==='expiry');
+}
+function invToggleRestock(btn){
+  btn.classList.toggle('on');invRestockOn=btn.classList.contains('on');
+  document.getElementById('inv-g-restock').classList.toggle('show',invRestockOn);
+}
+function invSetMode(mode,el){
+  invQtyMode=mode;
+  document.querySelectorAll('.mode-seg-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  document.getElementById('inv-g-qty').style.display=mode==='qty'?'block':'none';
+  document.getElementById('inv-g-ratio').style.display=mode==='ratio'?'block':'none';
+}
+function invOnCatChange(){
+  const v=document.getElementById('inv-f-category').value;
+  document.getElementById('inv-f-category-custom').style.display=v==='__custom'?'block':'none';
+}
+function invOnSourceChange(){
+  const v=document.getElementById('inv-f-source').value;
+  document.getElementById('inv-f-source-custom').style.display=v==='__custom'?'block':'none';
+}
+function invOpenAdd(prefillLoc = null, prefillSub = null){
+  invEditingId=null;invCurrentType='item';invQtyMode='qty';invRestockOn=false;
+  document.getElementById('inv-modal-title').textContent='新增物品';
+  document.getElementById('inv-edit-id').value='';
+  document.getElementById('inv-f-name').value='';document.getElementById('inv-f-note').value='';
+
+  // 🌟 修正點 1：自動帶入存放位置
+  const targetLoc = prefillLoc || '廚房';
+  document.getElementById('inv-f-location').value = targetLoc;
+
+  document.getElementById('inv-f-category').value='日常用品';
+  document.getElementById('inv-f-category-custom').style.display='none';document.getElementById('inv-f-category-custom').value='';
+  document.getElementById('inv-f-expiry').value='';
+  document.getElementById('inv-f-qty').value='';document.getElementById('inv-f-threshold').value='1';
+  document.getElementById('inv-f-ratio').value='50';document.getElementById('inv-ratio-disp').textContent='50%';
+  document.getElementById('inv-f-ratio-thr').value='25';
+  document.getElementById('inv-f-source').value='';document.getElementById('inv-f-source-custom').style.display='none';
+  document.querySelectorAll('.itype-opt').forEach((o,i)=>o.classList.toggle('sel',i===0));
+  document.getElementById('inv-g-expiry').classList.remove('show');
+  document.getElementById('inv-tgl-restock').classList.remove('on');
+  document.getElementById('inv-g-restock').classList.remove('show');
+  invSetMode('qty',document.getElementById('inv-mode-qty'));
+
+  // 🌟 修正點 2：自動帶入並選取「細分位置」
+  invPopulateSublocDropdown(targetLoc, prefillSub);
+
+  document.getElementById('invItemModal').classList.add('open');
+}
+function invOpenEdit(id){
+  document.getElementById('inv-global-popup')?.remove();
+  const it=inventory.find(x=>x.id===id);if(!it)return;invEditingId=id;
+  document.getElementById('inv-modal-title').textContent='修改物品';document.getElementById('inv-edit-id').value=id;
+  document.getElementById('inv-f-name').value=it.name;document.getElementById('inv-f-note').value=it.note||'';
+  document.getElementById('inv-f-location').value=it.location;
+  const knownCats=['日常用品','保養品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
+  if(knownCats.includes(it.category||'')){
+    document.getElementById('inv-f-category').value=it.category||'其他';
+    document.getElementById('inv-f-category-custom').style.display='none';
+  }else{
+    document.getElementById('inv-f-category').value='__custom';
+    document.getElementById('inv-f-category-custom').style.display='block';
+    document.getElementById('inv-f-category-custom').value=it.category||'';
+  }
+  document.getElementById('inv-f-expiry').value=it.expiryDate||'';
+  invCurrentType=it.type;
+  document.querySelectorAll('.itype-opt').forEach((o,i)=>o.classList.toggle('sel',i===(it.type==='expiry'?1:0)));
+  document.getElementById('inv-g-expiry').classList.toggle('show',it.type==='expiry');
+  invRestockOn=!!it.restock;
+  document.getElementById('inv-tgl-restock').classList.toggle('on',invRestockOn);
+  document.getElementById('inv-g-restock').classList.toggle('show',invRestockOn);
+  invQtyMode=it.qtyMode||'qty';
+  invSetMode(invQtyMode,document.getElementById('inv-mode-'+invQtyMode));
+  document.getElementById('inv-f-qty').value=it.qty??'';document.getElementById('inv-f-threshold').value=it.threshold??1;
+  const r=it.ratio??50;document.getElementById('inv-f-ratio').value=r;document.getElementById('inv-ratio-disp').textContent=r+'%';
+  document.getElementById('inv-f-ratio-thr').value=it.ratioThr??25;
+  const knownSrc=['','蝦皮','酷澎','全聯','大潤發','家樂福','momo','藥局'];
+  if(knownSrc.includes(it.source||'')){document.getElementById('inv-f-source').value=it.source||'';document.getElementById('inv-f-source-custom').style.display='none';}
+  else{document.getElementById('inv-f-source').value='__custom';document.getElementById('inv-f-source-custom').style.display='block';document.getElementById('inv-f-source-custom').value=it.source||'';}
+  invPopulateSublocDropdown(it.location,it.subLocationId||null);
+  document.getElementById('invItemModal').classList.add('open');
+}
+function invSaveItem(){
+  const name=document.getElementById('inv-f-name').value.trim();if(!name){showToast('請輸入物品名稱','error');return}
+  const location=document.getElementById('inv-f-location').value;
+  const catSel=document.getElementById('inv-f-category').value;
+  const category=catSel==='__custom'?document.getElementById('inv-f-category-custom').value.trim()||'其他':catSel;
+  const srcSel=document.getElementById('inv-f-source').value;
+  const source=srcSel==='__custom'?document.getElementById('inv-f-source-custom').value.trim():srcSel;
+  const subLocVal=document.getElementById('inv-f-subloc')?.value||'';
+  // 先把輸入框的值抓出來當字串判斷
+  const rawQty = document.getElementById('inv-f-qty').value;
+  const rawThr = document.getElementById('inv-f-threshold').value;
+  
+  const obj={
+    id:invEditingId||Date.now().toString(),type:invCurrentType,name,location,
+    category,
+    note:document.getElementById('inv-f-note').value.trim(),
+    expiryDate:invCurrentType==='expiry'?document.getElementById('inv-f-expiry').value||null:null,
+    restock:invRestockOn,qtyMode:invQtyMode,
+    qty:invRestockOn&&invQtyMode==='qty'?(rawQty===''?0:parseInt(rawQty)):null,
+    threshold:invRestockOn&&invQtyMode==='qty'?(rawThr===''?1:parseInt(rawThr)):null,
+    ratio:invRestockOn&&invQtyMode==='ratio'?parseInt(document.getElementById('inv-f-ratio').value):null,
+    ratioThr:invRestockOn&&invQtyMode==='ratio'?parseInt(document.getElementById('inv-f-ratio-thr').value):null,
+    source:invRestockOn?source:'',
+    subLocationId:subLocVal||null,
+  };
+  if(!invEditingId){
+    const dup=inventory.find(x=>x.name===name&&x.location===location);
+    if(dup){
+      appConfirm('物品已存在',`「${name}」已在「${location}」中，確定要新增嗎？`,()=>{inventory.push(obj);saveInv();closeModal('invItemModal');renderInventoryPage();showToast('已新增');},{danger:false,icon:'inventory_2'});
+      return;
+    }
+  }
+  if(invEditingId)inventory=inventory.map(x=>x.id===invEditingId?obj:x);else inventory.push(obj);
+  saveInv();
+  closeModal('invItemModal');
+
+  // 根據當前頁籤狀態，決定回傳到哪個畫面
+  if(invCurrentTab === 'location' && invLocMode === 'fp') {
+    renderFloorplanPage(); // 回到平面圖子模式
+  } else if(invCurrentTab === 'locmgr') {
+    renderLocMgrPage();    // 回到位置管理頁面
+  } else {
+    renderInventoryPage(); // 回到標準物品清單
+  }
+}
+
+// ── INVENTORY IMPORT ──────────────────────────────────────
+function invOpenImport(){invPendingImport=[];const r=document.getElementById('inv-import-result');r.classList.remove('show');r.innerHTML='';document.getElementById('inv-import-confirm-btn').style.display='none';document.getElementById('inv-xlsx-file').value='';document.getElementById('invImportModal').classList.add('open');}
+function invDownloadTemplate(){
+  const rows=[
+    ['物品名稱','物品類型','存放位置','細分位置(選填)','物品類別','備註','到期日(YYYY-MM-DD)','需補貨追蹤(是/否)','目前數量','補貨門檻','補貨來源'],
+    ['感冒藥','有效期限','藥箱','藥箱上層','藥品保健','小朋友用','2026-12-31','否','','',''],
+    ['洗碗精','一般物品','廚房','流理台下','清潔用品','橘子香','','是','2','1','全聯'],
+    ['沐浴乳','一般物品','浴室','浴室收納櫃','日常用品','','','是（比例）','','25%','momo']
+  ];
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='物品庫存範本_含細分位置.csv';
+  a.click();
+}
+function invHandleImport(e){
+  const file=e.target.files[0];if(!file)return;const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      let rows=[];
+      if(file.name.endsWith('.csv')){rows=ev.target.result.split('\n').map(l=>{const out=[];let cur='',inQ=false;for(const ch of l){if(ch==='"'){inQ=!inQ}else if(ch===','&&!inQ){out.push(cur.trim());cur=''}else{cur+=ch}}out.push(cur.trim());return out;});}
+      else{const wb=XLSX.read(ev.target.result,{type:'array'});rows=XLSX.utils.sheet_to_array(wb.Sheets[wb.SheetNames[0]],{defval:''});}
+      invPendingImport=[];
+      for(let i=1;i<rows.length;i++){
+        const r=rows[i],name=String(r[0]||'').trim();if(!name)continue;
+        const typeRaw=String(r[1]||'').trim(),type=typeRaw==='有效期限'?'expiry':'item';
+        const loc=String(r[2]||'').trim()||'其他';
+        const subLocName=String(r[3]||'').trim(); // 🌟 讀取第4欄：細分位置
+        const cat=String(r[4]||'').trim()||'其他';
+        const note=String(r[5]||'').trim();
+        const expiryDate=type==='expiry'?String(r[6]||'').trim()||null:null;
+        const restockRaw=String(r[7]||'').trim(),restock=restockRaw.startsWith('是');
+        const isRatio=restockRaw.includes('比例');
+        const ratioThrRaw=parseInt(String(r[9]||'').replace('%',''))||25;
+        
+        // 抓出匯入欄位的原始字串
+        const rawQty = String(r[8]||'').trim();
+        const rawThr = String(r[9]||'').trim();
+        
+        invPendingImport.push({
+          id:Date.now().toString()+i, type, name, location:loc, subLocationName:subLocName, 
+          category:cat, note, expiryDate, restock, qtyMode:isRatio?'ratio':'qty',
+          qty:restock&&!isRatio?(rawQty===''?0:parseInt(rawQty)):null,
+          threshold:restock&&!isRatio?(rawThr===''?1:parseInt(rawThr)):null,
+          ratio:restock&&isRatio?50:null, ratioThr:restock&&isRatio?ratioThrRaw:null,
+          source:String(r[10]||'').trim()
+        });
+      }
+      const res=document.getElementById('inv-import-result');res.classList.add('show');
+      if(invPendingImport.length>0){
+        const dupes=invPendingImport.filter(it=>inventory.some(ex=>ex.name===it.name&&ex.location===it.location));
+        const news=invPendingImport.filter(it=>!dupes.includes(it));
+        let html=`<p style="font-weight:700;color:#059669;margin-bottom:6px">解析成功，共 ${invPendingImport.length} 筆</p>`;
+        if(news.length) html+=`<p style="font-size:12px;margin-bottom:4px">✅ 新增 ${news.length} 筆：${news.slice(0,3).map(x=>x.name).join('、')}${news.length>3?'…':''}</p>`;
+        if(dupes.length) html+=`<p style="font-size:12px;color:#d97706;margin-bottom:2px">⚠️ 發現 ${dupes.length} 筆重複（名稱+位置相同），確認後將略過</p>`;
+        res.innerHTML=html;res.style.color='var(--text-primary)';
+        document.getElementById('inv-import-confirm-btn').style.display=news.length>0?'block':'none';
+        if(news.length===0){res.innerHTML+=`<p style="font-size:12px;color:#dc2626;margin-top:6px;font-weight:600">所有項目均已存在，無需匯入。</p>`;}
+      }else{res.style.color='#dc2626';res.innerHTML='<p>找不到有效資料，請確認格式是否正確</p>';}
+    }catch(err){const res=document.getElementById('inv-import-result');res.classList.add('show');res.style.color='#dc2626';res.innerHTML=`<p>解析失敗：${err.message}</p>`;}
+  };
+  if(file.name.endsWith('.csv'))reader.readAsText(file,'UTF-8');else reader.readAsArrayBuffer(file);
+}
+function invConfirmImport(){
+  const toAdd=invPendingImport.filter(it=>!inventory.some(ex=>ex.name===it.name&&ex.location===it.location));
+  const skipped=invPendingImport.length-toAdd.length;
+  
+  // 🌟 智慧建置邏輯：自動為匯入的物品建立房間與細分位置
+  toAdd.forEach(it=>{
+    if(it.location){
+      let room=locations.find(r=>r.name===it.location);
+      if(!room){
+        room={id:locGenId('room'),name:it.location,icon:'🏠',bgColor:'#F8FAFC',subLocations:[]};
+        locations.push(room);
+      }
+      if(it.subLocationName){
+        let subloc=room.subLocations.find(sl=>sl.name===it.subLocationName);
+        if(!subloc){
+          // 如果細分位置不存在，自動產生一個預設的藍色方塊 (之後可以去預覽頁面自由拖拉)
+          subloc={id:locGenId('subloc'),name:it.subLocationName,color:'#5b52e8',x:50,y:50,w:100,h:80};
+          room.subLocations.push(subloc);
+        }
+        it.subLocationId=subloc.id; // 綁定到系統 ID
+      }
+    }
+    delete it.subLocationName; // 清理多餘欄位
+  });
+
+  inventory=[...inventory,...toAdd];
+  saveInv(); saveLocations(); // 儲存庫存與新產生的位置
+  closeModal('invImportModal'); renderInventoryPage();
+  showToast(`成功匯入 ${toAdd.length} 筆${skipped>0?`，略過 ${skipped} 筆重複`:''}`);
+  invPendingImport=[];
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+let appSettings=JSON.parse(localStorage.getItem('app_settings')||'{}');
+function saveSetting(key,val){appSettings[key]=val;localStorage.setItem('app_settings',JSON.stringify(appSettings))}
+function toggleSetting(key,btn){appSettings[key]=!appSettings[key];btn.classList.toggle('on',appSettings[key]);localStorage.setItem('app_settings',JSON.stringify(appSettings));renderAll()}
+function renderSettingsPage(){
+  const sn=document.getElementById('set-name'),se=document.getElementById('set-email');
+  const sdf=document.getElementById('set-default-filter'),to=document.getElementById('tog-overdue');
+  const tn=document.getElementById('tog-notes'),td=document.getElementById('tog-desc');
+  if(sn)sn.value=appSettings.userName||'';if(se)se.value=appSettings.userEmail||'';
+  if(sdf)sdf.value=appSettings.defaultFilter||'all';
+  if(to)to.classList.toggle('on',appSettings.showOverdue!==false);
+  if(tn)tn.classList.toggle('on',appSettings.showNotes!==false);
+  if(td)td.classList.toggle('on',appSettings.showDesc!==false);
+}
+
+// ── TOAST / CONFIRM / INPUT ───────────────────────────────
+let _toastTimer=null;
+function showToast(msg,type='success'){
+  const el=document.getElementById('app-toast'),icon=document.getElementById('app-toast-icon'),msgEl=document.getElementById('app-toast-msg');
+  if(!el)return;
+  icon.textContent=type==='error'?'error':type==='warn'?'warning':'check_circle';
+  icon.style.color=type==='error'?'#fca5a5':type==='warn'?'#fde68a':'#6ee7b7';
+  msgEl.textContent=msg;
+  if(_toastTimer)clearTimeout(_toastTimer);
+  el.style.opacity='1';el.style.transform='translateX(-50%) translateY(0)';
+  _toastTimer=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(-50%) translateY(20px)';},2500);
+}
+let _confirmCb=null;
+function appConfirm(title,msg,cb,{danger=true,icon='warning'}={}){
+  document.getElementById('app-confirm-title').textContent=title;
+  document.getElementById('app-confirm-msg').textContent=msg||'';
+  const iconEl=document.getElementById('app-confirm-icon'),iconWrap=document.getElementById('app-confirm-icon-wrap'),okBtn=document.getElementById('app-confirm-ok');
+  iconEl.textContent=icon;iconEl.style.color=danger?'#dc2626':'var(--primary)';
+  iconWrap.style.background=danger?'#fee2e2':'var(--primary-light)';
+  okBtn.style.background=danger?'#dc2626':'var(--primary)';
+  _confirmCb=cb;document.getElementById('app-confirm-overlay').style.display='flex';
+}
+function appConfirmOk(){document.getElementById('app-confirm-overlay').style.display='none';if(_confirmCb){const cb=_confirmCb;_confirmCb=null;cb();}}
+function appConfirmCancel(){document.getElementById('app-confirm-overlay').style.display='none';_confirmCb=null;}
+let _inputCb=null;
+function appPrompt(title,defaultVal,cb){
+  document.getElementById('app-input-title').textContent=title;
+  const f=document.getElementById('app-input-field');f.value=defaultVal??'';
+  _inputCb=cb;document.getElementById('app-input-overlay').style.display='flex';
+  setTimeout(()=>f.focus(),100);
+}
+function appInputOk(){
+  const val=document.getElementById('app-input-field').value;
+  document.getElementById('app-input-overlay').style.display='none';
+  if(_inputCb){const cb=_inputCb;_inputCb=null;cb(val);}
+}
+function appInputCancel(){document.getElementById('app-input-overlay').style.display='none';_inputCb=null;}
+
+function renderAll(){twRenderAll();renderTasksPage();renderHouseworkPage();}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────
+function copyShareLink(){const data=JSON.stringify({tasks,housework});const url=location.origin+location.pathname+'#data='+btoa(unescape(encodeURIComponent(data)));navigator.clipboard.writeText(url).then(()=>showToast('連結已複製')).catch(()=>showToast('複製失敗，請手動複製','error'));}
+
+// ── CLICK LISTENERS ───────────────────────────────────────
+document.addEventListener('click',function(e){
+  closeAllPopups();
+  if(openAssignDay&&!e.target.closest('.day-assign-dropdown')){openAssignDay=null;renderTasksPage();}
+});
+
+// ══════════════════════════════════════════════════════════
+// TO DO WEEKLY CALENDAR
+// ══════════════════════════════════════════════════════════
+let twWeekOffset=0,twOpenDays=new Set([todayStr]),twOpenDropDay=null,twDelayTarget=null;
+let twDropTab = 'task'; // 新增：記錄下拉選單目前停留在哪一個頁籤
+function twSetDropTab(tab, e) {
+  e.stopPropagation();
+  twDropTab = tab;
+  twRender(); // 切換頁籤後重新渲染畫面
+}
+let twDragHintShown=false,twProgMode='day';
+let twDrag={active:false,sid:null,ghost:null,overDate:null,startEl:null,longPressTimer:null,startX:0,startY:0};
+
+const TW_DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+function twGetWeekDays(off){
+  const base=new Date(NOW);base.setDate(base.getDate()+off*7);
+  const dow=base.getDay(),mon=new Date(base);mon.setDate(base.getDate()-(dow===0?6:dow-1));
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return toLD(d)});
+}
+function twShiftW(d){twWeekOffset+=d;twOpenDropDay=null;twRender()}
+function twJumpToday(){twWeekOffset=0;twOpenDays.add(todayStr);twOpenDropDay=null;twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+
+// Build schedule from tasks + housework
+function twGetSchedule(){
+  const sched=[];
+  tasks.forEach(t=>{
+    if(!t.plannedDate)return;
+    sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,status:t.status==='已完成'?'done':'pending',isTask:true});
+  });
+  housework.forEach(h=>{
+    // 1. 尚未完成的排程
+    if(h.reminderDate){
+      sched.push({id:h.id,type:'hw',title:h.name,date:h.reminderDate,status:'pending',isHw:true});
+    }
+    // 2. 已完成的歷史紀錄 (讓它留在畫面上顯示灰底劃線)
+    if(h.history && h.history.length > 0) {
+      h.history.forEach(d => {
+        if(d !== h.reminderDate) {
+          sched.push({id:h.id,type:'hw',title:h.name,date:d,status:'done',isHw:true});
+        }
+      });
+    }
+  });
+  return sched;
+}
+
+function twRenderAll(){
+  const el=document.getElementById('page-todo');
+  if(!el||!el.classList.contains('active'))return;
+  twRender();
+}
+
+function twRender(){
+  const days=twGetWeekDays(twWeekOffset);
+  const wnl=document.getElementById('tw-wnl');
+  const wns=document.getElementById('tw-wns');
+  if(!wnl)return;
+  wnl.textContent=twWeekOffset===0?'本週':twWeekOffset===-1?'上週':twWeekOffset===1?'下週':fmtD(days[0])+' 那週';
+  wns.textContent=fmtD(days[0])+' – '+fmtD(days[6]);
+  twRenderProg(days);
+  const hint=document.getElementById('tw-drag-hint');
+  if(hint)hint.style.display=twDragHintShown?'none':'flex';
+  const wlist=document.getElementById('tw-wlist');
+  if(wlist)wlist.innerHTML=days.map(d=>twRenderDay(d)).join('');
+  twBindDragEvents();
+}
+
+function twRenderProg(days){
+  const el=document.getElementById('tw-prog');if(!el)return;
+  const sched=twGetSchedule();
+  let items=twProgMode==='day'?sched.filter(s=>s.date===todayStr):sched.filter(s=>days.includes(s.date));
+  const done=items.filter(s=>s.status==='done').length;
+  const total=items.length;
+  const pct=total?Math.round(done/total*100):0;
+  const taskP=items.filter(s=>s.type==='task'&&s.status==='pending').length;
+  const hwP=items.filter(s=>s.type==='hw'&&s.status==='pending').length;
+  const ovCnt=twProgMode==='day'
+    ? sched.filter(s=>s.status==='pending'&&s.date<todayStr).length
+    : sched.filter(s=>s.status==='pending'&&s.date<todayStr&&days.includes(s.date)).length;
+  const r=17,circ=2*Math.PI*r,col=pct===100?'#10b981':'var(--primary)';
+  const dash=circ*pct/100,gap=circ-dash;
+  const label=twProgMode==='day'?'今日進度':'本週進度';
+  const sub=twProgMode==='day'?new Date().toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'short'}):fmtD(days[0])+' – '+fmtD(days[6]);
+  let ch='';
+  if(ovCnt>0)ch+=`<span class="tw-chip" style="background:var(--danger-light);color:var(--danger)">⚠️ ${ovCnt} 件逾期</span>`;
+  if(taskP>0)ch+=`<span class="tw-chip" style="background:var(--primary-light);color:var(--primary)">📝 任務 ${taskP}</span>`;
+  if(hwP>0)ch+=`<span class="tw-chip" style="background:#fffbeb;color:#d97706">🏠 家事 ${hwP}</span>`;
+  if(pct===100&&total>0)ch+=`<span class="tw-chip" style="background:#d1fae5;color:#059669">✓ 全完成！</span>`;
+  if(total===0&&ovCnt===0)ch+=`<span class="tw-chip" style="background:var(--border-light);color:var(--text-muted)">尚未安排</span>`;
+  el.innerHTML=`
+    <div class="tw-prog-ring">
+      <svg width="44" height="44" viewBox="0 0 44 44">
+        <circle cx="22" cy="22" r="${r}" fill="none" stroke="#e8edf5" stroke-width="4.5"/>
+        <circle cx="22" cy="22" r="${r}" fill="none" stroke="${col}" stroke-width="4.5" stroke-dasharray="${dash} ${gap}" stroke-linecap="round"/>
+      </svg>
+      <div class="tw-prog-pct">${pct}%</div>
+    </div>
+    <div class="tw-prog-info">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        <div class="tw-prog-t">${label}${total>0?' — '+done+'/'+total+' 件':''}</div>
+        <div style="display:flex;gap:2px;background:var(--border-light);border-radius:6px;padding:2px;flex-shrink:0">
+          <button onclick="twProgMode='day';twRender()" style="padding:3px 9px;border-radius:5px;border:none;background:${twProgMode==='day'?'var(--surface)':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='day'?'var(--text-primary)':'var(--text-muted)'};cursor:pointer;font-family:'Noto Sans TC',sans-serif">今日</button>
+          <button onclick="twProgMode='week';twRender()" style="padding:3px 9px;border-radius:5px;border:none;background:${twProgMode==='week'?'var(--surface)':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='week'?'var(--text-primary)':'var(--text-muted)'};cursor:pointer;font-family:'Noto Sans TC',sans-serif">本週</button>
+        </div>
+      </div>
+      <div class="tw-prog-s">${sub}</div>
+      <div class="tw-prog-chips">${ch}</div>
+    </div>`;
+}
+
+function twRenderDay(d){
+  const sched=twGetSchedule();
+  const items=sched.filter(s=>s.date===d);
+  const pending=items.filter(s=>s.status==='pending');
+  const isToday=d===todayStr,isPast=d<todayStr;
+  const hasOv=isPast&&pending.length>0;
+  const isOpen=twOpenDays.has(d),isDropOpen=twOpenDropDay===d;
+  const dt=new Date(d+'T00:00:00'),dowIdx=dt.getDay();
+  // Pills
+  const MAX=4;let pillHtml='';
+  if(!items.length){pillHtml=`<span class="tw-emptyp">空閒</span>`;}
+  else{
+    items.slice(0,MAX).forEach(s=>{
+      const isDone=s.status==='done',isOv=!isDone&&isPast;
+      let cls=s.type==='hw'?'tw-hw-p':'tw-task-p';
+      if(isDone)cls='tw-done-p';else if(isOv)cls='tw-ov-p';
+      const draggable=!isDone;
+      pillHtml+=`<span class="tw-mp ${cls}" data-sid="${s.id}" data-stype="${s.type}" data-date="${d}" data-draggable="${draggable}">${s.title}</span>`;
+    });
+    if(items.length>MAX)pillHtml+=`<span class="tw-morep">+${items.length-MAX}</span>`;
+  }
+  // Detail rows
+  let detHtml='';
+  if(!items.length){detHtml=`<div class="tw-det-empty">這天還沒有安排 · 點 <b>+</b> 新增</div>`;}
+  else{
+    detHtml=items.map(s=>{
+      const isDone=s.status==='done',isOv=!isDone&&isPast;
+      return`<div class="tw-irow">
+        <div class="tw-icb ${isDone ? (s.type==='hw' ? 'tw-done tw-hw-done' : 'tw-done') : ''}" onclick="twToggleDone('${s.id}','${s.type}','${d}')"></div>
+        <div class="tw-iinfo">
+          <div class="tw-iname ${isDone?'tw-done-t':''}">${s.title}</div>
+          <div class="tw-imeta">
+            <div class="tw-idot" style="background:${s.type==='hw'?'#d97706':'var(--primary)'}"></div>
+            <span class="tw-ilbl">${s.type==='hw'?'家事':'任務'}</span>
+            ${isOv?`<span class="tw-ovbadge">逾期</span>`:''}
+          </div>
+        </div>
+        <div class="tw-ibtns">
+          ${!isDone?`<button class="tw-ib tw-dly" onclick="twOpenDelay('${s.id}','${s.type}',event)"><span class="material-symbols-outlined" style="font-size:17px">schedule</span></button>`:''}
+          <button class="tw-ib tw-del" onclick="twRemoveItem('${s.id}','${s.type}',event)"><span class="material-symbols-outlined" style="font-size:17px">delete</span></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // 抓取當天已排的任務與家事 ID，用來將選單中的項目標示為「已排」並反灰
+  const tasksToday = tasks.filter(t => t.plannedDate === d);
+  const assignedTaskTemplateIds = new Set(tasksToday.map(t => t.templateId || t.id));
+  const assignedHwIds = new Set(housework.filter(h => h.reminderDate === d).map(h => h.id));
+
+  // 抓取「完整」的任務模板與家事清單
+  const allTaskTemplates = tasks.filter(t => !t.templateId); 
+  const allHw = housework;
+
+  let dropHtml='';
+  if(isDropOpen){
+    // 建立頂部切換頁籤 (Tabs)
+    const tabHtml = `
+      <div style="display:flex; border-bottom:1px solid var(--border-light); position:sticky; top:0; background:var(--surface); z-index:2">
+        <button onclick="twSetDropTab('task', event)" style="flex:1; justify-content:center; padding:10px 0; font-size:12px; font-weight:700; border:none; background:none; cursor:pointer; color:${twDropTab==='task'?'var(--primary)':'var(--text-muted)'}; border-bottom:2px solid ${twDropTab==='task'?'var(--primary)':'transparent'}">📝 任務</button>
+        <button onclick="twSetDropTab('hw', event)" style="flex:1; justify-content:center; padding:10px 0; font-size:12px; font-weight:700; border:none; background:none; cursor:pointer; color:${twDropTab==='hw'?'#d97706':'var(--text-muted)'}; border-bottom:2px solid ${twDropTab==='hw'?'#d97706':'transparent'}">🏠 家事</button>
+      </div>
+    `;
+
+    let inner = '';
+    // 根據目前選取的頁籤顯示對應的完整列表
+    if (twDropTab === 'task') {
+      if(allTaskTemplates.length){
+        allTaskTemplates.forEach(t=>{
+          const already = assignedTaskTemplateIds.has(t.id);
+          inner+=`<button onclick="twAssignTask('${t.id}','${d}',event)" class="${already?'tw-alr':''}">${t.title}${already?'<span class="tw-anote">已排</span>':''}</button>`;
+        });
+      }else{
+        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">無任務可排</div>`;
+      }
+    } else {
+      if(allHw.length){
+        allHw.forEach(h=>{
+          const already = assignedHwIds.has(h.id);
+          inner+=`<button onclick="twAssignHw('${h.id}','${d}',event)" class="tw-hwo ${already?'tw-alr':''}">${h.name}${already?'<span class="tw-anote">已排</span>':''}</button>`;
+        });
+      }else{
+        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">無家事可排</div>`;
+      }
+    }
+
+    dropHtml=`<div class="tw-adrop" id="tw-adrop-${d}" style="padding-top:0">${tabHtml}<div style="padding:4px 0">${inner}</div></div>`;
+  }
+  return`<div class="tw-dc ${isToday?'tw-today':''} ${isPast?'tw-past':''} ${hasOv?'tw-has-ov':''}" id="tw-dr-${d}" data-date="${d}">
+    <div class="tw-dhdr" onclick="twToggleDay('${d}')">
+      <div class="tw-ddate">
+        <div class="tw-dow">${TW_DOW[dowIdx]}</div>
+        <div class="tw-dom">${dt.getDate()}</div>
+      </div>
+      <div class="tw-pstrip">${pillHtml}</div>
+      <div class="tw-dright" onclick="event.stopPropagation()">
+        <div class="tw-dawrap">
+          <button class="tw-dabtn ${isDropOpen?'open':''}" onclick="twToggleDrop('${d}',event)">
+            <span class="material-symbols-outlined" style="font-size:15px">${isDropOpen?'close':'add'}</span>
+          </button>
+          ${dropHtml}
+        </div>
+        <span class="material-symbols-outlined tw-dchev ${isOpen?'open':''}">expand_more</span>
+      </div>
+    </div>
+    <div class="tw-ddet ${isOpen?'open':''}">${detHtml}</div>
+  </div>`;
+}
+
+// ── Actions ──
+function twToggleDay(d){if(twOpenDays.has(d))twOpenDays.delete(d);else twOpenDays.add(d);twOpenDropDay=null;twRender()}
+function twToggleDrop(d,e){
+  e.stopPropagation();twOpenDropDay=(twOpenDropDay===d)?null:d;twRender();
+  if(twOpenDropDay){requestAnimationFrame(()=>{const el=document.getElementById('tw-adrop-'+d);if(!el)return;if(el.getBoundingClientRect().bottom>window.innerHeight-100)el.classList.add('flip');});}
+}
+function twAssignTask(tid,d,e){
+  e.stopPropagation();
+  tasks=tasks.map(t=>t.id===tid?{...t,plannedDate:d,status:'待辦'}:t);
+  saveData();twOpenDropDay=null;twOpenDays.add(d);showToast('已排入 '+fmtD(d));twRender();
+}
+function twAssignHw(hid,d,e){
+  e.stopPropagation();
+  housework=housework.map(h=>h.id===hid?{...h,reminderDate:d}:h);
+  saveData();twOpenDropDay=null;twOpenDays.add(d);showToast('已排入 '+fmtD(d));twRender();
+}
+function twToggleDone(sid, stype, dateStr){
+  if(stype==='task'){
+    tasks=tasks.map(t=>t.id===sid?{...t,status:t.status==='已完成'?'待辦':'已完成'}:t);
+    saveData();showToast('任務狀態已更新');
+  }else{
+    const hw = housework.find(h => h.id === sid);
+    if(!hw) return;
+    const hist = hw.history || [];
+    
+    if(hist.includes(dateStr)){
+      // 取消完成：從歷史紀錄移除，並將提醒日退回這一天
+      hw.history = hist.filter(x => x !== dateStr);
+      hw.reminderDate = dateStr;
+      showToast('已取消完成');
+    } else {
+      // 勾選完成：加入歷史紀錄，並計算下一次提醒日
+      hw.history = [...hist, dateStr];
+      
+      // 🌟 修正重點 1：下一次提醒日，從「該日曆日期 (dateStr)」加上頻率來計算
+      let nr = hw.frequency > 0 ? addD(dateStr, hw.frequency) : hw.reminderDate;
+      if(hw.weekendMode && nr) nr = nextWeekend(nr);
+      
+      // 🌟 修正重點 2：上次完成日，記錄為「該日曆日期 (dateStr)」而不是現實的今天
+      hw.lastCompleted = dateStr;
+      hw.reminderDate = nr;
+      showToast('家事已完成');
+    }
+    saveData();
+  }
+  twRender();
+}
+function twOpenDelay(sid,stype,e){
+  e.stopPropagation();twDelayTarget={sid,stype};
+  const name=stype==='task'?tasks.find(t=>t.id===sid)?.title:housework.find(h=>h.id===sid)?.name;
+  document.getElementById('tw-dly-name').textContent=name||'';
+  document.getElementById('tw-dlysh').classList.add('show');document.getElementById('tw-scrim').classList.add('show');
+}
+function twCloseDelay() {
+  document.getElementById('tw-dlysh').classList.remove('show');
+  document.getElementById('tw-scrim').classList.remove('show');
+  const sec = document.getElementById('twCustomDateSection');
+  if(sec) sec.classList.remove('show');
+}
+
+function twToggleCustomDate() {
+  const sec = document.getElementById('twCustomDateSection');
+  sec.classList.toggle('show');
+  if (sec.classList.contains('show')) {
+    const inp = document.getElementById('twCustomDelayDate');
+    inp.value = todayStr;
+    inp.min = todayStr;
+    setTimeout(() => inp.focus(), 100);
+  }
+}
+
+function twApplyCustomDelay() {
+  const val = document.getElementById('twCustomDelayDate').value;
+  if (!val) { showToast('請選擇日期', 'error'); return; }
+  if (!twDelayTarget) return;
+
+  const {sid, stype} = twDelayTarget;
+  if (stype === 'task') {
+    tasks = tasks.map(t => t.id === sid ? {...t, plannedDate: val, status: '延後'} : t);
+  } else {
+    housework = housework.map(h => h.id === sid ? {...h, reminderDate: val} : h);
+  }
+
+  saveData();
+  twCloseDelay();
+  showToast('已延後至 ' + fmtD(val)); 
+  twRender();
+}
+function twApplyDelay(days){
+  if(!twDelayTarget)return;
+  const{sid,stype}=twDelayTarget;
+  if(stype==='task'){tasks=tasks.map(t=>t.id===sid?{...t,plannedDate:addD(t.plannedDate||todayStr,days),status:'延後'}:t);}
+  else{housework=housework.map(h=>h.id===sid?{...h,reminderDate:addD(h.reminderDate||todayStr,days)}:h);}
+  saveData();twCloseDelay();showToast('已延後 '+days+' 天');twRender();
+}
+function twRemoveItem(sid, stype, e) {
+  e.stopPropagation();
+  appConfirm('移除項目', '確定要將此項目從這天移除嗎？', () => {
+    if (stype === 'task') {
+      tasks = tasks.map(t => t.id === sid ? {...t, plannedDate: '', status: '待辦'} : t); // 狀態順便改回待辦
+    } else {
+      housework = housework.map(h => h.id === sid ? {...h, reminderDate: ''} : h);
+    }
+    saveData();
+    twRender();
+    showToast('已從清單移除');
+  });
+}
+
+// ── Drag & Drop ──
+function twBindDragEvents(){
+  document.querySelectorAll('.tw-mp[data-draggable="true"]').forEach(el=>{
+    el.addEventListener('touchstart',twOnTouchStart,{passive:false});
+    el.addEventListener('mousedown',twOnMouseDown);
+  });
+}
+function twOnTouchStart(e){
+  const el=e.currentTarget;
+  twDrag.startX=e.touches[0].clientX;twDrag.startY=e.touches[0].clientY;twDrag.startEl=el;
+  twDrag.longPressTimer=setTimeout(()=>twStartDrag(el,twDrag.startX,twDrag.startY),350);
+  el.addEventListener('touchmove',twOnTouchMove,{passive:false});
+  el.addEventListener('touchend',twOnTouchEnd);
+  el.addEventListener('touchcancel',twCleanup);
+}
+function twOnTouchMove(e){
+  const dx=e.touches[0].clientX-twDrag.startX,dy=e.touches[0].clientY-twDrag.startY;
+  if(!twDrag.active){if(Math.abs(dx)>6||Math.abs(dy)>6){clearTimeout(twDrag.longPressTimer);twDrag.longPressTimer=null;}return;}
+  e.preventDefault();twMoveGhost(e.touches[0].clientX,e.touches[0].clientY);twHighlight(e.touches[0].clientX,e.touches[0].clientY);
+}
+function twOnTouchEnd(e){
+  clearTimeout(twDrag.longPressTimer);twDrag.longPressTimer=null;
+  if(!twDrag.active){twCleanup();return;}
+  const t=e.changedTouches[0];twDrop(t.clientX,t.clientY);twCleanup();
+}
+function twOnMouseDown(e){
+  if(e.button!==0)return;
+  const el=e.currentTarget;twDrag.startX=e.clientX;twDrag.startY=e.clientY;twDrag.startEl=el;
+  twDrag.longPressTimer=setTimeout(()=>twStartDrag(el,twDrag.startX,twDrag.startY),300);
+  document.addEventListener('mousemove',twOnMouseMove);document.addEventListener('mouseup',twOnMouseUp);
+}
+function twOnMouseMove(e){
+  const dx=e.clientX-twDrag.startX,dy=e.clientY-twDrag.startY;
+  if(!twDrag.active){if(Math.abs(dx)>6||Math.abs(dy)>6){clearTimeout(twDrag.longPressTimer);twDrag.longPressTimer=null;}return;}
+  twMoveGhost(e.clientX,e.clientY);twHighlight(e.clientX,e.clientY);
+}
+function twOnMouseUp(e){
+  clearTimeout(twDrag.longPressTimer);twDrag.longPressTimer=null;
+  document.removeEventListener('mousemove',twOnMouseMove);document.removeEventListener('mouseup',twOnMouseUp);
+  if(!twDrag.active){twCleanup();return;}
+  twDrop(e.clientX,e.clientY);twCleanup();
+}
+function twStartDrag(el,x,y){
+  twDrag.active=true;twDrag.sid=el.dataset.sid;twDrag.stype=el.dataset.stype;
+  el.classList.add('tw-dragging');
+  const ghost=document.createElement('div');
+  ghost.className='tw-drag-ghost '+(twDrag.stype==='hw'?'tw-hw-g':'tw-task-g');
+  ghost.innerHTML=`<span class="material-symbols-outlined" style="font-size:14px">drag_indicator</span>${el.textContent.trim()}`;
+  document.body.appendChild(ghost);twDrag.ghost=ghost;
+  twDragHintShown=true;
+  const hint=document.getElementById('tw-drag-hint');if(hint)hint.style.display='none';
+  twMoveGhost(x,y);navigator.vibrate&&navigator.vibrate(40);
+}
+function twMoveGhost(x,y){if(twDrag.ghost){twDrag.ghost.style.left=x+'px';twDrag.ghost.style.top=y+'px';}}
+function twHighlight(x,y){
+  document.querySelectorAll('.tw-dc').forEach(el=>el.classList.remove('tw-drag-over'));
+  const card=document.elementFromPoint(x,y)?.closest('.tw-dc');
+  if(card)card.classList.add('tw-drag-over');
+}
+function twDrop(x,y){
+  const card=document.elementFromPoint(x,y)?.closest('.tw-dc');
+  if(!card){twCleanup();return;}
+  const targetDate=card.dataset.date;
+  const {sid,stype}=twDrag;
+  const currentDate=twDrag.startEl?.dataset.date;
+  if(targetDate===currentDate){showToast('已在同一天','info');return;}
+  if(stype==='task'){tasks=tasks.map(t=>t.id===sid?{...t,plannedDate:targetDate}:t);}
+  else{housework=housework.map(h=>h.id===sid?{...h,reminderDate:targetDate}:h);}
+  saveData();twOpenDays.add(targetDate);showToast('已移至 '+fmtD(targetDate));
+}
+function twCleanup(){
+  twDrag.active=false;twDrag.sid=null;twDrag.stype=null;
+  twDrag.startEl?.classList.remove('tw-dragging');twDrag.startEl=null;
+  twDrag.ghost?.remove();twDrag.ghost=null;
+  clearTimeout(twDrag.longPressTimer);twDrag.longPressTimer=null;
+  document.querySelectorAll('.tw-dc').forEach(el=>el.classList.remove('tw-drag-over'));
+  document.querySelectorAll('.tw-mp').forEach(el=>{
+    el.removeEventListener('touchmove',twOnTouchMove);
+    el.removeEventListener('touchend',twOnTouchEnd);
+    el.removeEventListener('touchcancel',twCleanup);
+  });
+  twRender();
+}
+document.addEventListener('click',e=>{if(twOpenDropDay&&!e.target.closest('.tw-dawrap')){twOpenDropDay=null;twRender();}});
+
+
+// ══════════════════════════════════════════════════════════
+// LOCATION / FLOORPLAN SYSTEM
+// ══════════════════════════════════════════════════════════
+
+const DL=[
+  {id:'room-1',name:'客廳',icon:'🏠',bgColor:'#E1F5EE',subLocations:[{id:'subloc-1',name:'沙發下',color:'#5b52e8',x:40,y:40,w:160,h:90},{id:'subloc-2',name:'茶几抽屜',color:'#7c3aed',x:230,y:60,w:110,h:90},{id:'subloc-3',name:'電視櫃',color:'#2563eb',x:370,y:40,w:110,h:90}]},
+  {id:'room-2',name:'臥室',icon:'🛏',bgColor:'#F5F3FF',subLocations:[{id:'subloc-4',name:'床下收納',color:'#7c3aed',x:40,y:30,w:220,h:80},{id:'subloc-5',name:'衣櫃一層',color:'#5b52e8',x:300,y:30,w:160,h:110},{id:'subloc-6',name:'衣櫃二層',color:'#2563eb',x:300,y:150,w:160,h:110}]},
+  {id:'room-3',name:'浴室',icon:'🚿',bgColor:'#ECFEFF',subLocations:[{id:'subloc-7',name:'浴室收納櫃',color:'#0891b2',x:40,y:40,w:140,h:100},{id:'subloc-8',name:'鏡櫃',color:'#0284c7',x:220,y:40,w:120,h:80}]},
+  {id:'room-4',name:'廚房',icon:'🍳',bgColor:'#FFFBEB',subLocations:[{id:'subloc-9',name:'流理台下',color:'#d97706',x:40,y:40,w:160,h:90},{id:'subloc-10',name:'冰箱旁',color:'#b45309',x:240,y:40,w:100,h:90}]},
+  {id:'room-5',name:'藥箱',icon:'💊',bgColor:'#FFF5F5',subLocations:[{id:'subloc-11',name:'藥箱上層',color:'#dc2626',x:40,y:40,w:180,h:90},{id:'subloc-12',name:'藥箱下層',color:'#b91c1c',x:40,y:150,w:180,h:90}]},
+  {id:'room-6',name:'陽台',icon:'📦',bgColor:'#F8FAFC',subLocations:[{id:'subloc-13',name:'上層架',color:'#475569',x:40,y:30,w:200,h:80},{id:'subloc-14',name:'下層地板',color:'#64748b',x:40,y:140,w:200,h:80}]}
+];
+
+let locations=[];
+let fpCurrentRoom=null,fpHighlightSubloc=null;
+let locMgrTab='rooms',locMgrRoom=null;
+
+function locFindSubloc(sublocId){for(const room of locations){const s=room.subLocations.find(sl=>sl.id===sublocId);if(s)return s;}return null;}
+function locFindRoomBySubloc(sublocId){return locations.find(r=>r.subLocations.some(sl=>sl.id===sublocId))||null;}
+function locFindRoomByName(name){return locations.find(r=>r.name===name)||null;}
+function locGenId(prefix){return prefix+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+function invOnLocationChange(){const loc=document.getElementById('inv-f-location')?.value||'';invPopulateSublocDropdown(loc,null);}
+function invPopulateSublocDropdown(locationName,selectedId){
+  const sel=document.getElementById('inv-f-subloc'),grp=document.getElementById('inv-f-subloc-group');
+  if(!sel||!grp)return;
+  const room=locFindRoomByName(locationName);
+  sel.innerHTML='<option value="">未設定</option>';
+  if(room&&room.subLocations.length){
+    room.subLocations.forEach(sl=>{const opt=document.createElement('option');opt.value=sl.id;opt.textContent=sl.name;if(sl.id===selectedId)opt.selected=true;sel.appendChild(opt);});
+    grp.style.display='block';
+  }else{
+    let any=false;
+    locations.forEach(r=>r.subLocations.forEach(sl=>{const opt=document.createElement('option');opt.value=sl.id;opt.textContent=r.name+' · '+sl.name;if(sl.id===selectedId)opt.selected=true;sel.appendChild(opt);any=true;}));
+    grp.style.display=any?'block':'none';
+  }
+}
+
+function invGoToFloorplan(sublocId){
+  const room=locFindRoomBySubloc(sublocId);if(!room){showToast('找不到對應房間','error');return;}
+  fpCurrentRoom=room.id;fpHighlightSubloc=sublocId;
+  invCurrentTab='location';invLocMode='fp';
+  // 切換 tab active 狀態
+  document.querySelectorAll('.inv-tab').forEach(t=>t.classList.remove('active'));
+  const locTab=document.getElementById('inv-tab-location');if(locTab)locTab.classList.add('active');
+  // 顯示子模式列並切換到平面圖模式
+  const modeBar=document.getElementById('inv-loc-mode-bar');if(modeBar)modeBar.style.display='block';
+  _syncLocModeBtns();
+  const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='none';
+  const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
+  renderFloorplanPage();
+}
+
+function renderFloorplanPage(){
+  const content=document.getElementById('inv-content');if(!content)return;
+  const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='none';
+  const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
+  if(!fpCurrentRoom&&locations.length)fpCurrentRoom=locations[0].id;
+  const room=locations.find(r=>r.id===fpCurrentRoom);
+  const roomOpts=locations.map(r=>`<option value="${r.id}" ${r.id===fpCurrentRoom?'selected':''}>${r.icon} ${r.name}</option>`).join('');
+  let html=`<div class="fp-wrap"><div class="fp-header"><select class="fp-room-sel" style="width:100%;font-size:14px" onchange="fpSelectRoom(this.value)">${roomOpts||'<option>（無房間）</option>'}</select></div>`;
+  if(!room){html+='<div style="padding:32px;text-align:center;color:var(--text-muted)">請先在「位置管理」新增房間</div></div>';content.innerHTML=html;return;}
+  const W=600,H=400;let svgInner='';
+  room.subLocations.forEach(sl=>{
+    const cnt=inventory.filter(it=>it.subLocationId===sl.id).length,isHL=fpHighlightSubloc===sl.id;
+    const hasUrgent=inventory.filter(it=>it.subLocationId===sl.id).some(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
+    svgInner+=`<g onclick="fpClickSubloc('${sl.id}',event)" style="cursor:pointer">
+      <rect x="${sl.x}" y="${sl.y}" width="${sl.w}" height="${sl.h}" fill="${sl.color}" fill-opacity="${isHL?'0.38':'0.18'}" stroke="${sl.color}" stroke-width="${isHL?3:1.5}" rx="6"/>
+      ${hasUrgent?`<circle cx="${sl.x+sl.w-8}" cy="${sl.y+8}" r="5" fill="#dc2626"/>`:''} 
+      <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2-6}" text-anchor="middle" font-size="11" font-weight="700" fill="${sl.color}" font-family="Noto Sans TC,sans-serif">${sl.name}</text>
+      <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2+10}" text-anchor="middle" font-size="10" fill="${sl.color}" font-family="Noto Sans TC,sans-serif" opacity="0.8">${cnt} 件</text>
+    </g>`;
+  });
+  html+=`<div class="fp-svg-area"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:${room.bgColor};border-radius:8px;max-width:100%">${svgInner}</svg></div></div>`;
+
+  if(fpHighlightSubloc){
+    const sl=room.subLocations.find(s=>s.id===fpHighlightSubloc);
+    if(sl){
+      const slItems=inventory.filter(it=>it.subLocationId===fpHighlightSubloc);
+      html+=`<div class="fp-wrap">
+        <div class="fp-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${sl.color};flex-shrink:0"></div>
+            <span style="font-size:13px;font-weight:700;color:var(--text-primary)">${sl.name}</span>
+            <span style="font-size:11px;color:var(--text-muted)">${slItems.length} 件</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="invOpenAdd('${room.name}','${sl.id}')" style="background:var(--primary);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:3px"><span class="material-symbols-outlined" style="font-size:14px">add</span>新增</button>
+            <button onclick="fpHighlightSubloc=null;renderFloorplanPage()" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted)"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+          </div>
+        </div>`;
+      if(!slItems.length){
+        html+=`<div style="padding:20px 14px;text-align:center;font-size:12px;color:var(--text-muted)">此位置尚無物品，點「新增」來加入</div>`;
+      }else{
+        // 使用完整的 invRenderRow，與位置索引一致
+        html+=`<div class="inv-list" style="border-radius:0;border:none;box-shadow:none">${slItems.map(it=>invRenderRow(it,false)).join('')}</div>`;
+      }
+      html+=`</div>`;
+    }
+  }else{
+    html+=`<div class="fp-wrap"><div class="fp-header"><div style="font-size:13px;font-weight:700;color:var(--text-primary)">點擊區域查看物品</div></div><div class="fp-item-list">`;
+    if(!room.subLocations.length){
+      html+=`<div style="padding:14px;text-align:center;font-size:12px;color:var(--text-muted)">此房間尚無細分位置，請至「位置管理」設定</div>`;
+    }else{
+      room.subLocations.forEach(sl=>{
+        const cnt=inventory.filter(it=>it.subLocationId===sl.id).length;
+        const hasUrgent=inventory.filter(it=>it.subLocationId===sl.id).some(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
+        html+=`<div class="fp-item-row" onclick="fpClickSubloc('${sl.id}',event)" style="cursor:pointer">
+          <div class="fp-item-dot" style="background:${sl.color}"></div>
+          <div class="fp-item-name">${sl.name}</div>
+          <div class="fp-item-cnt">${cnt} 件物品${hasUrgent?' ⚠️':''}</div>
+          <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted)">chevron_right</span>
+        </div>`;
+      });
+    }
+    html+=`</div></div>`;
+  }
+  content.innerHTML=html;
+}
+function fpSelectRoom(id){fpCurrentRoom=id;fpHighlightSubloc=null;renderFloorplanPage();}
+function fpClickSubloc(id,e){e.stopPropagation();fpHighlightSubloc=fpHighlightSubloc===id?null:id;renderFloorplanPage();}
+
+function renderLocMgrPage(){
+  const content=document.getElementById('inv-content');if(!content)return;
+  const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='none';
+  const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
+  const TABS=[['rooms','🏠 房間設定'],['sublocs','📍 細分位置'],['preview','👁 預覽']];
+  let html=`<div class="lmgr-tab-bar">${TABS.map(([t,l])=>`<button class="lmgr-tab ${locMgrTab===t?'on':''}" onclick="locMgrSwitchTab('${t}')">${l}</button>`).join('')}</div>`;
+  if(locMgrTab==='rooms'){
+    html+=`<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button onclick="locOpenRoomModal(null)" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px"><span class="material-symbols-outlined" style="font-size:16px">add</span>新增房間</button></div>`;
+    if(!locations.length){html+=`<div style="text-align:center;padding:32px;color:var(--text-muted)">尚無房間，請新增</div>`;}
+    else locations.forEach(r=>{const cnt=inventory.filter(it=>r.subLocations.some(sl=>sl.id===it.subLocationId)).length;html+=`<div class="lmgr-room-card" onclick="locMgrRoom='${r.id}';locMgrTab='sublocs';renderLocMgrPage()"><div class="lmgr-room-icon" style="background:${r.bgColor}">${r.icon}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text-primary)">${r.name}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${r.subLocations.length} 個位置 · ${cnt} 件物品</div></div><button onclick="event.stopPropagation();locOpenRoomModal('${r.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted)"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button onclick="event.stopPropagation();locDeleteRoom('${r.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:#d1d5db"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button><span class="material-symbols-outlined" style="font-size:20px;color:var(--text-muted)">chevron_right</span></div>`;});
+  }else if(locMgrTab==='sublocs'){
+    if(!locMgrRoom&&locations.length)locMgrRoom=locations[0].id;
+    const rOpts=locations.map(r=>`<option value="${r.id}" ${r.id===locMgrRoom?'selected':''}>${r.icon} ${r.name}</option>`).join('');
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><select class="fp-room-sel" style="flex:1" onchange="locMgrRoom=this.value;renderLocMgrPage()">${rOpts}</select><button onclick="locOpenSubModal(null)" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px">add</span>新增位置</button></div>`;
+    const room=locations.find(r=>r.id===locMgrRoom);
+    if(!room){html+=`<div style="text-align:center;padding:24px;color:var(--text-muted)">請選擇房間</div>`;}
+    else if(!room.subLocations.length){html+=`<div style="text-align:center;padding:24px;color:var(--text-muted)">此房間尚無細分位置</div>`;}
+    else{
+      html+=`<div style="background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;box-shadow:var(--shadow-sm)">`;
+      room.subLocations.forEach(sl=>{const cnt=inventory.filter(it=>it.subLocationId===sl.id).length;html+=`<div class="lmgr-subloc-row"><div class="lmgr-color-dot" style="background:${sl.color}"></div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text-primary)">${sl.name}</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px">座標: (${sl.x},${sl.y}) · ${sl.w}×${sl.h} · ${cnt} 件物品</div></div><button onclick="locOpenSubModal('${sl.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted)"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button onclick="locDeleteSubloc('${sl.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:#d1d5db"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></div>`;});
+      html+=`</div>`;
+    }
+  }else{
+    if(!locMgrRoom&&locations.length)locMgrRoom=locations[0].id;
+    const rOpts=locations.map(r=>`<option value="${r.id}" ${r.id===locMgrRoom?'selected':''}>${r.icon} ${r.name}</option>`).join('');
+    html+=`<div style="margin-bottom:12px"><select class="fp-room-sel" style="width:100%" onchange="locMgrRoom=this.value;renderLocMgrPage()">${rOpts}</select></div>`;
+    const room=locations.find(r=>r.id===locMgrRoom);
+    if(room){
+      const W=600,H=400;let svgInner='';
+      room.subLocations.forEach(sl=>{
+        const cnt=inventory.filter(it=>it.subLocationId===sl.id).length;
+        svgInner+=`<g cursor="move" onmousedown="fpStartDrag(event,'${sl.id}','move')" ontouchstart="fpStartDrag(event,'${sl.id}','move')">
+          <rect x="${sl.x}" y="${sl.y}" width="${sl.w}" height="${sl.h}" fill="${sl.color}" fill-opacity="0.2" stroke="${sl.color}" stroke-width="1.5" rx="6"/>
+          <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2-6}" text-anchor="middle" font-size="11" font-weight="700" fill="${sl.color}" font-family="Noto Sans TC,sans-serif" style="pointer-events:none">${sl.name}</text>
+          <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2+10}" text-anchor="middle" font-size="10" fill="${sl.color}" font-family="Noto Sans TC,sans-serif" opacity="0.8" style="pointer-events:none">${cnt} 件</text>
+        </g>
+        <rect x="${sl.x+sl.w-12}" y="${sl.y+sl.h-12}" width="16" height="16" fill="${sl.color}" rx="8" cursor="nwse-resize" stroke="#fff" stroke-width="2" 
+          onmousedown="fpStartDrag(event,'${sl.id}','resize')" ontouchstart="fpStartDrag(event,'${sl.id}','resize')" />`;
+      });
+
+      // 🌟 畫出紅色的磁吸對齊輔助線
+      if(typeof fpSnapLines !== 'undefined') {
+        fpSnapLines.forEach(line => {
+          svgInner += `<line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" style="pointer-events:none" />`;
+        });
+      }
+
+      html+=`<div class="fp-wrap">
+        <div style="padding:10px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light);background:#f8fafc;display:flex;align-items:center;gap:6px">
+          <span class="material-symbols-outlined" style="font-size:16px">touch_app</span> 直接拖拉方塊，靠近其他方塊時會自動對齊
+        </div>
+        <div class="fp-svg-area" style="touch-action:none">
+          <svg id="lmgr-edit-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:${room.bgColor};border-radius:8px;max-width:100%" 
+               onmousemove="fpDoDrag(event)" ontouchmove="fpDoDrag(event)" onmouseup="fpEndDrag()" ontouchend="fpEndDrag()" onmouseleave="fpEndDrag()">
+            ${svgInner}
+          </svg>
+        </div>
+      </div>`;
+    }
+  }
+  content.innerHTML=html;
+}
+function locMgrSwitchTab(t){locMgrTab=t;renderLocMgrPage();}
+
+function locOpenRoomModal(roomId){
+  document.getElementById('loc-room-edit-id').value=roomId||'';
+  document.getElementById('loc-room-modal-title').textContent=roomId?'修改房間':'新增房間';
+  const r=roomId?locations.find(x=>x.id===roomId):null;
+  document.getElementById('loc-room-name').value=r?r.name:'';document.getElementById('loc-room-icon').value=r?r.icon:'🏠';
+  document.getElementById('loc-room-bg').value=r?r.bgColor:'#E1F5EE';document.getElementById('loc-room-bg-txt').value=r?r.bgColor:'#E1F5EE';
+  document.getElementById('locRoomModal').classList.add('open');
+}
+function locSaveRoom(){
+  const name=document.getElementById('loc-room-name').value.trim();if(!name){showToast('請輸入房間名稱','error');return;}
+  const id=document.getElementById('loc-room-edit-id').value,icon=document.getElementById('loc-room-icon').value.trim()||'🏠',bgColor=document.getElementById('loc-room-bg').value||'#E1F5EE';
+  if(id)locations=locations.map(r=>r.id===id?{...r,name,icon,bgColor}:r);else locations.push({id:locGenId('room'),name,icon,bgColor,subLocations:[]});
+  saveLocations();closeModal('locRoomModal');renderLocMgrPage();showToast('已儲存');
+}
+function locDeleteRoom(roomId){
+  const room=locations.find(r=>r.id===roomId);if(!room)return;
+  const subIds=room.subLocations.map(sl=>sl.id),aff=inventory.filter(it=>subIds.includes(it.subLocationId));
+  appConfirm('刪除房間',aff.length?`「${room.name}」下有 ${aff.length} 件物品，刪除後將清除其細分位置設定。確定刪除？`:`確定刪除「${room.name}」？`,()=>{
+    if(aff.length){inventory=inventory.map(it=>subIds.includes(it.subLocationId)?{...it,subLocationId:null}:it);saveInv();}
+    locations=locations.filter(r=>r.id!==roomId);saveLocations();if(locMgrRoom===roomId)locMgrRoom=null;renderLocMgrPage();showToast('已刪除');
+  });
+}
+function locOpenSubModal(sublocId){
+  const roomId=sublocId?locFindRoomBySubloc(sublocId)?.id:locMgrRoom;
+  document.getElementById('loc-sub-room-id').value=roomId||'';document.getElementById('loc-sub-edit-id').value=sublocId||'';
+  document.getElementById('loc-sub-modal-title').textContent=sublocId?'修改細分位置':'新增細分位置';
+  const sl=sublocId?locFindSubloc(sublocId):null;
+  document.getElementById('loc-sub-name').value=sl?sl.name:'';document.getElementById('loc-sub-color').value=sl?sl.color:'#5b52e8';
+  document.getElementById('loc-sub-x').value=sl?sl.x:50;document.getElementById('loc-sub-y').value=sl?sl.y:50;
+  document.getElementById('loc-sub-w').value=sl?sl.w:120;document.getElementById('loc-sub-h').value=sl?sl.h:80;
+  document.getElementById('locSubModal').classList.add('open');
+}
+function locSaveSubLoc(){
+  const name=document.getElementById('loc-sub-name').value.trim();if(!name){showToast('請輸入位置名稱','error');return;}
+  const id=document.getElementById('loc-sub-edit-id').value,roomId=document.getElementById('loc-sub-room-id').value;if(!roomId){showToast('找不到房間','error');return;}
+  const color=document.getElementById('loc-sub-color').value||'#5b52e8',x=parseInt(document.getElementById('loc-sub-x').value)||50,y=parseInt(document.getElementById('loc-sub-y').value)||50,w=parseInt(document.getElementById('loc-sub-w').value)||120,h=parseInt(document.getElementById('loc-sub-h').value)||80;
+  const obj={id:id||locGenId('subloc'),name,color,x,y,w,h};
+  locations=locations.map(r=>{if(r.id!==roomId)return r;return{...r,subLocations:id?r.subLocations.map(sl=>sl.id===id?obj:sl):[...r.subLocations,obj]};});
+  saveLocations();closeModal('locSubModal');renderLocMgrPage();showToast('已儲存');
+}
+function locDeleteSubloc(sublocId){
+  const sl=locFindSubloc(sublocId);if(!sl)return;const cnt=inventory.filter(it=>it.subLocationId===sublocId).length;
+  appConfirm('刪除細分位置',cnt?`「${sl.name}」下有 ${cnt} 件物品，刪除後將清除其位置設定。確定刪除？`:`確定刪除「${sl.name}」？`,()=>{
+    if(cnt){inventory=inventory.map(it=>it.subLocationId===sublocId?{...it,subLocationId:null}:it);saveInv();}
+    locations=locations.map(r=>({...r,subLocations:r.subLocations.filter(s=>s.id!==sublocId)}));saveLocations();renderLocMgrPage();showToast('已刪除');
+  });
+}
+
+// ── FLOORPLAN DRAG & DROP ──────────────────────────────────────────
+let fpDragState = { active: false, id: null, mode: null, sx: 0, sy: 0, w: 0, h: 0, ex: 0, ey: 0 };
+
+// 將螢幕點擊的像素座標，精準轉換為 SVG 內部的座標
+function fpGetSvgPt(e) {
+  const svg = document.getElementById('lmgr-edit-svg');
+  if(!svg) return {x:0, y:0};
+  const pt = svg.createSVGPoint();
+  const evt = e.touches ? e.touches[0] : e;
+  pt.x = evt.clientX; pt.y = evt.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+function fpStartDrag(e, id, mode) {
+  e.preventDefault(); e.stopPropagation();
+  const sl = locFindSubloc(id); 
+  if(!sl) return;
+  const pt = fpGetSvgPt(e);
+  // 紀錄起始狀態
+  fpDragState = { active: true, id, mode, sx: sl.x, sy: sl.y, w: sl.w, h: sl.h, ex: pt.x, ey: pt.y };
+}
+
+let fpSnapLines = []; // 新增：用來存放目前的對齊虛線
+
+function fpDoDrag(e) {
+  if(!fpDragState.active) return;
+  e.preventDefault();
+  const pt = fpGetSvgPt(e);
+  let dx = pt.x - fpDragState.ex;
+  let dy = pt.y - fpDragState.ey;
+  const sl = locFindSubloc(fpDragState.id);
+  const room = locFindRoomBySubloc(fpDragState.id);
+
+  // 1. 先計算出「預計」滑鼠到達的新座標與大小
+  let nx = fpDragState.sx, ny = fpDragState.sy;
+  let nw = fpDragState.w, nh = fpDragState.h;
+
+  if (fpDragState.mode === 'move') {
+    nx = Math.max(0, fpDragState.sx + dx);
+    ny = Math.max(0, fpDragState.sy + dy);
+  } else if (fpDragState.mode === 'resize') {
+    nw = Math.max(20, fpDragState.w + dx);
+    nh = Math.max(20, fpDragState.h + dy);
+  }
+
+  // 2. 智慧對齊 (Snapping) 運算
+  fpSnapLines = [];
+  const TOL = 10; // 吸附距離：小於 10px 就自動貼齊
+  let snapX = null, snapY = null;
+
+  // 我目前的邊界 [左邊/寬, 中間, 右邊/高]
+  const myX = fpDragState.mode === 'move' ? [nx, nx + nw/2, nx + nw] : [nx + nw];
+  const myY = fpDragState.mode === 'move' ? [ny, ny + nh/2, ny + nh] : [ny + nh];
+
+  room.subLocations.forEach(other => {
+    if(other.id === sl.id) return;
+
+    // 其他方塊的邊界
+    const otX = [other.x, other.x + other.w/2, other.x + other.w];
+    const otY = [other.y, other.y + other.h/2, other.y + other.h];
+
+    // 找 X 軸吸附
+    if(snapX === null) {
+      for(let m of myX) {
+        for(let o of otX) {
+          if(Math.abs(m - o) < TOL) {
+            snapX = o - m;
+            fpSnapLines.push({x1: o, y1: 0, x2: o, y2: 400}); // 畫出垂直輔助線
+            break;
+          }
+        }
+        if(snapX !== null) break;
+      }
+    }
+
+    // 找 Y 軸吸附
+    if(snapY === null) {
+      for(let m of myY) {
+        for(let o of otY) {
+          if(Math.abs(m - o) < TOL) {
+            snapY = o - m;
+            fpSnapLines.push({x1: 0, y1: o, x2: 600, y2: o}); // 畫出水平輔助線
+            break;
+          }
+        }
+        if(snapY !== null) break;
+      }
+    }
+  });
+
+  // 3. 套用吸附後的座標
+  if (fpDragState.mode === 'move') {
+    sl.x = Math.round(nx + (snapX || 0));
+    sl.y = Math.round(ny + (snapY || 0));
+  } else {
+    sl.w = Math.round(nw + (snapX || 0));
+    sl.h = Math.round(nh + (snapY || 0));
+  }
+
+  renderLocMgrPage(); // 即時重繪，會把輔助線畫上去
+}
+
+function fpEndDrag() {
+  if(!fpDragState.active) return;
+  fpDragState.active = false;
+  fpSnapLines = []; // 放開滑鼠時清除所有輔助線
+  saveLocations();
+  renderLocMgrPage();
+}
+
+// ── INIT（由底部 initFirebase() 呼叫）──────────────────────
+function appInit(){
+  loadData();
+  renderAll();
+  setTimeout(()=>{
+    twRender();
+    document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'});
+  },200);
+}
+</script>
+
+<!-- Firebase 初始化：放在 body 最底部，確保 SDK 完全載入後才執行 -->
+<script>
+(function initFirebase(){
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    // 監聽連線狀態
+    db.ref('.info/connected').on('value', snap => {
+      fbSetStatus(snap.val() ? 'online' : 'offline');
+    });
+    console.log('Firebase initialized OK');
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    fbSetStatus('error');
+  }
+  appInit();
+})();
+</script>
+</body>
+</html>

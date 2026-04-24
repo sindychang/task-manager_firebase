@@ -1,0 +1,88 @@
+{
+  "name": "家事與任務管理應用程式",
+  "short_name": "任務管理",
+  "description": "一款全功能的家事管理、任務追蹤和待辦清單應用程式。支持離線使用、數據導入導出和任務分享。",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "categories": ["productivity"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%236366f1' width='192' height='192'/%3E%3Ctext x='50%' y='50%' font-size='40' fill='white' text-anchor='middle' dominant-baseline='middle'%3E📋%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "form_factor": "narrow",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%236366f1' width='512' height='512'/%3E%3Ctext x='50%' y='50%' font-size='200' fill='white' text-anchor='middle' dominant-baseline='middle'%3E📋%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "form_factor": "wide",
+      "type": "image/svg+xml"
+    }
+  ],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%236366f1' width='192' height='192' rx='45'/%3E%3Ctext x='96' y='96' font-size='80' fill='white' text-anchor='middle' dominant-baseline='middle'%3E✓%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Ccircle cx='96' cy='96' r='96' fill='%236366f1'/%3E%3Ctext x='96' y='96' font-size='80' fill='white' text-anchor='middle' dominant-baseline='middle'%3E✓%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%236366f1' width='512' height='512' rx='110'/%3E%3Ctext x='256' y='256' font-size='200' fill='white' text-anchor='middle' dominant-baseline='middle'%3E✓%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "新增待辦",
+      "short_name": "待辦",
+      "description": "快速新增待辦項目",
+      "url": "/index.html?tab=todo",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect fill='%236366f1' width='96' height='96' rx='20'/%3E%3Ctext x='48' y='48' font-size='40' fill='white' text-anchor='middle' dominant-baseline='middle'%3E✓%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "新增任務",
+      "short_name": "任務",
+      "description": "快速新增任務",
+      "url": "/index.html?tab=tasks",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect fill='%236366f1' width='96' height='96' rx='20'/%3E%3Ctext x='48' y='48' font-size='40' fill='white' text-anchor='middle' dominant-baseline='middle'%3E📝%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "新增家事",
+      "short_name": "家事",
+      "description": "快速新增家事",
+      "url": "/index.html?tab=housework",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect fill='%236366f1' width='96' height='96' rx='20'/%3E%3Ctext x='48' y='48' font-size='40' fill='white' text-anchor='middle' dominant-baseline='middle'%3E🧹%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}
