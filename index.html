@@ -1025,67 +1025,26 @@ const firebaseConfig = {
   messagingSenderId: "792978110342",
   appId: "1:792978110342:web:8dde74d7ca02af00561e07"
 };
-let db = null; // 在底部 initFirebase() 後才賦值
+let db = null;
 
-// ── 密碼 / 存取控制 ───────────────────────────────────────
-const ROOM_ID = 'shared';
-let _roomToken = null; // sha256(密碼)，作為資料路徑的一部分
+// ── 存取控制：固定 token（SHA-256 of "0502_housework_salt"）──────
+// 不需要密碼輸入畫面，直接用固定路徑
+const ROOM_ID = 'shared'; // 保留相容性
+const FIXED_TOKEN = 'e7ce730391515c7c7377b12f0e867ccfb7c85e12a71c6f9da3a68e6e215ef4d0';
+let _roomToken = FIXED_TOKEN;
 
-// 簡單的 SHA-256（用 Web Crypto API）
-async function sha256(str){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-function lockShow(firstTime=false){
-  const ls=document.getElementById('lock-screen');
-  if(ls){ls.style.display='flex';}
-  const hint=document.getElementById('lock-first-hint');
-  if(hint)hint.style.display=firstTime?'block':'none';
-  setTimeout(()=>document.getElementById('lock-pw-input')?.focus(),100);
-}
-function lockHide(){
-  const ls=document.getElementById('lock-screen');
-  if(ls)ls.style.display='none';
-}
-function lockShowError(msg){
-  const el=document.getElementById('lock-error');
-  if(el){el.textContent=msg;el.style.display='block';}
-  const inp=document.getElementById('lock-pw-input');
-  if(inp){inp.value='';inp.focus();}
-}
-
-async function lockSubmit(){
-  const pw=document.getElementById('lock-pw-input')?.value?.trim();
-  if(!pw){lockShowError('請輸入密碼');return;}
-  const token=await sha256(pw+'_housework_salt');
-  // 驗證：嘗試讀取 /rooms/{token}/meta
-  fbSetStatus('connecting');
-  db.ref('rooms/'+token+'/meta').once('value').then(snap=>{
-    if(snap.exists()||true){
-      // token 有效（首次使用時 snap 不存在，也允許進入並初始化）
-      _roomToken=token;
-      localStorage.setItem('app_room_token',token);
-      lockHide();
-      loadData(); // 開始載入此房間的資料
-    }
-  }).catch(err=>{
-    lockShowError('連線失敗，請稍後再試');
-    fbSetStatus('error');
-    console.error(err);
-  });
-}
-
-// 登出（清除 token）
+// 密碼畫面相關函數（保留空殼，避免其他地方呼叫報錯）
+function lockShow(){}
+function lockHide(){}
+function lockShowError(){}
+function lockSubmit(){}
 function lockLogout(){
-  const oldToken = _roomToken; // 先備份，因為等等要清空
-  localStorage.removeItem('app_room_token');
-  _roomToken = null;
-  _fbListening = false;
-  if(db && oldToken) db.ref('rooms/'+oldToken).off();
-  closeDrawer();
-  lockShow();
+  // 登出：清除快取並重新載入
+  localStorage.clear();
+  location.reload();
 }
+
+// ── 同步狀態指示器 ────────────────────────────────────────
 
 // ── 同步狀態指示器 ────────────────────────────────────────
 function fbSetStatus(state){
@@ -1130,68 +1089,64 @@ function saveLocations(){fbSave('locations',locations);}
 
 // 從 Firebase 讀取資料，並設定即時監聽（多人協作的核心）
 let _fbListening = false;
-let _localSnapshot = null; // 記錄本機資料快照，供衝突選擇用
+let _localSnapshot = null;
 
 function loadData(){
-  // 先讀 localStorage 快取
+  // 先讀 localStorage 快取，讓畫面立刻有東西顯示
   const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
   const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
   tasks    = t ? JSON.parse(t) : JSON.parse(JSON.stringify(DT));
   housework= h ? JSON.parse(h) : JSON.parse(JSON.stringify(DH));
   inventory= i ? JSON.parse(i) : JSON.parse(JSON.stringify(DI));
   locations= l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL));
-  // 記錄本機快照（衝突時用）
-  _localSnapshot = t ? {tasks,housework,inventory,locations} : null;
+  _localSnapshot = t ? true : false; // 記錄本機是否有資料
+  renderAll(); // 先顯示本機快取
 
   if(_fbListening) return;
   _fbListening = true;
-  if(!db||!_roomToken){ console.warn('db/token not ready'); renderAll(); return; }
+  if(!db||!_roomToken){ console.warn('db/token not ready'); return; }
 
-  const roomRef = db.ref('rooms/'+_roomToken);
+  let _firstLoad = true; // 第一次收到 Firebase 資料的標記
 
-  // 只讀一次做初始判斷
-  roomRef.once('value').then(snap => {
+  // 用 on() 持續監聽：自己改或朋友改都會觸發
+  db.ref('rooms/'+_roomToken).on('value', snap => {
     const d = snap.val();
 
     if(!d || !d.tasks){
-      // ── 情況 A：Firebase 是空的 → 上傳本機資料初始化 ──
-      showToast('首次同步，上傳本機資料…');
-      return Promise.all([
-        fbSave('tasks', tasks),
-        fbSave('housework', housework),
-        fbSave('inventory', inventory),
-        fbSave('locations', locations),
-        db.ref('rooms/'+_roomToken+'/meta').set({created: Date.now(), updatedAt: Date.now()})
-      ]);
+      if(_firstLoad){
+        // Firebase 是空的，上傳本機資料做初始化
+        _firstLoad = false;
+        showToast('首次同步，上傳本機資料…');
+        fbSave('tasks', tasks);
+        fbSave('housework', housework);
+        fbSave('inventory', inventory);
+        fbSave('locations', locations);
+      }
+      return;
     }
 
-    const hasLocal = !!_localSnapshot;
-    const remoteUpdated = d.meta?.updatedAt || 0;
-    const localUpdated  = parseInt(localStorage.getItem('app_updatedAt')||'0');
+    if(_firstLoad && _localSnapshot){
+      // 第一次收到 Firebase 資料，且本機也有資料
+      // 檢查是否有衝突
+      const remoteUpdated = d.meta?.updatedAt || 0;
+      const localUpdated  = parseInt(localStorage.getItem('app_updatedAt')||'0');
+      _firstLoad = false;
 
-    if(hasLocal && localUpdated > 0 && Math.abs(localUpdated - remoteUpdated) > 5000){
-      // ── 情況 B：本機和雲端都有資料且時間差 > 5 秒 → 顯示衝突選擇 ──
-      _remoteSnapshot = d;
-      showConflictUI(localUpdated, remoteUpdated, d);
-    } else {
-      // ── 情況 C：以雲端為主（正常情況）──
-      applyRemoteData(d);
+      if(localUpdated > 0 && remoteUpdated > 0 && Math.abs(localUpdated - remoteUpdated) > 10000){
+        // 時間差超過 10 秒，顯示衝突選擇
+        _remoteSnapshot = d;
+        showConflictUI(localUpdated, remoteUpdated, d);
+        return;
+      }
     }
+    _firstLoad = false;
 
-  }).then(()=>{
-    // 設定即時監聽（之後的變更）
-    roomRef.on('value', snap => {
-      const d = snap.val();
-      if(!d) return;
-      applyRemoteData(d);
-    }, err => {
-      console.error('Firebase listen error:', err);
-      fbSetStatus('error');
-    });
-  }).catch(err=>{
-    console.error('Firebase read error:', err);
+    // 正常情況：套用雲端資料
+    applyRemoteData(d);
+
+  }, err => {
+    console.error('Firebase listen error:', err);
     fbSetStatus('error');
-    renderAll(); // 降級用本機資料
   });
 }
 
@@ -3087,7 +3042,6 @@ function appInit(){
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-    // 監聽連線狀態
     db.ref('.info/connected').on('value', snap => {
       fbSetStatus(snap.val() ? 'online' : 'offline');
     });
@@ -3096,19 +3050,7 @@ function appInit(){
     console.error('Firebase init error:', e);
     fbSetStatus('error');
   }
-
-  // 檢查是否已有儲存的 token（已登入過）
-  const savedToken = localStorage.getItem('app_room_token');
-  if(savedToken){
-    _roomToken = savedToken;
-    lockHide();
-    appInit(); // 直接進入 app
-  } else {
-    // 沒有 token，顯示密碼鎖畫面
-    // 先 render 讓 DOM 就緒，再顯示鎖
-    appInit();
-    lockShow();
-  }
+  appInit(); // 直接進入 app，不需要密碼畫面
 })();
 </script>
 </body>
