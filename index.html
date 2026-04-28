@@ -472,7 +472,7 @@
 </head>
 <body>
 
-<!-- ── 密碼鎖畫面 ── -->
+<!-- ── 密碼鎖畫面（密碼固定，只是作為重新連線的入口）── -->
 <div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);align-items:center;justify-content:center;flex-direction:column;padding:24px">
   <div style="width:100%;max-width:340px">
     <div style="text-align:center;margin-bottom:32px">
@@ -480,18 +480,17 @@
         <span class="material-symbols-outlined" style="font-size:32px;color:#fff">lock</span>
       </div>
       <h1 style="color:#fff;font-size:22px;font-weight:700;margin-bottom:6px">家務管理 App</h1>
-      <p style="color:rgba(255,255,255,.7);font-size:13px">請輸入房間密碼以繼續</p>
+      <p style="color:rgba(255,255,255,.7);font-size:13px">點擊進入，重新連線雲端資料</p>
     </div>
     <div style="background:rgba(255,255,255,.12);border-radius:16px;padding:24px">
       <div id="lock-error" style="display:none;background:rgba(220,38,38,.25);border:1px solid rgba(220,38,38,.4);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:#fca5a5;font-weight:600;text-align:center"></div>
-      <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-bottom:8px">房間密碼</label>
-      <input id="lock-pw-input" type="password" placeholder="輸入密碼…"
-        style="width:100%;padding:13px 16px;border-radius:10px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15);color:#fff;font-size:16px;font-family:'Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;margin-bottom:14px"
-        onkeydown="if(event.key==='Enter')lockSubmit()">
-      <button onclick="lockSubmit()"
-        style="width:100%;padding:14px;background:#fff;color:#5b52e8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif"
-        >進入</button>
-      <p id="lock-first-hint" style="color:rgba(255,255,255,.55);font-size:11px;text-align:center;margin-top:12px;display:none">首次使用：輸入密碼後會自動設定為房間密碼</p>
+      <button onclick="lockEnter()"
+        style="width:100%;padding:14px;background:#fff;color:#5b52e8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
+        <span style="display:flex;align-items:center;justify-content:center;gap:8px">
+          <span class="material-symbols-outlined" style="font-size:18px">cloud_sync</span>重新連線
+        </span>
+      </button>
+      <p style="color:rgba(255,255,255,.45);font-size:11px;text-align:center;margin-top:14px;line-height:1.6">連線至共用房間<br>你和朋友的資料將自動同步</p>
     </div>
   </div>
 </div>
@@ -562,10 +561,28 @@
       </button>
     </div>
     <div class="drawer-divider" style="margin-top:12px"></div>
+    <div class="drawer-section">雲端同步</div>
+    <div style="padding:0 18px 10px">
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border-light)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">最近同步</span>
+          <span id="drawer-sync-time" style="font-size:12px;color:var(--text-muted)">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">資料來源</span>
+          <span id="drawer-data-source" style="font-size:12px;color:var(--text-muted)">-</span>
+        </div>
+      </div>
+      <button onclick="forceUpload()" style="background:var(--primary-light);border:1px solid rgba(91,82,232,.2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--primary);width:100%;font-family:'Noto Sans TC',sans-serif">
+        <span class="material-symbols-outlined" style="font-size:16px">cloud_upload</span>強制上傳本機資料
+      </button>
+      <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:6px">將此裝置的資料覆蓋雲端</p>
+    </div>
+    <div class="drawer-divider"></div>
     <div class="drawer-section">帳號</div>
     <button class="drawer-item" onclick="lockLogout()">
       <div class="di-icon" style="background:#fee2e2"><span class="material-symbols-outlined" style="font-size:18px;color:#dc2626">logout</span></div>
-      <div><div class="di-label" style="color:#dc2626">登出房間</div><div class="di-sub">清除密碼，返回鎖定畫面</div></div>
+      <div><div class="di-label" style="color:#dc2626">登出房間</div><div class="di-sub">清除快取，重新連線</div></div>
     </button>
   </div>
 </div>
@@ -584,9 +601,12 @@
     </div>
     <div style="display:flex;align-items:center;gap:6px">
       <!-- Firebase 同步狀態指示器 -->
-      <div id="fb-status" title="雲端同步狀態" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 9px;cursor:default">
+      <div id="fb-status" title="點擊查看同步資訊" onclick="fbStatusClick()" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 8px;cursor:pointer">
         <span id="fb-status-dot" style="width:7px;height:7px;border-radius:50%;background:#fbbf24;flex-shrink:0;transition:background .3s"></span>
-        <span id="fb-status-txt" style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600">連線中</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-start">
+          <span id="fb-status-txt" style="font-size:10px;color:rgba(255,255,255,.8);font-weight:600;line-height:1.2">連線中</span>
+          <span id="fb-sync-time" style="font-size:9px;color:rgba(255,255,255,.4);line-height:1.2">-</span>
+        </div>
       </div>
       <button id="global-import-btn" onclick="invOpenImport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;padding:8px 12px;align-items:center;gap:5px;cursor:pointer" title="匯入物品資料">
         <span class="material-symbols-outlined" style="font-size:18px">upload_file</span>
@@ -594,9 +614,21 @@
       <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;align-items:center;gap:5px;cursor:pointer">
         <span class="material-symbols-outlined" style="font-size:17px">send_to_mobile</span>傳送至 iPhone
       </button>
-      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:pointer">
-        <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
-      </button>
+      <div style="position:relative">
+        <button id="global-add-btn" onclick="openAddModal(event)" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:none;align-items:center;gap:5px;cursor:pointer">
+          <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
+        </button>
+        <!-- 物品頁專用下拉選單 -->
+        <div id="add-inv-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.18);border:1px solid var(--border);z-index:500;min-width:170px;overflow:hidden">
+          <button onclick="invOpenAdd();closeAllPopups()" style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-primary);text-align:left;font-family:'Noto Sans TC',sans-serif">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary)">edit_note</span>手動輸入
+          </button>
+          <div style="height:1px;background:var(--border-light);margin:0 12px"></div>
+          <button onclick="invOpenImport();closeAllPopups()" style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-primary);text-align:left;font-family:'Noto Sans TC',sans-serif">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#059669">upload_file</span>匯入資料
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </header>
@@ -680,12 +712,14 @@
 </div>
 
 <div id="page-inventory" class="page">
-  <div class="inv-tab-bar">
-    <button class="inv-tab active" onclick="invSwitchTab('all',this)"><span class="material-symbols-outlined" style="font-size:13px">apps</span>全部<span class="tcnt" id="inv-cnt-all"></span></button>
-    <button class="inv-tab" onclick="invSwitchTab('expiry',this)"><span class="material-symbols-outlined" style="font-size:13px">event</span>有效期限<span class="tcnt" id="inv-cnt-expiry"></span></button>
-    <button class="inv-tab" onclick="invSwitchTab('restock',this)"><span class="material-symbols-outlined" style="font-size:13px">shopping_bag</span>補貨追蹤<span class="tcnt" id="inv-cnt-restock"></span></button>
-    <button class="inv-tab" id="inv-tab-location" onclick="invSwitchTab('location',this)"><span class="material-symbols-outlined" style="font-size:13px">place</span>位置<span class="tcnt" id="inv-cnt-loc"></span></button>
-    <button class="inv-tab" onclick="invSwitchTab('locmgr',this)"><span class="material-symbols-outlined" style="font-size:13px">settings</span>位置管理</button>
+  <div style="display:flex;align-items:center;padding:10px 14px 0;max-width:640px;margin:0 auto;gap:8px">
+    <div class="inv-tab-bar" style="flex:1;padding:0;margin:0">
+      <button class="inv-tab active" onclick="invSwitchTab('all',this)"><span class="material-symbols-outlined" style="font-size:13px">apps</span>全部<span class="tcnt" id="inv-cnt-all"></span></button>
+      <button class="inv-tab" onclick="invSwitchTab('expiry',this)"><span class="material-symbols-outlined" style="font-size:13px">event</span>有效期限<span class="tcnt" id="inv-cnt-expiry"></span></button>
+      <button class="inv-tab" onclick="invSwitchTab('restock',this)"><span class="material-symbols-outlined" style="font-size:13px">shopping_bag</span>補貨追蹤<span class="tcnt" id="inv-cnt-restock"></span></button>
+      <button class="inv-tab" id="inv-tab-location" onclick="invSwitchTab('location',this)"><span class="material-symbols-outlined" style="font-size:13px">place</span>位置<span class="tcnt" id="inv-cnt-loc"></span></button>
+      <button class="inv-tab" onclick="invSwitchTab('locmgr',this)"><span class="material-symbols-outlined" style="font-size:13px">settings</span>位置管理</button>
+    </div>
   </div>
   <!-- 位置子模式切換列（只在 location tab 時顯示） -->
   <div id="inv-loc-mode-bar" style="display:none;padding:8px 14px 0;max-width:640px;margin:0 auto">
@@ -1027,21 +1061,77 @@ const firebaseConfig = {
 };
 let db = null;
 
-// ── 存取控制：固定 token（SHA-256 of "0502_housework_salt"）──────
-// 不需要密碼輸入畫面，直接用固定路徑
-const ROOM_ID = 'shared'; // 保留相容性
+// ── 存取控制：固定 token ──────────────────────────────────
 const FIXED_TOKEN = 'e7ce730391515c7c7377b12f0e867ccfb7c85e12a71c6f9da3a68e6e215ef4d0';
 let _roomToken = FIXED_TOKEN;
 
-// 密碼畫面相關函數（保留空殼，避免其他地方呼叫報錯）
-function lockShow(){}
-function lockHide(){}
-function lockShowError(){}
-function lockSubmit(){}
+function lockShow(){
+  const ls=document.getElementById('lock-screen');
+  if(ls) ls.style.display='flex';
+}
+function lockHide(){
+  const ls=document.getElementById('lock-screen');
+  if(ls) ls.style.display='none';
+}
+function lockShowError(msg){
+  const el=document.getElementById('lock-error');
+  if(el){el.textContent=msg;el.style.display='block';}
+}
+function lockEnter(){
+  // 重新連線：重設監聽狀態，重新 loadData
+  lockHide();
+  _fbListening = false;
+  _roomToken = FIXED_TOKEN;
+  loadData();
+}
+function lockSubmit(){ lockEnter(); } // 相容舊呼叫
+
 function lockLogout(){
-  // 登出：清除快取並重新載入
-  localStorage.clear();
-  location.reload();
+  // 清除本機快取，顯示重新連線畫面
+  const keysToRemove = ['app_tasks','app_housework','app_inventory','app_locations','app_updatedAt'];
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+  _fbListening = false;
+  // 停止舊監聽
+  if(db && _roomToken) { try{ db.ref('rooms/'+_roomToken).off(); }catch(e){} }
+  closeDrawer();
+  lockShow();
+}
+
+// 強制把本機資料上傳覆蓋雲端
+function forceUpload(){
+  appConfirm('強制上傳', '確定要以此裝置的資料覆蓋雲端嗎？另一台裝置的資料將被覆蓋。', ()=>{
+    const now = Date.now();
+    localStorage.setItem('app_updatedAt', String(now));
+    Promise.all([
+      fbSave('tasks', tasks),
+      fbSave('housework', housework),
+      fbSave('inventory', inventory),
+      fbSave('locations', locations),
+    ]).then(()=>{
+      showToast('已上傳本機資料至雲端');
+      updateSyncTimeUI(now, '本機上傳');
+    });
+  }, {danger:false, icon:'cloud_upload'});
+}
+
+// 更新同步時間顯示
+function updateSyncTimeUI(ts, source){
+  if(!ts) return;
+  const d = new Date(ts);
+  const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const dateStr = d.toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
+  const display = (d.toDateString()===new Date().toDateString()) ? timeStr : dateStr+' '+timeStr;
+  const el1 = document.getElementById('fb-sync-time');
+  const el2 = document.getElementById('drawer-sync-time');
+  const el3 = document.getElementById('drawer-data-source');
+  if(el1) el1.textContent = display;
+  if(el2) el2.textContent = display;
+  if(el3) el3.textContent = source || '雲端';
+}
+
+// 點擊狀態指示器：顯示 drawer 的同步資訊
+function fbStatusClick(){
+  openDrawer();
 }
 
 // ── 同步狀態指示器 ────────────────────────────────────────
@@ -1161,9 +1251,12 @@ function applyRemoteData(d){
   localStorage.setItem('app_housework', JSON.stringify(housework));
   localStorage.setItem('app_inventory', JSON.stringify(inventory));
   localStorage.setItem('app_locations', JSON.stringify(locations));
+  const now = Date.now();
+  localStorage.setItem('app_updatedAt', String(d.meta?.updatedAt || now));
   renderAll();
   if(currentPage==='inventory') renderInventoryPage();
   fbSetStatus('online');
+  updateSyncTimeUI(d.meta?.updatedAt || now, '雲端同步');
 }
 
 function showConflictUI(localTs, remoteTs, remoteData){
@@ -1314,6 +1407,8 @@ function switchPage(p,b){
   const addBtn=document.getElementById('global-add-btn');
   const importBtn=document.getElementById('global-import-btn');
   const iphoneBtn=document.getElementById('global-iphone-btn');
+  const addMenu=document.getElementById('add-inv-menu');
+  if(addMenu) addMenu.style.display='none'; // 切頁時關掉 dropdown
   if(p==='tasks'){
     if(addBtn)addBtn.style.setProperty('display','none','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
@@ -1322,9 +1417,13 @@ function switchPage(p,b){
     if(addBtn)addBtn.style.setProperty('display','none','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','flex','important');
+  } else if(p==='todo'){
+    if(addBtn)addBtn.style.setProperty('display','none','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   } else if(p==='inventory'){
     if(addBtn)addBtn.style.setProperty('display','flex','important');
-    if(importBtn)importBtn.style.setProperty('display','flex','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   } else {
     if(addBtn)addBtn.style.setProperty('display','flex','important');
@@ -1345,14 +1444,32 @@ function switchPage(p,b){
   else if(p==='todo'){twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
   else renderAll();
 }
-function openAddModal(){
-  if(currentPage==='housework')openHouseworkModal();
-  else if(currentPage==='inventory')invOpenAdd();
-  else if(currentPage==='todo'){twOpenDropDay=todayStr;twRender();}
-  else openTaskModal();
+function openAddModal(e){
+  if(e) e.stopPropagation();
+  if(currentPage==='housework') { openHouseworkModal(); return; }
+  if(currentPage==='inventory'){
+    const menu=document.getElementById('add-inv-menu');
+    if(!menu) return;
+    // 用 hidden attribute 判斷開關，完全不碰 display
+    if(menu.hasAttribute('data-open')){
+      menu.style.display='none';
+      menu.removeAttribute('data-open');
+    } else {
+      menu.style.display='block';
+      menu.setAttribute('data-open','1');
+    }
+    return;
+  }
+  if(currentPage==='todo') return; // todo 無功能
+  openTaskModal();
 }
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-function closeAllPopups(){document.querySelectorAll('.popup-menu').forEach(p=>p.classList.remove('show','flip-up'));document.getElementById('inv-global-popup')?.remove();}
+function closeAllPopups(){
+  document.querySelectorAll('.popup-menu').forEach(p=>p.classList.remove('show','flip-up'));
+  document.getElementById('inv-global-popup')?.remove();
+  const addMenu=document.getElementById('add-inv-menu');
+  if(addMenu){ addMenu.style.display='none'; addMenu.removeAttribute('data-open'); }
+}
 
 // ── TASK MODAL ────────────────────────────────────────────
 function onTaskFreqTypeChange(){
@@ -2209,13 +2326,11 @@ function saveSetting(key,val){appSettings[key]=val;localStorage.setItem('app_set
 function toggleSetting(key,btn){appSettings[key]=!appSettings[key];btn.classList.toggle('on',appSettings[key]);localStorage.setItem('app_settings',JSON.stringify(appSettings));renderAll()}
 function renderSettingsPage(){
   const sn=document.getElementById('set-name'),se=document.getElementById('set-email');
-  const sdf=document.getElementById('set-default-filter'),to=document.getElementById('tog-overdue');
-  const tn=document.getElementById('tog-notes'),td=document.getElementById('tog-desc');
-  if(sn)sn.value=appSettings.userName||'';if(se)se.value=appSettings.userEmail||'';
-  if(sdf)sdf.value=appSettings.defaultFilter||'all';
-  if(to)to.classList.toggle('on',appSettings.showOverdue!==false);
-  if(tn)tn.classList.toggle('on',appSettings.showNotes!==false);
-  if(td)td.classList.toggle('on',appSettings.showDesc!==false);
+  if(sn)sn.value=appSettings.userName||'';
+  if(se)se.value=appSettings.userEmail||'';
+  // 更新同步時間顯示
+  const ts = parseInt(localStorage.getItem('app_updatedAt')||'0');
+  if(ts) updateSyncTimeUI(ts, '雲端同步');
 }
 
 // ── TOAST / CONFIRM / INPUT ───────────────────────────────
