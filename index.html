@@ -57,6 +57,55 @@
     .relative{position:relative}.absolute{position:absolute}.fixed{position:fixed}
     .inset-0{inset:0}.top-0{top:0}.bottom-0{bottom:0}.left-0{left:0}.right-0{right:0}
     .z-\[100\]{z-index:100}
+
+    /* ── SHOPPING LIST ── */
+    .shop-sub-tabs{display:flex;margin:10px 14px 0;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px;max-width:640px;margin-left:auto;margin-right:auto}
+    .shop-stab{flex:1;padding:7px 0;border-radius:6px;border:none;background:none;font-size:12px;font-weight:700;color:var(--text-muted);cursor:pointer;text-align:center;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+    .shop-stab.on{background:var(--surface);color:var(--primary);box-shadow:0 1px 4px rgba(91,82,232,.1)}
+    .shop-body{padding:10px 14px;display:flex;flex-direction:column;gap:7px;max-width:640px;margin:0 auto}
+    .shop-filter-box{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light)}
+    .shop-filter-header{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer;user-select:none}
+    .shop-filter-header-left{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text-secondary)}
+    .shop-filter-body{padding:0 13px 10px;display:none;flex-direction:column;gap:8px}
+    .shop-filter-body.open{display:flex}
+    .shop-filter-row{display:flex;align-items:flex-start;gap:8px}
+    .shop-filter-row-label{font-size:10px;font-weight:700;color:var(--text-muted);white-space:nowrap;padding-top:5px;min-width:32px}
+    .shop-chips-wrap{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+    .shop-chip{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--border);background:var(--surface);color:#64748b;cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+    .shop-chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .shop-card{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);cursor:pointer;position:relative;margin-bottom:6px}
+    .shop-card-top{display:flex;align-items:center;gap:9px;padding:11px 13px}
+    .shop-cb{width:20px;height:20px;border-radius:5px;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--surface);cursor:pointer}
+    .shop-cb.checked{background:var(--primary);border-color:var(--primary)}
+    .shop-cb.checked::after{content:'';width:4px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg) translateY(-1px);display:block}
+    .shop-b-high{background:#fee2e2;color:#dc2626}
+    .shop-b-mid{background:#fef3c7;color:#b45309}
+    .shop-b-low{background:#d1fae5;color:#059669}
+    .shop-b-restock{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+    .shop-expand{border-top:1px solid var(--border-light);padding:10px 13px;display:none;flex-direction:column;gap:0}
+    .shop-expand.open{display:flex}
+    .shop-field-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)}
+    .shop-field-row:last-child{border-bottom:none}
+    .shop-field-label{font-size:11px;color:var(--text-muted);font-weight:700}
+    .shop-field-val{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;transition:border-color .15s}
+    .shop-field-val:hover{border-color:var(--primary)}
+    .shop-field-arr{font-size:9px;color:var(--text-muted);margin-left:2px}
+    .shop-dot-btn{background:none;border:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;flex-shrink:0;padding:0}
+    .shop-dot-menu{position:absolute;right:8px;top:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:600;min-width:130px;overflow:hidden;display:none}
+    .shop-dot-menu.open{display:block}
+    .shop-dot-menu button{display:flex;align-items:center;gap:8px;width:100%;padding:11px 14px;border:none;background:none;font-size:13px;font-weight:500;cursor:pointer;color:var(--text-primary);border-bottom:1px solid var(--border-light);font-family:'Noto Sans TC',sans-serif;text-align:left}
+    .shop-dot-menu button:last-child{border-bottom:none;color:var(--danger)}
+    .shop-dot-menu button:hover{background:var(--bg)}
+    .shop-prio-seg{display:flex;gap:5px;margin-bottom:12px}
+    .shop-prio-seg button{flex:1;padding:8px 0;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:700;color:#64748b;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+    .shop-prio-seg button.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .shop-src-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+    #shop-global-dd{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:2000;min-width:130px;overflow:hidden;display:none}
+    #shop-global-dd.open{display:block}
+    #shop-global-dd .dd-opt{padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text-primary);border-bottom:1px solid var(--border-light);font-family:'Noto Sans TC',sans-serif}
+    #shop-global-dd .dd-opt:last-child{border-bottom:none}
+    #shop-global-dd .dd-opt:hover{background:var(--bg)}
+    #shop-global-dd .dd-opt.sel{color:var(--primary);font-weight:700}
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +123,7 @@
       --radius-sm:8px;--radius-md:14px;
     }
     *{font-family:'Noto Sans TC',sans-serif;-webkit-tap-highlight-color:transparent;box-sizing:border-box}
-    body{background:var(--bg);padding-bottom:84px;min-height:100vh;margin:0}
+    body{background:var(--bg);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 80px);min-height:100vh;margin:0}
     .page{display:none}.page.active{display:block}
 
     /* ── NAV ── */
@@ -93,6 +142,8 @@
     .fp-wrap{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:12px}
     .fp-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-light)}
     .fp-room-sel{padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--text-primary);background:var(--surface);cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+    .fp-room-chip-bar{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 10px;overflow-x:auto}
+    .fp-room-chip-bar::-webkit-scrollbar{display:none}
     .fp-svg-area{width:100%;overflow-x:auto;padding:8px}
     .fp-svg-area svg{display:block;margin:0 auto}
     .fp-item-list{padding:8px 14px}
@@ -128,8 +179,8 @@
     .card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border-light)}
     .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
     .badge-urgent{background:#fee2e2;color:#dc2626}.badge-normal{background:#dbeafe;color:#2563eb}.badge-low{background:#d1fae5;color:#059669}
-    .section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-    .section-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .section-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .empty-state{text-align:center;padding:32px 16px;color:var(--text-muted)}
     .empty-state .material-symbols-outlined{font-size:44px;display:block;margin-bottom:8px;opacity:.5}
 
@@ -199,10 +250,10 @@
     .hw-cb{width:22px;height:22px;border-radius:6px;border:2px solid #d1d5db;background:var(--surface);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
     .hw-cb.checked{background:var(--primary);border-color:var(--primary)}
     .hw-cb.checked::after{content:'';width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg) translateY(-1px);display:block}
-    .float-batch-bar{position:fixed;bottom:90px;left:0;right:0;z-index:200;display:flex;justify-content:center;pointer-events:auto}
+    .float-batch-bar{position:fixed;bottom:90px;left:0;right:0;z-index:200;display:flex;justify-content:center;pointer-events:none}
     .float-batch-bar.show{pointer-events:all}
-    .float-batch-inner{background:#1e293b;border-radius:18px;padding:10px 6px 10px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 8px 32px rgba(0,0,0,.32);transform:translateY(24px);opacity:0;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .22s ease;max-width:calc(100vw - 24px);overflow-x:auto}
-    .float-batch-bar.show .float-batch-inner{transform:translateY(0);opacity:1}
+    .float-batch-inner{background:#1e293b;border-radius:18px;padding:10px 6px 10px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 8px 32px rgba(0,0,0,.32);transform:translateY(24px);opacity:0;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .22s ease;max-width:calc(100vw - 24px);overflow-x:auto;pointer-events:none}
+    .float-batch-bar.show .float-batch-inner{transform:translateY(0);opacity:1;pointer-events:auto}
     .float-batch-count{color:#94a3b8;font-size:12px;font-weight:700;white-space:nowrap;padding-right:4px;border-right:1px solid rgba(255,255,255,.15);margin-right:2px}
     .fba{background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .13s;white-space:nowrap;flex-shrink:0}
     .fba:active{transform:scale(.95)}
@@ -299,8 +350,37 @@
     .inv-content{max-width:640px;margin:0 auto;padding:10px 16px}
     .inv-sec-head{display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px}
     .inv-sec-title{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
-    .inv-sec-title.red{color:#dc2626}.inv-sec-title.orange{color:#c2410c}
+    .inv-sec-title.red{color:#dc2626}.inv-sec-title.orange{color:#c2410c}.inv-sec-title.amber{color:#a16207}
     .inv-list{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:10px}
+    .missing-list{background:#fffbeb;border:1.5px dashed #fcd34d;box-shadow:none}
+    .missing-list .inv-row{background:transparent}
+    .missing-head{margin-top:4px}
+    /* ── 頂端工具小按鈕 ── */
+    .inv-tool-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:11px;font-weight:700;color:var(--text-secondary);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;white-space:nowrap}
+    .inv-tool-btn:hover{border-color:#9ca3af;background:var(--bg)}
+    .inv-tool-btn-primary{background:#fff7ed;border-color:#fed7aa;color:#d97706}
+    .inv-tool-btn-primary:hover{background:#fef3c7}
+    .inv-tool-btn-purple{background:#f5f3ff;border-color:#c4b5fd;color:#7c3aed}
+    .inv-tool-btn-purple:hover{background:#ede9fe}
+    .shop-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:12px;padding:9px 12px;margin:8px 0 10px}
+    .shop-bar-info{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+    .shop-bar-acts{display:flex;gap:6px;flex-shrink:0}
+    .shop-bar-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:11px;font-weight:700;color:var(--text-secondary);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+    .shop-bar-btn:hover{border-color:#d97706;color:#d97706}
+    .shop-bar-btn.primary{background:#d97706;border-color:#d97706;color:#fff}
+    .shop-bar-btn.primary:hover{background:#b45309}
+    /* 滑動快速操作 */
+    .inv-swipe-wrap{position:relative;overflow:hidden;touch-action:pan-y}
+    .inv-swipe-wrap .inv-row{position:relative;z-index:1;background:var(--surface);transition:transform .25s cubic-bezier(.2,.7,.3,1);will-change:transform}
+    .inv-swipe-wrap.swiped .inv-row{transform:translateX(var(--swipe-w,-180px))}
+    .inv-row-actions{position:absolute;top:0;right:0;height:100%;display:flex;align-items:stretch;z-index:0}
+    .swipe-act{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:60px;border:none;cursor:pointer;font-size:10.5px;font-weight:700;color:#fff;font-family:'Noto Sans TC',sans-serif;padding:0}
+    .swipe-act.sw-amber{background:#d97706}
+    .swipe-act.sw-green{background:#059669}
+    .swipe-act.sw-red{background:#dc2626}
+    .swipe-act.sw-blue{background:#0369a1}
+    .swipe-act:active{filter:brightness(.92)}
+    .inv-swipe-wrap.swiped{--swipe-w:calc(-1 * var(--actions-w,180px))}
     .inv-item-wrap{position:relative}
     .inv-row{display:flex;align-items:center;gap:8px;padding:11px 10px 11px 13px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .1s;border-left:3px solid transparent}
     .inv-row:last-child{border-bottom:none}
@@ -372,18 +452,16 @@
     .tw-wnc{text-align:center}
     .tw-wnl{font-size:14px;font-weight:700;color:var(--text-primary)}
     .tw-wns{font-size:11px;color:var(--text-muted);margin-top:2px}
-    /* Progress card */
-    .tw-prog{background:#fffef9;border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
-    .tw-prog-ring{width:44px;height:44px;flex-shrink:0;position:relative}
+    /* Progress card — compact gradient style */
+    .tw-prog{background:linear-gradient(120deg,#ede9fe 0%,#ddd6fe 100%);border-radius:var(--radius-md);box-shadow:0 2px 10px rgba(91,82,232,.13);padding:8px 11px;margin-bottom:8px;display:flex;align-items:center;gap:10px;border:none}
+    .tw-prog-ring{width:36px;height:36px;flex-shrink:0;position:relative}
     .tw-prog-ring svg{transform:rotate(-90deg)}
-    .tw-prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--primary)}
-    .tw-prog-info{flex:1;min-width:0}
-    .tw-prog-t{font-size:13px;font-weight:700;color:var(--text-primary)}
-    .tw-prog-s{font-size:11px;color:var(--text-muted);margin-top:1px}
-    .tw-prog-chips{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
-    .tw-chip{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+    .tw-prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--primary)}
+    .tw-prog-info{flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .tw-prog-t{font-size:12px;font-weight:700;color:var(--text-primary)}
+    .tw-chip{padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700}
     /* Day cards */
-    .tw-wlist{display:flex;flex-direction:column;gap:6px}
+    .tw-wlist{display:flex;flex-direction:column;gap:6px;padding-bottom:60px}
     .tw-dc{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:visible;transition:box-shadow .15s,border-color .15s}
     .tw-dc.tw-today{border-color:var(--primary);box-shadow:0 0 0 1.5px var(--primary),var(--shadow-sm)}
     .tw-dc.tw-past{opacity:.72}
@@ -472,7 +550,8 @@
 </head>
 <body>
 
-<!-- ── 密碼鎖畫面（密碼固定，只是作為重新連線的入口）── -->
+<!-- ── LEFT DRAWER ── -->
+<!-- ── 重新連線畫面（登出房間後或首次使用） ── -->
 <div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);align-items:center;justify-content:center;flex-direction:column;padding:24px">
   <div style="width:100%;max-width:340px">
     <div style="text-align:center;margin-bottom:32px">
@@ -484,8 +563,7 @@
     </div>
     <div style="background:rgba(255,255,255,.12);border-radius:16px;padding:24px">
       <div id="lock-error" style="display:none;background:rgba(220,38,38,.25);border:1px solid rgba(220,38,38,.4);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:#fca5a5;font-weight:600;text-align:center"></div>
-      <button onclick="lockEnter()"
-        style="width:100%;padding:14px;background:#fff;color:#5b52e8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
+      <button onclick="lockEnter()" style="width:100%;padding:14px;background:#fff;color:#5b52e8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
         <span style="display:flex;align-items:center;justify-content:center;gap:8px">
           <span class="material-symbols-outlined" style="font-size:18px">cloud_sync</span>重新連線
         </span>
@@ -524,7 +602,6 @@
   </div>
 </div>
 
-<!-- ── LEFT DRAWER ── -->
 <div class="drawer-scrim" id="drawer-scrim" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -588,15 +665,14 @@
 </div>
 
 <!-- ── HEADER ── -->
-<header style="background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:18px 16px 14px;padding-top:calc(18px + env(safe-area-inset-top,0px));box-shadow:0 2px 16px rgba(91,82,232,.25)">
+<header style="background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:10px 14px 9px;padding-top:calc(10px + env(safe-area-inset-top,0px));box-shadow:0 2px 12px rgba(91,82,232,.2)">
   <div class="max-w-2xl mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <button onclick="openDrawer()" style="background:rgba(255,255,255,.15);border:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
-        <span class="material-symbols-outlined" style="font-size:22px;color:#fff">menu</span>
+    <div class="flex items-center gap-2">
+      <button onclick="openDrawer()" style="background:rgba(255,255,255,.15);border:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+        <span class="material-symbols-outlined" style="font-size:20px;color:#fff">menu</span>
       </button>
       <div>
-        <h1 class="text-white font-bold" id="pageTitle" style="font-size:17px;letter-spacing:.01em">To Do List</h1>
-        <p style="color:rgba(255,255,255,.7);font-size:11px;margin-top:1px" id="pageSubtitle">管理您的每日任務</p>
+        <h1 class="text-white font-bold" id="pageTitle" style="font-size:15px;letter-spacing:.01em">To Do List</h1>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px">
@@ -608,27 +684,21 @@
           <span id="fb-sync-time" style="font-size:9px;color:rgba(255,255,255,.4);line-height:1.2">-</span>
         </div>
       </div>
+      <button id="global-ics-btn" onclick="invExportICS(7)" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯出 .ics 行事曆提醒">
+        <span class="material-symbols-outlined" style="font-size:18px">calendar_month</span>
+      </button>
+      <button id="global-shop-btn" onclick="invShopExport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯出購物清單">
+        <span class="material-symbols-outlined" style="font-size:18px">shopping_cart</span>
+      </button>
       <button id="global-import-btn" onclick="invOpenImport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;padding:8px 12px;align-items:center;gap:5px;cursor:pointer" title="匯入物品資料">
         <span class="material-symbols-outlined" style="font-size:18px">upload_file</span>
       </button>
-      <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;align-items:center;gap:5px;cursor:pointer">
+      <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;align-items:center;gap:5px;cursor:pointer">
         <span class="material-symbols-outlined" style="font-size:17px">send_to_mobile</span>傳送至 iPhone
       </button>
-      <div style="position:relative">
-        <button id="global-add-btn" onclick="openAddModal(event)" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:11px;font-weight:700;display:none;align-items:center;gap:5px;cursor:pointer">
-          <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
-        </button>
-        <!-- 物品頁專用下拉選單 -->
-        <div id="add-inv-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.18);border:1px solid var(--border);z-index:500;min-width:170px;overflow:hidden">
-          <button onclick="invOpenAdd();closeAllPopups()" style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-primary);text-align:left;font-family:'Noto Sans TC',sans-serif">
-            <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary)">edit_note</span>手動輸入
-          </button>
-          <div style="height:1px;background:var(--border-light);margin:0 12px"></div>
-          <button onclick="invOpenImport();closeAllPopups()" style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-primary);text-align:left;font-family:'Noto Sans TC',sans-serif">
-            <span class="material-symbols-outlined" style="font-size:18px;color:#059669">upload_file</span>匯入資料
-          </button>
-        </div>
-      </div>
+      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:pointer">
+        <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
+      </button>
     </div>
   </div>
 </header>
@@ -678,7 +748,7 @@
   <button class="tw-dlycancel" onclick="twCloseDelay()">取消</button>
 </div>
 
-<div id="page-tasks" class="page max-w-2xl mx-auto px-4 py-6">
+<div id="page-tasks" class="page max-w-2xl mx-auto px-4 py-3">
   <section>
     <div class="section-header">
       <div class="section-icon" style="background:#f5f3ff"><span class="material-symbols-outlined" style="color:#5b52e8">table_rows</span></div>
@@ -698,7 +768,7 @@
   </section>
 </div>
 
-<div id="page-housework" class="page max-w-2xl mx-auto px-4 py-6">
+<div id="page-housework" class="page max-w-2xl mx-auto px-4 py-3">
   <div class="section-header mb-3">
     <div class="section-icon" style="background:#fef3c7"><span class="material-symbols-outlined" style="color:#d97706">cleaning_services</span></div>
     <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">家事管理</h2><p style="color:var(--text-muted);font-size:11px">勾選可批次延後</p></div>
@@ -712,13 +782,17 @@
 </div>
 
 <div id="page-inventory" class="page">
-  <div style="display:flex;align-items:center;padding:10px 14px 0;max-width:640px;margin:0 auto;gap:8px">
-    <div class="inv-tab-bar" style="flex:1;padding:0;margin:0">
-      <button class="inv-tab active" onclick="invSwitchTab('all',this)"><span class="material-symbols-outlined" style="font-size:13px">apps</span>全部<span class="tcnt" id="inv-cnt-all"></span></button>
-      <button class="inv-tab" onclick="invSwitchTab('expiry',this)"><span class="material-symbols-outlined" style="font-size:13px">event</span>有效期限<span class="tcnt" id="inv-cnt-expiry"></span></button>
-      <button class="inv-tab" onclick="invSwitchTab('restock',this)"><span class="material-symbols-outlined" style="font-size:13px">shopping_bag</span>補貨追蹤<span class="tcnt" id="inv-cnt-restock"></span></button>
-      <button class="inv-tab" id="inv-tab-location" onclick="invSwitchTab('location',this)"><span class="material-symbols-outlined" style="font-size:13px">place</span>位置<span class="tcnt" id="inv-cnt-loc"></span></button>
-      <button class="inv-tab" onclick="invSwitchTab('locmgr',this)"><span class="material-symbols-outlined" style="font-size:13px">settings</span>位置管理</button>
+  <div class="inv-tab-bar">
+    <button class="inv-tab active" onclick="invSwitchTab('alert',this)"><span class="material-symbols-outlined" style="font-size:13px">notifications_active</span>待注意<span class="tcnt" id="inv-cnt-alert"></span></button>
+    <button class="inv-tab" id="inv-tab-location" onclick="invSwitchTab('location',this)"><span class="material-symbols-outlined" style="font-size:13px">place</span>位置<span class="tcnt" id="inv-cnt-loc"></span></button>
+    <button class="inv-tab" id="inv-tab-shopping" onclick="invSwitchTab('shopping',this)"><span class="material-symbols-outlined" style="font-size:13px">shopping_cart</span>購物清單<span class="tcnt" id="shop-restock-new-cnt" style="display:none"></span></button>
+    <button class="inv-tab" onclick="invSwitchTab('locmgr',this)"><span class="material-symbols-outlined" style="font-size:13px">settings</span>管理</button>
+  </div>
+  <!-- 待注意子篩選列（只在 alert tab 時顯示） -->
+  <div id="inv-alert-sub-bar" style="display:none;padding:8px 14px 0;max-width:640px;margin:0 auto">
+    <div style="display:flex;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px">
+      <button id="alertsub-btn-expiry" class="lmgr-tab on" onclick="invSwitchAlertSub('expiry')">效期管理</button>
+      <button id="alertsub-btn-restock" class="lmgr-tab" onclick="invSwitchAlertSub('restock')">補貨追蹤</button>
     </div>
   </div>
   <!-- 位置子模式切換列（只在 location tab 時顯示） -->
@@ -772,7 +846,180 @@
   </div>
   </div>
   <div class="inv-content" id="inv-content"></div>
+<!-- ── SHOPPING LIST PANEL ── -->
+<div id="inv-shopping-panel" style="display:none">
+  <div class="shop-sub-tabs">
+    <button class="shop-stab on" id="shop-st-buy" onclick="shopSetSub('buy')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">shopping_cart</span> 待購買</button>
+    <button class="shop-stab" id="shop-st-done" onclick="shopSetSub('done')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">task_alt</span> 已購買</button>
+    <button class="shop-stab" id="shop-st-restock" onclick="shopSetSub('restock')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">inventory_2</span> 補貨追蹤<span id="shop-restock-badge" style="display:none;background:#ef4444;color:#fff;border-radius:999px;padding:0 5px;font-size:9px;margin-left:3px;font-weight:700"></span></button>
+  </div>
+  <div id="shop-buy-panel" class="shop-body">
+    <div class="shop-filter-box">
+      <div class="shop-filter-header" onclick="shopToggleFilter()">
+        <div class="shop-filter-header-left">
+          <span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted)">tune</span>篩選
+        </div>
+        <span class="material-symbols-outlined" id="shop-filter-arrow" style="font-size:18px;color:var(--text-muted)">expand_less</span>
+      </div>
+      <div class="shop-filter-body" id="shop-filter-body">
+        <div class="shop-filter-row">
+          <span class="shop-filter-row-label">優先度</span>
+          <div class="shop-chips-wrap" id="shop-prio-filter-chips">
+            <button class="shop-chip on" onclick="shopSetFilter('prio','all',this)">全部</button>
+            <button class="shop-chip" onclick="shopSetFilter('prio',0,this)">🔴 高</button>
+            <button class="shop-chip" onclick="shopSetFilter('prio',1,this)">🟡 中</button>
+            <button class="shop-chip" onclick="shopSetFilter('prio',2,this)">🟢 低</button>
+          </div>
+        </div>
+        <div class="shop-filter-row" style="align-items:center">
+          <span class="shop-filter-row-label">分類</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="shop-chip on" id="shop-cat-all-btn" onclick="shopSetCatAll()">全部</button>
+            <select id="shop-cat-select" onchange="shopSetCatDd(this.value)"
+              style="height:28px;padding:0 28px 0 10px;font-size:12px;border:1px solid var(--border-light);border-radius:20px;background:var(--surface);color:var(--text-primary);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2394a3b8' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:90px">
+              <option value="">選擇分類</option>
+              <option>日常用品</option><option>保養品</option><option>化妝品</option>
+              <option>糧食/飲品</option><option>藥品保健</option><option>清潔用品</option>
+              <option>文具工具</option><option>調味料</option><option>其他</option>
+            </select>
+          </div>
+        </div>
+        <div class="shop-filter-row">
+          <span class="shop-filter-row-label">排序</span>
+          <div class="shop-chips-wrap" id="shop-sort-chips">
+            <button class="shop-chip on" onclick="shopSetSort('prio',this)">優先度</button>
+            <button class="shop-chip" onclick="shopSetSort('price-asc',this)">價格低→高</button>
+            <button class="shop-chip" onclick="shopSetSort('price-desc',this)">價格高→低</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="shop-buy-list"></div>
+  </div>
+  <div id="shop-done-panel" style="display:none">
+    <div style="padding:10px 14px 6px;max-width:640px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:5px 10px;margin-bottom:8px">
+        <span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted)">search</span>
+        <input type="text" id="shop-done-search" placeholder="搜尋購買紀錄…" oninput="shopSetDoneSearch(this.value)"
+          style="border:none;outline:none;background:transparent;flex:1;font-size:12px;color:var(--text-primary)">
+      </div>
+      <div class="shop-filter-box">
+        <div class="shop-filter-header" onclick="shopToggleDoneFilter()">
+          <div class="shop-filter-header-left">
+            <span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted)">tune</span>篩選
+          </div>
+          <span class="material-symbols-outlined" id="shop-done-filter-arrow" style="font-size:18px;color:var(--text-muted)">expand_more</span>
+        </div>
+        <div class="shop-filter-body" id="shop-done-filter-body">
+          <div class="shop-filter-row" style="align-items:center">
+            <span class="shop-filter-row-label">分類</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <button class="shop-chip on" id="shop-done-cat-all-btn" onclick="shopSetDoneCatAll()">全部</button>
+              <select id="shop-done-cat-select" onchange="shopSetDoneCatDd(this.value)"
+                style="height:28px;padding:0 28px 0 10px;font-size:12px;border:1px solid var(--border-light);border-radius:20px;background:var(--surface);color:var(--text-primary);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2394a3b8' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:90px">
+                <option value="">選擇分類</option>
+                <option>日常用品</option><option>保養品</option><option>化妝品</option>
+                <option>糧食/飲品</option><option>藥品保健</option><option>清潔用品</option>
+                <option>文具工具</option><option>調味料</option><option>其他</option>
+              </select>
+            </div>
+          </div>
+          <div class="shop-filter-row" style="align-items:center">
+            <span class="shop-filter-row-label">日期</span>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap">
+              <input type="date" id="shop-done-date-from" onchange="shopRender()"
+                style="height:28px;padding:0 6px;font-size:11px;border:1px solid var(--border-light);border-radius:8px;background:var(--surface);color:var(--text-primary);outline:none;max-width:130px">
+              <span style="font-size:11px;color:var(--text-muted);white-space:nowrap">至</span>
+              <input type="date" id="shop-done-date-to" onchange="shopRender()"
+                style="height:28px;padding:0 6px;font-size:11px;border:1px solid var(--border-light);border-radius:8px;background:var(--surface);color:var(--text-primary);outline:none;max-width:130px">
+              <button onclick="shopClearDateFilter()" style="font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 4px;white-space:nowrap">清除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shop-body" style="padding-top:0">
+      <div id="shop-done-list"></div>
+    </div>
+  </div>
+  <div id="shop-restock-panel" style="display:none;max-width:640px;margin:0 auto;padding:6px 0">
+    <div id="shop-restock-list"></div>
+  </div>
 </div>
+<div id="shop-global-dd"></div>
+</div>
+
+
+<!-- ── SHOPPING LIST: ADD/EDIT MODAL ── -->
+<div class="modal-overlay" id="shopItemModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-5">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="shop-modal-title">新增購物項目</h2>
+      <button onclick="closeModal('shopItemModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="shop-edit-id">
+    <div class="form-group"><label>商品名稱 *</label><input type="text" id="shop-f-name" placeholder="例：空氣清淨機濾網"></div>
+    <div class="form-group"><label>優先度</label>
+      <div class="shop-prio-seg" id="shop-form-prio-seg">
+        <button onclick="shopSetFormPrio(0,this)">🔴 高</button>
+        <button class="on" onclick="shopSetFormPrio(1,this)">🟡 中</button>
+        <button onclick="shopSetFormPrio(2,this)">🟢 低</button>
+      </div>
+    </div>
+    <div class="form-group"><label>分類</label><select id="shop-f-cat"><option  selected>日常用品</option><option>保養品</option><option>化妝品</option><option>糧食/飲品</option><option>藥品保健</option><option>清潔用品</option><option>文具工具</option><option>調味料</option><option>其他</option></select></div>
+    <div class="form-group"><label>購買來源</label>
+      <div class="shop-src-row" id="shop-form-src-row">
+        <button class="shop-chip on" onclick="shopSetFormSrc(this)">蝦皮</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">momo</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">全聯</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">實體店</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">其他</button>
+      </div>
+      <input type="text" id="shop-f-store" placeholder="店家名稱（如：Gracegift、寶雅…）"
+        style="display:none;margin-top:8px;width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary)">
+    </div>
+    <div class="form-group"><label>購買連結（選填）</label><input type="text" id="shop-f-link" placeholder="https://..."></div>
+    <div class="form-group"><label>預算（選填）</label><input type="text" id="shop-f-price" placeholder="NT$..."></div>
+    <div class="form-group"><label>備註（選填）</label><input type="text" id="shop-f-note" placeholder="顏色、尺寸、等特價..."></div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('shopItemModal')">取消</button><button class="btn-primary flex-1" onclick="shopSaveItem()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ── SHOPPING LIST: REVIEW MODAL ── -->
+<div class="modal-overlay" id="shopReviewModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b">購買評價 🎉</h2>
+      <button onclick="closeModal('shopReviewModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="shop-review-id">
+    <input type="hidden" id="shop-review-restock-inv-id">
+    <input type="hidden" id="shop-review-qty-mode">
+    <div class="form-group" id="shop-review-qty-row" style="display:none">
+      <label id="shop-review-qty-label">補充數量（件）</label>
+      <input type="number" id="shop-review-qty" min="0" placeholder="購買了幾件？" style="width:100%">
+    </div>
+    <div class="form-group"><label>滿意度</label>
+      <div style="display:flex;gap:8px;margin-top:6px" id="shop-stars-row">
+        <span class="shop-star" data-n="1" onclick="shopSetStar(1)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+        <span class="shop-star" data-n="2" onclick="shopSetStar(2)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+        <span class="shop-star" data-n="3" onclick="shopSetStar(3)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+        <span class="shop-star" data-n="4" onclick="shopSetStar(4)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+        <span class="shop-star" data-n="5" onclick="shopSetStar(5)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+      </div>
+    </div>
+    <div class="form-group"><label>實際花費</label><input type="text" id="shop-review-price" placeholder="NT$..."></div>
+    <div class="form-group"><label>心得備註</label><input type="text" id="shop-review-note" placeholder="品質如何？值得嗎？"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary flex-1" onclick="closeModal('shopReviewModal')">略過</button>
+        <button class="btn-primary flex-1" onclick="shopSaveReview()">儲存評價</button>
+      </div>
+      <button onclick="shopCancelBuy()" style="width:100%;padding:10px;border:1px solid #fca5a5;border-radius:10px;background:#fff5f5;color:#ef4444;font-size:13px;font-weight:600;cursor:pointer">取消購買（回到待購買）</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ── BATCH + FLOATING ── -->
 <div class="float-batch-bar" id="float-batch-bar">
@@ -936,7 +1183,7 @@
     <div class="form-group" id="inv-f-subloc-group"><label>細分位置 <span style="font-size:10px;color:var(--text-muted);font-weight:400">（選填）</span></label><select id="inv-f-subloc"><option value="">未設定</option></select></div>
     <div class="form-group"><label>物品類別</label>
       <select id="inv-f-category" onchange="invOnCatChange()">
-        <option>日常用品</option><option>保養品</option><option>糧食/飲品</option>
+        <option>日常用品</option><option>保養品</option><option>化妝品</option><option>糧食/飲品</option>
         <option>藥品保健</option><option>清潔用品</option><option>文具工具</option>
         <option>調味料</option><option>其他</option>
         <option value="__custom">✏️ 自訂…</option>
@@ -946,7 +1193,15 @@
     <div class="form-group"><label>備註</label><input type="text" id="inv-f-note" placeholder="品牌、規格…（選填）"></div>
     <!-- 有效期限 -->
     <div class="icond" id="inv-g-expiry">
-      <div class="form-group"><label>到期日</label><input type="date" id="inv-f-expiry"><p style="font-size:11px;color:var(--text-muted);margin-top:5px">到期前 14 天自動提醒</p></div>
+      <div class="form-group"><label>到期日</label><input type="date" id="inv-f-expiry"></div>
+      <div class="form-group"><label>提醒時間</label>
+        <select id="inv-f-remind-days" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary)">
+          <option value="7">到期前 7 天</option>
+          <option value="14" selected>到期前 14 天</option>
+          <option value="30">到期前 30 天（約 1 個月）</option>
+          <option value="60">到期前 60 天（約 2 個月）</option>
+        </select>
+      </div>
     </div>
     <!-- 補貨追蹤開關 -->
     <div class="inv-toggle-row">
@@ -1049,246 +1304,7 @@
 </div>
 
 <script>
-// ── FIREBASE 設定（物件先定義，initializeApp 在 body 底部執行）────
-const firebaseConfig = {
-  apiKey: "AIzaSyBN8V3wZOp9vaJFkIN9rDWTNELK9UHOB8I",
-  authDomain: "my-housework-73a32.firebaseapp.com",
-  databaseURL: "https://my-housework-73a32-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "my-housework-73a32",
-  storageBucket: "my-housework-73a32.firebasestorage.app",
-  messagingSenderId: "792978110342",
-  appId: "1:792978110342:web:8dde74d7ca02af00561e07"
-};
-let db = null;
-
-// ── 存取控制：固定 token ──────────────────────────────────
-const FIXED_TOKEN = 'e7ce730391515c7c7377b12f0e867ccfb7c85e12a71c6f9da3a68e6e215ef4d0';
-let _roomToken = FIXED_TOKEN;
-
-function lockShow(){
-  const ls=document.getElementById('lock-screen');
-  if(ls) ls.style.display='flex';
-}
-function lockHide(){
-  const ls=document.getElementById('lock-screen');
-  if(ls) ls.style.display='none';
-}
-function lockShowError(msg){
-  const el=document.getElementById('lock-error');
-  if(el){el.textContent=msg;el.style.display='block';}
-}
-function lockEnter(){
-  // 重新連線：重設監聽狀態，重新 loadData
-  lockHide();
-  _fbListening = false;
-  _roomToken = FIXED_TOKEN;
-  loadData();
-}
-function lockSubmit(){ lockEnter(); } // 相容舊呼叫
-
-function lockLogout(){
-  // 清除本機快取，顯示重新連線畫面
-  const keysToRemove = ['app_tasks','app_housework','app_inventory','app_locations','app_updatedAt'];
-  keysToRemove.forEach(k => localStorage.removeItem(k));
-  _fbListening = false;
-  // 停止舊監聽
-  if(db && _roomToken) { try{ db.ref('rooms/'+_roomToken).off(); }catch(e){} }
-  closeDrawer();
-  lockShow();
-}
-
-// 強制把本機資料上傳覆蓋雲端
-function forceUpload(){
-  appConfirm('強制上傳', '確定要以此裝置的資料覆蓋雲端嗎？另一台裝置的資料將被覆蓋。', ()=>{
-    const now = Date.now();
-    localStorage.setItem('app_updatedAt', String(now));
-    Promise.all([
-      fbSave('tasks', tasks),
-      fbSave('housework', housework),
-      fbSave('inventory', inventory),
-      fbSave('locations', locations),
-    ]).then(()=>{
-      showToast('已上傳本機資料至雲端');
-      updateSyncTimeUI(now, '本機上傳');
-    });
-  }, {danger:false, icon:'cloud_upload'});
-}
-
-// 更新同步時間顯示
-function updateSyncTimeUI(ts, source){
-  if(!ts) return;
-  const d = new Date(ts);
-  const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const dateStr = d.toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
-  const display = (d.toDateString()===new Date().toDateString()) ? timeStr : dateStr+' '+timeStr;
-  const el1 = document.getElementById('fb-sync-time');
-  const el2 = document.getElementById('drawer-sync-time');
-  const el3 = document.getElementById('drawer-data-source');
-  if(el1) el1.textContent = display;
-  if(el2) el2.textContent = display;
-  if(el3) el3.textContent = source || '雲端';
-}
-
-// 點擊狀態指示器：顯示 drawer 的同步資訊
-function fbStatusClick(){
-  openDrawer();
-}
-
-// ── 同步狀態指示器 ────────────────────────────────────────
-
-// ── 同步狀態指示器 ────────────────────────────────────────
-function fbSetStatus(state){
-  const dot=document.getElementById('fb-status-dot'),txt=document.getElementById('fb-status-txt');
-  if(!dot||!txt)return;
-  const MAP={
-    connecting:{color:'#fbbf24',label:'連線中'},
-    online:{color:'#34d399',label:'已同步'},
-    saving:{color:'#60a5fa',label:'儲存中'},
-    offline:{color:'#f87171',label:'離線'},
-    error:{color:'#f87171',label:'錯誤'},
-  };
-  const m=MAP[state]||MAP.connecting;
-  dot.style.background=m.color; txt.textContent=m.label;
-}
-
-// ── Firebase 讀寫封裝 ──────────────────────────────────────
-function fbSave(key, data){
-  fbSetStatus('saving');
-  const now = Date.now();
-  localStorage.setItem('app_'+key, JSON.stringify(data));
-  localStorage.setItem('app_updatedAt', String(now));
-  if(!db||!_roomToken){ fbSetStatus('offline'); return Promise.resolve(); }
-  // 同時更新 meta.updatedAt，讓其他裝置知道有新資料
-  db.ref('rooms/'+_roomToken+'/meta/updatedAt').set(now).catch(()=>{});
-  return db.ref('rooms/'+_roomToken+'/'+key).set(data)
-    .then(()=>fbSetStatus('online'))
-    .catch(err=>{console.error('Firebase save error:',err);fbSetStatus('error');});
-}
-
-// ── DATA ─────────────────────────────────────────────────
-let tasks=[],housework=[],inventory=[];
-let hwAreaFilter=null,todoDateFilter='all',todoAreaFilter=null;
-let hwBatchMode=false,hwSelected=new Set();
-let currentDbTab='recurring',calendarWeekOffset=0,openAssignDay=null;
-let todoFilterOpen=false;
-
-// 新的 save 函數，全部走 Firebase
-function saveData(){fbSave('tasks',tasks);fbSave('housework',housework);}
-function saveInv(){fbSave('inventory',inventory);}
-function saveLocations(){fbSave('locations',locations);}
-
-// 從 Firebase 讀取資料，並設定即時監聽（多人協作的核心）
-let _fbListening = false;
-let _localSnapshot = null;
-
-function loadData(){
-  // 先讀 localStorage 快取，讓畫面立刻有東西顯示
-  const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
-  const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
-  tasks    = t ? JSON.parse(t) : JSON.parse(JSON.stringify(DT));
-  housework= h ? JSON.parse(h) : JSON.parse(JSON.stringify(DH));
-  inventory= i ? JSON.parse(i) : JSON.parse(JSON.stringify(DI));
-  locations= l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL));
-  _localSnapshot = t ? true : false; // 記錄本機是否有資料
-  renderAll(); // 先顯示本機快取
-
-  if(_fbListening) return;
-  _fbListening = true;
-  if(!db||!_roomToken){ console.warn('db/token not ready'); return; }
-
-  let _firstLoad = true; // 第一次收到 Firebase 資料的標記
-
-  // 用 on() 持續監聽：自己改或朋友改都會觸發
-  db.ref('rooms/'+_roomToken).on('value', snap => {
-    const d = snap.val();
-
-    if(!d || !d.tasks){
-      if(_firstLoad){
-        // Firebase 是空的，上傳本機資料做初始化
-        _firstLoad = false;
-        showToast('首次同步，上傳本機資料…');
-        fbSave('tasks', tasks);
-        fbSave('housework', housework);
-        fbSave('inventory', inventory);
-        fbSave('locations', locations);
-      }
-      return;
-    }
-
-    if(_firstLoad && _localSnapshot){
-      // 第一次收到 Firebase 資料，且本機也有資料
-      // 檢查是否有衝突
-      const remoteUpdated = d.meta?.updatedAt || 0;
-      const localUpdated  = parseInt(localStorage.getItem('app_updatedAt')||'0');
-      _firstLoad = false;
-
-      if(localUpdated > 0 && remoteUpdated > 0 && Math.abs(localUpdated - remoteUpdated) > 10000){
-        // 時間差超過 10 秒，顯示衝突選擇
-        _remoteSnapshot = d;
-        showConflictUI(localUpdated, remoteUpdated, d);
-        return;
-      }
-    }
-    _firstLoad = false;
-
-    // 正常情況：套用雲端資料
-    applyRemoteData(d);
-
-  }, err => {
-    console.error('Firebase listen error:', err);
-    fbSetStatus('error');
-  });
-}
-
-let _remoteSnapshot = null;
-
-function applyRemoteData(d){
-  if(d.tasks)     tasks     = d.tasks;
-  if(d.housework) housework = d.housework;
-  if(d.inventory) inventory = d.inventory;
-  if(d.locations) locations = d.locations;
-  localStorage.setItem('app_tasks',     JSON.stringify(tasks));
-  localStorage.setItem('app_housework', JSON.stringify(housework));
-  localStorage.setItem('app_inventory', JSON.stringify(inventory));
-  localStorage.setItem('app_locations', JSON.stringify(locations));
-  const now = Date.now();
-  localStorage.setItem('app_updatedAt', String(d.meta?.updatedAt || now));
-  renderAll();
-  if(currentPage==='inventory') renderInventoryPage();
-  fbSetStatus('online');
-  updateSyncTimeUI(d.meta?.updatedAt || now, '雲端同步');
-}
-
-function showConflictUI(localTs, remoteTs, remoteData){
-  const fmt = ts => ts ? new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '不明';
-  const li = document.getElementById('conflict-local-info');
-  const ri = document.getElementById('conflict-remote-info');
-  if(li) li.textContent = `修改時間：${fmt(localTs)} · ${tasks.length} 筆任務・${housework.length} 筆家事`;
-  if(ri) ri.textContent = `修改時間：${fmt(remoteTs)} · ${(remoteData.tasks||[]).length} 筆任務・${(remoteData.housework||[]).length} 筆家事`;
-  const cs = document.getElementById('conflict-screen');
-  if(cs) cs.style.display='flex';
-}
-
-function conflictChoose(choice){
-  const cs = document.getElementById('conflict-screen');
-  if(cs) cs.style.display='none';
-  if(choice==='local'){
-    // 以本機為主，強制上傳覆蓋雲端
-    const now = Date.now();
-    localStorage.setItem('app_updatedAt', String(now));
-    fbSave('tasks', tasks);
-    fbSave('housework', housework);
-    fbSave('inventory', inventory);
-    fbSave('locations', locations);
-    db.ref('rooms/'+_roomToken+'/meta').update({updatedAt: now});
-    showToast('已上傳本機資料');
-    renderAll();
-  } else {
-    // 以雲端為主
-    if(_remoteSnapshot) applyRemoteData(_remoteSnapshot);
-    showToast('已套用雲端資料');
-  }
-}
+// ── DATE UTILS ──────────────────────────────────────────
 function toLD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function addD(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return toLD(d)}
 const NOW=new Date(),todayStr=toLD(NOW),weekEndStr=addD(todayStr,7);
@@ -1309,7 +1325,222 @@ function sendAllProgressToShortcut(){
   window.location.href=`shortcuts://run-shortcut?name=${encodeURIComponent('家事進度回報')}&input=text&text=${encodeURIComponent(message)}`;
 }
 
-// ── EXPORT / IMPORT ───────────────────────────────────────
+// ── DATA ─────────────────────────────────────────────────
+let tasks=[],housework=[],inventory=[];
+let hwAreaFilter=null,todoDateFilter='all',todoAreaFilter=null;
+let hwBatchMode=false,hwSelected=new Set();
+let currentDbTab='recurring',calendarWeekOffset=0,openAssignDay=null;
+let todoFilterOpen=false; // collapsible filter state
+
+// ── FIREBASE 設定 ────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBN8V3wZOp9vaJFkIN9rDWTNELK9UHOB8I",
+  authDomain: "my-housework-73a32.firebaseapp.com",
+  databaseURL: "https://my-housework-73a32-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "my-housework-73a32",
+  storageBucket: "my-housework-73a32.firebasestorage.app",
+  messagingSenderId: "792978110342",
+  appId: "1:792978110342:web:8dde74d7ca02af00561e07"
+};
+let db = null;
+
+// ── 存取控制：固定 token ──────────────────────────────────────
+const FIXED_TOKEN = 'e7ce730391515c7c7377b12f0e867ccfb7c85e12a71c6f9da3a68e6e215ef4d0';
+let _roomToken = FIXED_TOKEN;
+
+// ── 鎖定畫面函數 ─────────────────────────────────────────────
+function lockShow(){ const ls=document.getElementById('lock-screen'); if(ls) ls.style.display='flex'; }
+function lockHide(){ const ls=document.getElementById('lock-screen'); if(ls) ls.style.display='none'; }
+function lockShowError(msg){ const el=document.getElementById('lock-error'); if(el){el.textContent=msg;el.style.display='block';} }
+function lockEnter(){
+  lockHide();
+  _fbListening = false;
+  _roomToken = FIXED_TOKEN;
+  loadData();
+}
+function lockSubmit(){ lockEnter(); }
+function lockLogout(){
+  const keysToRemove = ['app_tasks','app_housework','app_inventory','app_locations','app_shoplist','app_updatedAt'];
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+  _fbListening = false;
+  if(db && _roomToken) { try{ db.ref('rooms/'+_roomToken).off(); }catch(e){} }
+  closeDrawer();
+  lockShow();
+}
+
+// ── 強制上傳本機至雲端 ────────────────────────────────────────
+function forceUpload(){
+  appConfirm('強制上傳', '確定要以此裝置的資料覆蓋雲端嗎？另一台裝置的資料將被覆蓋。', ()=>{
+    const now = Date.now();
+    localStorage.setItem('app_updatedAt', String(now));
+    Promise.all([
+      fbSave('tasks', tasks),
+      fbSave('housework', housework),
+      fbSave('inventory', inventory),
+      fbSave('locations', locations),
+      fbSave('shoplist', shopList),
+    ]).then(()=>{
+      showToast('已上傳本機資料至雲端');
+      updateSyncTimeUI(now, '本機上傳');
+    });
+  }, {danger:false, icon:'cloud_upload'});
+}
+
+// ── 同步時間顯示 ──────────────────────────────────────────────
+function updateSyncTimeUI(ts, source){
+  if(!ts) return;
+  const d = new Date(ts);
+  const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const dateStr = d.toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
+  const display = (d.toDateString()===new Date().toDateString()) ? timeStr : dateStr+' '+timeStr;
+  const el1 = document.getElementById('fb-sync-time');
+  const el2 = document.getElementById('drawer-sync-time');
+  const el3 = document.getElementById('drawer-data-source');
+  if(el1) el1.textContent = display;
+  if(el2) el2.textContent = display;
+  if(el3) el3.textContent = source || '雲端';
+}
+
+// ── 點擊狀態指示器開啟 drawer ─────────────────────────────────
+function fbStatusClick(){ openDrawer(); }
+
+// ── 同步狀態指示器 ────────────────────────────────────────────
+function fbSetStatus(state){
+  const dot=document.getElementById('fb-status-dot'),txt=document.getElementById('fb-status-txt');
+  if(!dot||!txt)return;
+  const MAP={
+    connecting:{color:'#fbbf24',label:'連線中'},
+    online:{color:'#34d399',label:'已同步'},
+    saving:{color:'#60a5fa',label:'儲存中'},
+    offline:{color:'#f87171',label:'離線'},
+    error:{color:'#f87171',label:'錯誤'},
+  };
+  const m=MAP[state]||MAP.connecting;
+  dot.style.background=m.color; txt.textContent=m.label;
+}
+
+// ── Firebase 讀寫封裝 ─────────────────────────────────────────
+function fbSave(key, data){
+  fbSetStatus('saving');
+  const now = Date.now();
+  localStorage.setItem('app_'+key, JSON.stringify(data));
+  localStorage.setItem('app_updatedAt', String(now));
+  if(!db||!_roomToken){ fbSetStatus('offline'); return Promise.resolve(); }
+  db.ref('rooms/'+_roomToken+'/meta/updatedAt').set(now).catch(()=>{});
+  return db.ref('rooms/'+_roomToken+'/'+key).set(data)
+    .then(()=>{ fbSetStatus('online'); updateSyncTimeUI(now,'本機儲存'); })
+    .catch(err=>{console.error('Firebase save error:',err);fbSetStatus('error');});
+}
+
+// ── save 函數，全部走 Firebase ─────────────────────────────────
+function saveData(){fbSave('tasks',tasks);fbSave('housework',housework);}
+function saveInv(){fbSave('inventory',inventory);}
+function saveLocations(){fbSave('locations',locations);}
+
+// ── Firebase 監聽與 loadData ──────────────────────────────────
+let _fbListening = false;
+let _localSnapshot = null;
+let _remoteSnapshot = null;
+
+function loadData(){
+  const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
+  const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
+  const s=localStorage.getItem('app_shoplist');
+  tasks    = t ? JSON.parse(t) : JSON.parse(JSON.stringify(DT));
+  housework= h ? JSON.parse(h) : JSON.parse(JSON.stringify(DH));
+  inventory= i ? JSON.parse(i) : JSON.parse(JSON.stringify(DI));
+  locations= l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL));
+  if(typeof shopList !== 'undefined') shopList = s ? JSON.parse(s) : [];
+  _localSnapshot = t ? true : false;
+  renderAll();
+
+  if(_fbListening) return;
+  _fbListening = true;
+  if(!db||!_roomToken){ console.warn('db/token not ready'); return; }
+
+  let _firstLoad = true;
+
+  db.ref('rooms/'+_roomToken).on('value', snap => {
+    const d = snap.val();
+    if(!d || !d.tasks){
+      if(_firstLoad){
+        _firstLoad = false;
+        showToast('首次同步，上傳本機資料…');
+        fbSave('tasks', tasks);
+        fbSave('housework', housework);
+        fbSave('inventory', inventory);
+        fbSave('locations', locations);
+        if(typeof shopList !== 'undefined') fbSave('shoplist', shopList);
+      }
+      return;
+    }
+    if(_firstLoad && _localSnapshot){
+      const remoteUpdated = d.meta?.updatedAt || 0;
+      const localUpdated  = parseInt(localStorage.getItem('app_updatedAt')||'0');
+      _firstLoad = false;
+      if(localUpdated > 0 && remoteUpdated > 0 && Math.abs(localUpdated - remoteUpdated) > 10000){
+        _remoteSnapshot = d;
+        showConflictUI(localUpdated, remoteUpdated, d);
+        return;
+      }
+    }
+    _firstLoad = false;
+    applyRemoteData(d);
+  }, err => {
+    console.error('Firebase listen error:', err);
+    fbSetStatus('error');
+  });
+}
+
+function applyRemoteData(d){
+  if(d.tasks)     tasks     = d.tasks;
+  if(d.housework) housework = d.housework;
+  if(d.inventory) inventory = d.inventory;
+  if(d.locations) locations = d.locations;
+  if(d.shoplist && typeof shopList !== 'undefined') shopList = d.shoplist;
+  localStorage.setItem('app_tasks',     JSON.stringify(tasks));
+  localStorage.setItem('app_housework', JSON.stringify(housework));
+  localStorage.setItem('app_inventory', JSON.stringify(inventory));
+  localStorage.setItem('app_locations', JSON.stringify(locations));
+  if(typeof shopList !== 'undefined') localStorage.setItem('app_shoplist', JSON.stringify(shopList));
+  const now = Date.now();
+  localStorage.setItem('app_updatedAt', String(d.meta?.updatedAt || now));
+  renderAll();
+  if(typeof renderInventoryPage === 'function') renderInventoryPage();
+  if(typeof shopRender === 'function') shopRender();
+  fbSetStatus('online');
+  updateSyncTimeUI(d.meta?.updatedAt || now, '雲端同步');
+}
+
+function showConflictUI(localTs, remoteTs, remoteData){
+  const fmt = ts => ts ? new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '不明';
+  const li = document.getElementById('conflict-local-info');
+  const ri = document.getElementById('conflict-remote-info');
+  if(li) li.textContent = `修改時間：${fmt(localTs)} · ${tasks.length} 筆任務・${housework.length} 筆家事`;
+  if(ri) ri.textContent = `修改時間：${fmt(remoteTs)} · ${(remoteData.tasks||[]).length} 筆任務・${(remoteData.housework||[]).length} 筆家事`;
+  const cs = document.getElementById('conflict-screen');
+  if(cs) cs.style.display='flex';
+}
+
+function conflictChoose(choice){
+  const cs = document.getElementById('conflict-screen');
+  if(cs) cs.style.display='none';
+  if(choice==='local'){
+    const now = Date.now();
+    localStorage.setItem('app_updatedAt', String(now));
+    fbSave('tasks', tasks);
+    fbSave('housework', housework);
+    fbSave('inventory', inventory);
+    fbSave('locations', locations);
+    if(typeof shopList !== 'undefined') fbSave('shoplist', shopList);
+    db.ref('rooms/'+_roomToken+'/meta').update({updatedAt: now});
+    showToast('已上傳本機資料');
+    renderAll();
+  } else {
+    if(_remoteSnapshot) applyRemoteData(_remoteSnapshot);
+    showToast('已套用雲端資料');
+  }
+}
 function exportData(){
   // 確保 locations 也被包含在導出的物件中
   const data=JSON.stringify({tasks, housework, inventory, locations, settings:appSettings}, null, 2);
@@ -1401,14 +1632,29 @@ const PT={
   todo:{title:'To Do List',sub:'管理您的每日任務'},
   tasks:{title:'任務清單',sub:'檢視所有任務資料'},
   housework:{title:'家事管理',sub:'管理家事項目與頻率'},
-  inventory:{title:'物品庫存',sub:'家中物品 · 庫存追蹤'},
+  inventory:{title:'物品庫存',sub:'家中物品 · 庫存追蹤 · 補貨提醒'},
 };
+function _syncInvHeaderBtns(){
+  // 依目前 sub-tab 顯示對應的 header icon 按鈕
+  const icsBtn=document.getElementById('global-ics-btn');
+  const shopBtn=document.getElementById('global-shop-btn');
+  if(!icsBtn||!shopBtn)return;
+  const isExp=invCurrentTab==='alert'&&(invAlertSubMode==='expiry'||invAlertSubMode==='all');
+  const isRst=invCurrentTab==='alert'&&invAlertSubMode==='restock';
+  const hasExp=inventory.some(it=>it.type==='expiry'&&it.expiryDate);
+  const hasLow=inventory.some(it=>{if(!it.restock)return false;if(it.qtyMode==='ratio')return(it.ratio??100)<=(it.ratioThr??25);return(it.qty??0)<=(it.threshold??1);});
+  icsBtn.style.setProperty('display',isExp&&hasExp?'flex':'none','important');
+  shopBtn.style.setProperty('display',isRst&&hasLow?'flex':'none','important');
+}
 function switchPage(p,b){
   const addBtn=document.getElementById('global-add-btn');
   const importBtn=document.getElementById('global-import-btn');
   const iphoneBtn=document.getElementById('global-iphone-btn');
-  const addMenu=document.getElementById('add-inv-menu');
-  if(addMenu) addMenu.style.display='none'; // 切頁時關掉 dropdown
+  const icsBtn=document.getElementById('global-ics-btn');
+  const shopBtn=document.getElementById('global-shop-btn');
+  // 先全隱 contextual 按鈕
+  if(icsBtn)icsBtn.style.setProperty('display','none','important');
+  if(shopBtn)shopBtn.style.setProperty('display','none','important');
   if(p==='tasks'){
     if(addBtn)addBtn.style.setProperty('display','none','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
@@ -1417,13 +1663,9 @@ function switchPage(p,b){
     if(addBtn)addBtn.style.setProperty('display','none','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','flex','important');
-  } else if(p==='todo'){
-    if(addBtn)addBtn.style.setProperty('display','none','important');
-    if(importBtn)importBtn.style.setProperty('display','none','important');
-    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   } else if(p==='inventory'){
     if(addBtn)addBtn.style.setProperty('display','flex','important');
-    if(importBtn)importBtn.style.setProperty('display','none','important');
+    if(importBtn)importBtn.style.setProperty('display','flex','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   } else {
     if(addBtn)addBtn.style.setProperty('display','flex','important');
@@ -1438,38 +1680,23 @@ function switchPage(p,b){
   currentPage=p;
   const pg=PT[p];
   document.getElementById('pageTitle').textContent=pg.title;
-  document.getElementById('pageSubtitle').textContent=pg.sub;
+  const _sub=document.getElementById('pageSubtitle');if(_sub)_sub.textContent=pg.sub;
   closeAllPopups();
   if(p==='inventory')renderInventoryPage();
   else if(p==='todo'){twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
   else renderAll();
 }
-function openAddModal(e){
-  if(e) e.stopPropagation();
-  if(currentPage==='housework') { openHouseworkModal(); return; }
-  if(currentPage==='inventory'){
-    const menu=document.getElementById('add-inv-menu');
-    if(!menu) return;
-    // 用 hidden attribute 判斷開關，完全不碰 display
-    if(menu.hasAttribute('data-open')){
-      menu.style.display='none';
-      menu.removeAttribute('data-open');
-    } else {
-      menu.style.display='block';
-      menu.setAttribute('data-open','1');
-    }
-    return;
+function openAddModal(){
+  if(currentPage==='housework')openHouseworkModal();
+  else if(currentPage==='inventory'){
+    if(invCurrentTab==='shopping')shopOpenAdd();
+    else invOpenAdd();
   }
-  if(currentPage==='todo') return; // todo 無功能
-  openTaskModal();
+  else if(currentPage==='todo'){twOpenDropDay=todayStr;twRender();}
+  else openTaskModal();
 }
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-function closeAllPopups(){
-  document.querySelectorAll('.popup-menu').forEach(p=>p.classList.remove('show','flip-up'));
-  document.getElementById('inv-global-popup')?.remove();
-  const addMenu=document.getElementById('add-inv-menu');
-  if(addMenu){ addMenu.style.display='none'; addMenu.removeAttribute('data-open'); }
-}
+function closeAllPopups(){document.querySelectorAll('.popup-menu').forEach(p=>{p.classList.remove('show','flip-up');p.style.position='';p.style.top='';p.style.bottom='';p.style.right='';});document.getElementById('inv-global-popup')?.remove();shopCloseGlobalDd();shopOpenDotId=null;}
 
 // ── TASK MODAL ────────────────────────────────────────────
 function onTaskFreqTypeChange(){
@@ -1597,8 +1824,19 @@ function doDelayCustomInline(){
 function togglePopup(id,e){
   e&&e.stopPropagation();closeAllPopups();
   const el=document.getElementById('popup-'+id);if(!el)return;
+  // Use fixed positioning to escape overflow:hidden containers (fixes mobile clipping)
+  const btn=e?.currentTarget||e?.target?.closest('button')||e?.target;
+  if(btn){
+    const rect=btn.getBoundingClientRect();
+    el.style.position='fixed';
+    el.style.right=(window.innerWidth-rect.right)+'px';
+    el.style.top='';el.style.bottom='';
+    const navH=80;
+    const spaceBelow=window.innerHeight-rect.bottom-navH;
+    if(spaceBelow<130){el.style.bottom=(window.innerHeight-rect.top)+'px';}
+    else{el.style.top=(rect.bottom+4)+'px';}
+  }
   el.classList.add('show');
-  requestAnimationFrame(()=>{const r=el.getBoundingClientRect();if(r.bottom>window.innerHeight-80)el.classList.add('flip-up');});
 }
 
 // ── HELPERS ───────────────────────────────────────────────
@@ -1606,6 +1844,39 @@ function priorityBadge(p){return `<span class="badge ${p==='緊急'?'badge-urgen
 function areaColor(a){const m={'臥室':{bg:'#f5f3ff',dot:'#8b5cf6',icon:'🛏'},'所有空間':{bg:'#eff6ff',dot:'#3b82f6',icon:'🏠'},'浴室':{bg:'#ecfeff',dot:'#06b6d4',icon:'🚿'},'廚房':{bg:'#fffbeb',dot:'#f59e0b',icon:'🍳'}};return m[a]||{bg:'#f1f5f9',dot:'#6b7280',icon:'📍'}}
 function emptyS(m){return `<div class="empty-state"><span class="material-symbols-outlined">inbox</span><p>${m}</p></div>`}
 function freqLabel(t){if(!t||t.freqType==='none'||!t.freqVal)return '';return t.freqType==='days'?`每${t.freqVal}天`:`每月${t.freqVal}號`}
+
+// ── 定期任務 Virtual ID 輔助函式 ──────────────────────────────
+// Virtual ID 格式：'VIRTUAL::templateId::date'
+function isVirtualTaskId(sid){return typeof sid==='string'&&sid.startsWith('VIRTUAL::');}
+function parseVirtualTaskId(sid){const p=sid.split('::');return{templateId:p[1],date:p[2]};}
+/**
+ * 將 virtual 入口「實體化」：在 tasks 陣列中建立一筆真正的 instance。
+ * @param {string} templateId 定期任務模板 id
+ * @param {string} dateStr    自然排程日期 (YYYY-MM-DD)
+ * @param {string} status     初始狀態，預設 '待辦'
+ * @param {boolean} forDelay  若為 true，則在 instance 中寫入 originalMonthlyDate，
+ *                            讓該自然日期的 virtual 入口被隱藏（避免延後後重複出現）
+ * @returns {object|null} 建立或找到的 instance task
+ */
+function materializeMonthlyTask(templateId, dateStr, status, forDelay){
+  const template=tasks.find(t=>t.id===templateId&&!t.templateId);
+  if(!template)return null;
+  // 若已存在同日期的 instance，直接回傳
+  const existing=tasks.find(t=>t.templateId===templateId&&t.plannedDate===dateStr&&!t.originalMonthlyDate);
+  if(existing)return existing;
+  const instance={
+    ...template,
+    id:Date.now().toString()+'_'+Math.random().toString(36).slice(2,6),
+    templateId:templateId,
+    plannedDate:dateStr,
+    status:status||'待辦',
+    createdAt:new Date().toISOString()
+  };
+  if(forDelay) instance.originalMonthlyDate=dateStr; // 用於封鎖原始自然日期
+  tasks.push(instance);
+  saveData();
+  return instance;
+}
 
 // ── RENDER: TO DO ─────────────────────────────────────────
 
@@ -1721,8 +1992,8 @@ function renderHouseworkRow(h){
         <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8">more_vert</span>
       </button>
       <div class="popup-menu" id="popup-${h.id}">
-        <button onclick="markHouseworkDone('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#10b981">check_circle</span>標為完成</button>
         <button onclick="openHouseworkModal('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#5b52e8">edit</span>修改</button>
+        <button onclick="markHouseworkDone('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#10b981">check_circle</span>標為完成</button>
         <button onclick="openDelayModal('hw','${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b">schedule</span>延後</button>
         <button class="danger" onclick="deleteHousework('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>
       </div>
@@ -1730,7 +2001,7 @@ function renderHouseworkRow(h){
   </div>`;
 }
 function renderHouseworkPage(){
-  const allAreas=[...new Set(housework.map(h=>h.area))];
+  const allAreas=[...new Set(housework.map(h=>h.area))].sort((a,b)=>{if(a==='所有空間')return 1;if(b==='所有空間')return -1;return a.localeCompare(b,'zh-TW');});
   const tabBar=document.getElementById('hw-area-tab-bar');
   if(tabBar)tabBar.innerHTML=[null,...allAreas].map(a=>{const isAll=a===null,sel=(isAll&&!hwAreaFilter)||(hwAreaFilter===a),cnt=isAll?housework.length:housework.filter(h=>h.area===a).length,col=isAll?null:areaColor(a);
     return `<button class="area-tab ${sel?'active':''}" onclick="toggleAreaFilter(${a===null?'null':`'${a}'`})" style="${sel&&!isAll?`background:${col.dot};`:''}">
@@ -1758,9 +2029,11 @@ function invExpiryStatus(it){
   
   if(!it.expiryDate)return null;
   const d=daysBetween(todayStr,it.expiryDate);
+  const remind=it.reminderDays||14;
+  const urgentAt=Math.max(1,Math.floor(remind/2));
   if(d<0)return{cls:'red',urgent:true,rowCls:'row-danger'};
-  if(d<=7)return{cls:'red',urgent:true,rowCls:'row-danger'};
-  if(d<=14)return{cls:'orange',urgent:false,rowCls:'row-warn'};
+  if(d<=urgentAt)return{cls:'red',urgent:true,rowCls:'row-danger'};
+  if(d<=remind)return{cls:'orange',urgent:false,rowCls:'row-warn'};
   return{cls:'muted',urgent:false,rowCls:''};
 }
 function invRestockStatus(it){
@@ -1782,11 +2055,12 @@ function invWorstCls(es,rs){
 }
 
 // ── INVENTORY STATE ────────────────────────────────────────
-let invCurrentTab='all',invCurrentType='item',invEditingId=null;
+let invCurrentTab='alert',invCurrentType='item',invEditingId=null;
 let invLocFilter=null,invCatFilter=null,invSrcFilter=null,invDateFrom=null,invDateTo=null;
 let invQtyMode='qty',invRestockOn=false,invFilterOpen=false,invLocFilterOpen=false,invPendingImport=[];
 
 let invLocMode='list'; // 'list' or 'fp'
+let invAlertSubMode='expiry'; // 預設效期管理
 
 function invSwitchTab(tab,btn){
   invCurrentTab=tab;invLocFilter=null;invCatFilter=null;invSrcFilter=null;invDateFrom=null;invDateTo=null;
@@ -1795,13 +2069,57 @@ function invSwitchTab(tab,btn){
   // 子模式列只在 location tab 時顯示
   const modeBar=document.getElementById('inv-loc-mode-bar');
   if(modeBar)modeBar.style.display=tab==='location'?'block':'none';
+  // 待注意子篩選列只在 alert tab 時顯示
+  const alertBar=document.getElementById('inv-alert-sub-bar');
+  if(alertBar)alertBar.style.display=tab==='alert'?'block':'none';
+  // 購物清單 panel 只在 shopping tab 時顯示
+  const shopPanel=document.getElementById('inv-shopping-panel');
+  const invContent=document.getElementById('inv-content');
+  const invFilterPanel=document.getElementById('inv-filter-panel');
+  const invLocFilterPanel=document.getElementById('inv-loc-filter-panel');
+  const invAlertStrip=document.getElementById('inv-alert-strip');
+  if(tab==='shopping'){
+    if(shopPanel)shopPanel.style.display='block';
+    if(invContent)invContent.style.display='none';
+    if(invFilterPanel)invFilterPanel.style.display='none';
+    if(invLocFilterPanel)invLocFilterPanel.style.display='none';
+    if(invAlertStrip)invAlertStrip.style.display='none';
+    // 同步待補貨並渲染
+    shopSyncRestock();
+    if(shopSubTab==='restock'){shopRenderRestock();}else{shopRender();}
+    return;
+  } else {
+    if(shopPanel)shopPanel.style.display='none';
+    if(invContent)invContent.style.display='';
+  }
+  if(tab==='alert'){
+    invAlertSubMode='expiry'; // 預設效期管理
+    _syncAlertSubBtns();
+    renderInventoryPage();return;
+  }
   if(tab==='location'){
-    invLocMode='list'; // 預設進入清單模式
+    invLocMode='fp'; // 預設進入平面圖模式
     _syncLocModeBtns();
     renderInventoryPage();return;
   }
   if(tab==='locmgr'){renderLocMgrPage();return;}
   renderInventoryPage();
+}
+
+function invSwitchAlertSub(mode){
+  invAlertSubMode=mode;
+  // 切換子篩選時重置會被影響到的篩選條件
+  invDateFrom=null;invDateTo=null;invSrcFilter=null;
+  _syncAlertSubBtns();
+  renderInventoryPage();
+  if(currentPage==='inventory')_syncInvHeaderBtns();
+}
+
+function _syncAlertSubBtns(){
+  ['expiry','restock'].forEach(m=>{
+    const b=document.getElementById('alertsub-btn-'+m);
+    if(b)b.classList.toggle('on',invAlertSubMode===m);
+  });
 }
 
 function invSwitchLocMode(mode){
@@ -1859,15 +2177,27 @@ function invRenderFilterPanel(){
   [null,...cats].forEach(c=>{const a=(invCatFilter===null&&c===null)||(invCatFilter===c&&c!==null);ch+=`<button class="inv-chip${a?' active':''}" onclick="invSetCat(${c===null?'null':`'${c}'`})">${c||'全部'}</button>`;});
 
   let th='';
-  if(invCurrentTab==='expiry'){
-    th=`<span class="inv-filter-row-label">效期</span>
-      <input type="date" value="${invDateFrom||''}" onchange="invSetDateFrom(this.value)" style="height:26px;font-size:11px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;outline:none;flex-shrink:0;max-width:130px">
-      <span style="font-size:11px;color:var(--text-muted);flex-shrink:0">至</span>
-      <input type="date" value="${invDateTo||''}" onchange="invSetDateTo(this.value)" style="height:26px;font-size:11px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;outline:none;flex-shrink:0;max-width:130px">`;
+  // 是否要顯示第三列：效期 / 來源 / 隱藏
+  // - 待注意 + 效期管理：顯示日期範圍
+  // - 待注意 + 補貨追蹤：顯示來源
+  // - 待注意 + 全部待注意：隱藏第三列
+  // - 其他頁簽：維持原邏輯（expiry → 日期、其餘 → 來源）
+  const isAlertAll=(invCurrentTab==='alert'&&invAlertSubMode==='all');
+  const showExpiryRange=(invCurrentTab==='expiry')||(invCurrentTab==='alert'&&invAlertSubMode==='expiry');
+  if(isAlertAll){
+    thirdRow.style.display='none';
   }else{
-    th=`<span class="inv-filter-row-label">來源</span>`;
-    if(srcs.length){[null,...srcs].forEach(s=>{const a=(invSrcFilter===null&&s===null)||(invSrcFilter===s&&s!==null);th+=`<button class="inv-chip${a?' active':''}" onclick="invSetSrc(${s===null?'null':`'${s}'`})">${s?invSrcIcon(s)+s:'全部'}</button>`;});}
-    else{th+=`<span style="font-size:11px;color:var(--text-muted)">（無補貨來源）</span>`;}
+    thirdRow.style.display='';
+    if(showExpiryRange){
+      th=`<span class="inv-filter-row-label">效期</span>
+        <input type="date" value="${invDateFrom||''}" onchange="invSetDateFrom(this.value)" style="height:26px;font-size:11px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;outline:none;flex-shrink:0;max-width:130px">
+        <span style="font-size:11px;color:var(--text-muted);flex-shrink:0">至</span>
+        <input type="date" value="${invDateTo||''}" onchange="invSetDateTo(this.value)" style="height:26px;font-size:11px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;outline:none;flex-shrink:0;max-width:130px">`;
+    }else{
+      th=`<span class="inv-filter-row-label">來源</span>`;
+      if(srcs.length){[null,...srcs].forEach(s=>{const a=(invSrcFilter===null&&s===null)||(invSrcFilter===s&&s!==null);th+=`<button class="inv-chip${a?' active':''}" onclick="invSetSrc(${s===null?'null':`'${s}'`})">${s?invSrcIcon(s)+s:'全部'}</button>`;});}
+      else{th+=`<span style="font-size:11px;color:var(--text-muted)">（無補貨來源）</span>`;}
+    }
   }
 
   locRow.innerHTML=lh; catRow.innerHTML=ch; thirdRow.innerHTML=th;
@@ -1886,6 +2216,16 @@ function invRenderFilterPanel(){
 // ── INVENTORY FILTER / POOL ────────────────────────────────
 function invFilterByTab(){
   if(invCurrentTab==='all')return inventory;
+  if(invCurrentTab==='alert'){
+    if(invAlertSubMode==='expiry')return inventory.filter(it=>it.type==='expiry');
+    if(invAlertSubMode==='restock')return inventory.filter(it=>{
+      if(!it.restock)return false;
+      if(it.qtyMode==='ratio')return(it.ratio??100)<=(it.ratioThr??25);
+      return(it.qty??0)<=(it.threshold??1);
+    });
+    // all: 效期 ∪ 補貨
+    return inventory.filter(it=>it.type==='expiry'||it.restock);
+  }
   if(invCurrentTab==='expiry')return inventory.filter(it=>it.type==='expiry');
   if(invCurrentTab==='restock')return inventory.filter(it=>it.restock);
   if(invCurrentTab==='location')return inventory;
@@ -1905,10 +2245,13 @@ function invFilterPool(){
 function renderInventoryPage(){
   const strip=document.getElementById('inv-alert-strip'),content=document.getElementById('inv-content');
   if(!strip||!content)return;
-  document.getElementById('inv-cnt-all').textContent=inventory.length;
-  document.getElementById('inv-cnt-expiry').textContent=inventory.filter(i=>i.type==='expiry').length;
-  document.getElementById('inv-cnt-restock').textContent=inventory.filter(i=>i.restock).length;
-  document.getElementById('inv-cnt-loc').textContent=inventory.length;
+  // 待注意徽章：有效期限物品 ∪ 需補貨物品 的聯集數
+  const alertCnt=inventory.filter(i=>{if(!i.restock)return false;if(i.qtyMode==='ratio')return(i.ratio??100)<=(i.ratioThr??25);return(i.qty??0)<=(i.threshold??1);}).length;
+  const cntAlertEl=document.getElementById('inv-cnt-alert');if(cntAlertEl)cntAlertEl.textContent=alertCnt;
+  const cntLocEl=document.getElementById('inv-cnt-loc');if(cntLocEl)cntLocEl.textContent=inventory.length;
+  // 確保進入頁面時 alert sub-bar 在 alert 頁簽下顯示
+  const _alertBar=document.getElementById('inv-alert-sub-bar');
+  if(_alertBar)_alertBar.style.display=invCurrentTab==='alert'?'block':'none';
 
   invRenderFilterPanel();
 
@@ -1941,24 +2284,144 @@ function renderInventoryPage(){
   const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
 
   let pool=invFilterPool();
-  pool.sort((a,b)=>{
+  // 🌟 把「未填效期」獨立成一個分區，不混在 urgent 裡
+  const missingDate=pool.filter(it=>it.type==='expiry'&&!it.expiryDate);
+  const datedPool=pool.filter(it=>!(it.type==='expiry'&&!it.expiryDate));
+  datedPool.sort((a,b)=>{
     function s(it){if(invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent)return 0;if(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange')return 1;return 2;}
     return s(a)-s(b)||a.name.localeCompare(b.name);
   });
-  const urgent=pool.filter(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
-  const warn=pool.filter(it=>!urgent.includes(it)&&(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange'));
-  const normal=pool.filter(it=>!urgent.includes(it)&&!warn.includes(it));
+  const urgent=datedPool.filter(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
+  const warn=datedPool.filter(it=>!urgent.includes(it)&&(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange'));
+  const normal=datedPool.filter(it=>!urgent.includes(it)&&!warn.includes(it));
   let html='';
+  // 顯示順序：需要注意 → 即將到期 → 待補效期 → 其他
+  // 補貨追蹤模式下不顯示「待補效期」區塊
+  const isRestockMode=(invCurrentTab==='alert'&&invAlertSubMode==='restock')||invCurrentTab==='restock';
+  const isExpiryMode=(invCurrentTab==='alert'&&(invAlertSubMode==='expiry'||invAlertSubMode==='all'));
+  // ── 頂端工具列：把「購物清單」和「ICS 匯出」合併成一條細列 ──
+  const lowItems=pool.filter(it=>{
+    if(!it.restock)return false;
+    if(it.qtyMode==='ratio'){const r=it.ratio??100,t=it.ratioThr??25;return r<=t;}
+    const q=it.qty??0,thr=it.threshold??1;return q<=thr;
+  });
+  const expiryItems=pool.filter(it=>it.type==='expiry'&&it.expiryDate);
   if(urgent.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title red">需要注意</span><span style="font-size:11px;color:var(--text-muted)">${urgent.length}</span></div><div class="inv-list">${urgent.map(it=>invRenderRow(it)).join('')}</div>`;
   if(warn.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title orange">即將到期 / 快用完</span><span style="font-size:11px;color:var(--text-muted)">${warn.length}</span></div><div class="inv-list">${warn.map(it=>invRenderRow(it)).join('')}</div>`;
+  if(!isRestockMode&&missingDate.length)html+=`<div class="inv-sec-head missing-head"><span class="inv-sec-title amber">📝 待補效期</span><span style="font-size:11px;color:#a16207">${missingDate.length} 項，請點選日期補填</span></div><div class="inv-list missing-list">${missingDate.map(it=>invRenderRow(it,true,true)).join('')}</div>`;
   if(normal.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title">其他</span><span style="font-size:11px;color:var(--text-muted)">${normal.length}</span></div><div class="inv-list">${normal.map(it=>invRenderRow(it)).join('')}</div>`;
   if(!pool.length)html='<p style="text-align:center;padding:32px 0;color:var(--text-muted)">目前沒有項目</p>';
   content.innerHTML=html;
+  if(typeof _invSwipeBind==='function')_invSwipeBind();
+  _syncInvHeaderBtns();
 }
 function invSetLocFilter2(l){invLocFilter=l;renderInventoryPage()}
 function invSetCatFilter2(c){invCatFilter=c;renderInventoryPage()}
 
-function invRenderRow(it,showLoc=true){
+// 🛒 購物清單：產生 / 複製 / 匯出
+function invBuildShoppingList(){
+  const lows=inventory.filter(it=>{
+    if(!it.restock)return false;
+    if(it.qtyMode==='ratio'){const r=it.ratio??100,t=it.ratioThr??25;return r<=t;}
+    const q=it.qty??0,thr=it.threshold??1;return q<=thr;
+  });
+  // 依來源分組
+  const grouped={};
+  lows.forEach(it=>{const k=it.source||'未指定來源';if(!grouped[k])grouped[k]=[];grouped[k].push(it);});
+  let txt=`🛒 購物清單（${lows.length} 項）\n更新時間：${todayStr}\n\n`;
+  Object.keys(grouped).sort().forEach(src=>{
+    txt+=`【${invSrcIcon(src)}${src}】\n`;
+    grouped[src].forEach(it=>{
+      let line=`☐ ${it.name}`;
+      if(it.qtyMode==='ratio'){line+=` （剩 ${it.ratio??100}%）`;}
+      else{const q=it.qty??0,thr=it.threshold??1;line+=` （剩 ${q} 個 · 門檻 ${thr}）`;}
+      if(it.location)line+=` — ${it.location}`;
+      txt+=line+'\n';
+    });
+    txt+='\n';
+  });
+  return {text:txt.trim(),count:lows.length};
+}
+function invShopCopy(){
+  const {text,count}=invBuildShoppingList();
+  if(!count){showToast('沒有需要補貨的物品','error');return;}
+  const fallback=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showToast(`已複製 ${count} 項到剪貼簿`,'success');}catch(e){showToast('複製失敗，請手動複製','error');}document.body.removeChild(ta);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast(`已複製 ${count} 項到剪貼簿`,'success')).catch(fallback);
+  }else fallback();
+}
+function invShopExport(){
+  const {text,count}=invBuildShoppingList();
+  if(!count){showToast('沒有需要補貨的物品','error');return;}
+  const blob=new Blob(['﻿'+text],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`shopping-list_${todayStr}.txt`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),100);
+  showToast(`已匯出 ${count} 項購物清單`,'success');
+}
+
+// 📅 ICS 行事曆匯出（到期前 N 天提醒）
+function invExportICS(alarmDaysBefore=7){
+  const items=inventory.filter(it=>it.type==='expiry'&&it.expiryDate);
+  if(!items.length){showToast('沒有填寫效期的物品','error');return;}
+  function pad(n){return String(n).padStart(2,'0');}
+  function toICSDate(dateStr){
+    // dateStr = YYYY-MM-DD
+    return dateStr.replace(/-/g,'');
+  }
+  function toICSAlarmDate(dateStr,daysBefore){
+    const d=new Date(dateStr+'T00:00:00');
+    d.setDate(d.getDate()-daysBefore);
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+  }
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//家務管理App//TC\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n';
+  const now=new Date();
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}T${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}Z`;
+  items.forEach(it=>{
+    const dtstart=toICSDate(it.expiryDate);
+    const dtend=toICSDate(it.expiryDate); // 全天事件同一天
+    const uid=`inv-${it.id}-expiry@home-app`;
+    const loc=it.location?` (${it.location})`:'';
+    const note=it.note?`\\n備註：${it.note}`:'';
+    ics+='BEGIN:VEVENT\r\n';
+    ics+=`UID:${uid}\r\n`;
+    ics+=`DTSTAMP:${stamp}\r\n`;
+    ics+=`DTSTART;VALUE=DATE:${dtstart}\r\n`;
+    ics+=`DTEND;VALUE=DATE:${dtend}\r\n`;
+    ics+=`SUMMARY:【到期】${it.name}${loc}\r\n`;
+    ics+=`DESCRIPTION:${it.name}${loc} 今日到期${note}\r\n`;
+    // 提醒：到期當天
+    ics+='BEGIN:VALARM\r\n';
+    ics+='ACTION:DISPLAY\r\n';
+    ics+='TRIGGER;VALUE=DATE-TIME:'+dtstart+'T090000\r\n';
+    ics+=`DESCRIPTION:【到期提醒】${it.name} 今日到期\r\n`;
+    ics+='END:VALARM\r\n';
+    // 提醒：到期前 N 天
+    if(alarmDaysBefore>0){
+      const alarmDate=toICSAlarmDate(it.expiryDate,alarmDaysBefore);
+      ics+='BEGIN:VALARM\r\n';
+      ics+='ACTION:DISPLAY\r\n';
+      ics+=`TRIGGER;VALUE=DATE-TIME:${alarmDate}T090000\r\n`;
+      ics+=`DESCRIPTION:【即將到期】${it.name} 還有 ${alarmDaysBefore} 天到期\r\n`;
+      ics+='END:VALARM\r\n';
+    }
+    ics+='END:VEVENT\r\n';
+  });
+  ics+='END:VCALENDAR\r\n';
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const today=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'');
+  a.download=`expiry-reminders_${today}.ics`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),100);
+  showToast(`已匯出 ${items.length} 項效期提醒至行事曆`,'success');
+}
+
+function invRenderRow(it,showLoc=true,hideMissingChip=false){
   const es=invExpiryStatus(it),rs=invRestockStatus(it);
   const rowCls=invWorstCls(es,rs)||'';
 
@@ -1969,8 +2432,8 @@ function invRenderRow(it,showLoc=true){
       if(d<0)rightHtml+=`<div class="expiry-chip-row red">已過期</div>`;
       else if(d<=7)rightHtml+=`<div class="expiry-chip-row red">${d} 天後到期</div>`;
       else if(d<=14)rightHtml+=`<div class="expiry-chip-row amber">${d} 天後到期</div>`;
-    } else {
-      // 🌟 顯示明顯的虛線警告標籤
+    } else if(!hideMissingChip){
+      // 在「待補效期」區塊以外才顯示行內提示（區塊本身已表達此狀態）
       rightHtml+=`<div class="expiry-chip-row red" style="border-style:dashed">⚠️ 未填效期</div>`;
     }
   }
@@ -2021,17 +2484,124 @@ function invRenderRow(it,showLoc=true){
   const locLine=showLoc?`<span class="inv-loc-label">${it.location}</span>`:'';
   const catLine=it.category&&it.category!=='其他'?`<span class="inv-loc-label">${it.category}</span>`:'';
   const subSep=locLine&&catLine?`<span style="color:var(--text-muted);font-size:10px;margin:0 1px">·</span>`:'';
+  // 🌟 滑動快速操作：依物品類型決定動作集
+  let swipeActs='';
+  if(it.restock){
+    swipeActs+=`<button class="swipe-act sw-amber" onclick="event.stopPropagation();invSwipeAct('${it.id}','dec')"><span class="material-symbols-outlined" style="font-size:18px">remove</span><span>-1</span></button>`;
+    swipeActs+=`<button class="swipe-act sw-green" onclick="event.stopPropagation();invSwipeAct('${it.id}','inc')"><span class="material-symbols-outlined" style="font-size:18px">add</span><span>+1</span></button>`;
+    swipeActs+=`<button class="swipe-act sw-red" onclick="event.stopPropagation();invSwipeAct('${it.id}','empty')"><span class="material-symbols-outlined" style="font-size:18px">close</span><span>用完</span></button>`;
+  }
+  if(it.type==='expiry'&&it.expiryDate){
+    swipeActs+=`<button class="swipe-act sw-blue" onclick="event.stopPropagation();invSwipeAct('${it.id}','postpone')"><span class="material-symbols-outlined" style="font-size:18px">event_repeat</span><span>+30天</span></button>`;
+  }
   return `<div class="inv-item-wrap">
-    <div class="inv-row ${rowCls}" onclick="invToggleDetail('${it.id}')">
-      <div class="inv-dot-item"></div>
-      <div class="inv-info">
-        <div class="inv-name">${it.name}</div>
-        <div class="inv-sub">${locLine}${subSep}${catLine}</div>
+    <div class="inv-swipe-wrap" data-id="${it.id}">
+      ${swipeActs?`<div class="inv-row-actions">${swipeActs}</div>`:''}
+      <div class="inv-row ${rowCls}" onclick="invToggleDetail('${it.id}')">
+        <div class="inv-dot-item"></div>
+        <div class="inv-info">
+          <div class="inv-name">${it.name}</div>
+          <div class="inv-sub">${locLine}${subSep}${catLine}</div>
+        </div>
+        <div class="inv-right" onclick="event.stopPropagation()">${rightHtml}</div>
       </div>
-      <div class="inv-right" onclick="event.stopPropagation()">${rightHtml}</div>
     </div>
     <div class="inv-detail ${rowCls}" id="inv-detail-${it.id}">${detailHtml}${warnBox}</div>
   </div>`;
+}
+
+// 🌟 滑動操作邏輯
+function invSwipeAct(id,action){
+  const it=inventory.find(x=>x.id===id);if(!it)return;
+  if(action==='inc'||action==='dec'){
+    inventory=inventory.map(x=>{
+      if(x.id!==id)return x;
+      if(x.qtyMode==='ratio'){const r=x.ratio??100;return{...x,ratio:Math.max(0,Math.min(100,r+(action==='inc'?5:-5)))};}
+      return{...x,qty:Math.max(0,(x.qty??0)+(action==='inc'?1:-1))};
+    });
+    showToast(action==='inc'?`${it.name} +1`:`${it.name} -1`,'success');
+  } else if(action==='empty'){
+    inventory=inventory.map(x=>{
+      if(x.id!==id)return x;
+      if(x.qtyMode==='ratio')return{...x,ratio:0};
+      return{...x,qty:0};
+    });
+    showToast(`${it.name} 已標記為用完`,'success');
+  } else if(action==='postpone'){
+    if(!it.expiryDate)return;
+    const newDate=addD(it.expiryDate,30);
+    inventory=inventory.map(x=>x.id===id?{...x,expiryDate:newDate}:x);
+    showToast(`${it.name} 到期日延後 30 天`,'success');
+  }
+  saveInv();_invSwipeReset();renderInventoryPage();
+}
+function _invSwipeReset(){
+  document.querySelectorAll('.inv-swipe-wrap.swiped').forEach(el=>{
+    el.classList.remove('swiped');
+    const r=el.querySelector('.inv-row');if(r)r.style.transform='';
+  });
+}
+// 觸控滑動偵測（事件委派至 inv-content）
+let _invSwipe=null;
+function _invSwipeBind(){
+  const c=document.getElementById('inv-content');
+  if(!c||c.dataset.swipeBound)return;
+  c.dataset.swipeBound='1';
+  const onStart=(x,y,wrap)=>{_invSwipe={wrap,startX:x,startY:y,dragging:false,base:0};};
+  const onMove=(x,y,e)=>{
+    if(!_invSwipe)return;
+    const dx=x-_invSwipe.startX,dy=y-_invSwipe.startY;
+    if(!_invSwipe.dragging){
+      if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)*1.2){_invSwipe.dragging=true;}
+      else if(Math.abs(dy)>10){_invSwipe=null;return;}
+    }
+    if(_invSwipe.dragging){
+      if(e&&e.cancelable)e.preventDefault();
+      const row=_invSwipe.wrap.querySelector('.inv-row');
+      const acts=_invSwipe.wrap.querySelector('.inv-row-actions');
+      if(!row||!acts){_invSwipe=null;return;}
+      const max=acts.offsetWidth||0;
+      const target=Math.max(-max,Math.min(0,_invSwipe.base+dx));
+      row.style.transition='none';row.style.transform=`translateX(${target}px)`;
+    }
+  };
+  const onEnd=()=>{
+    if(!_invSwipe||!_invSwipe.dragging){_invSwipe=null;return;}
+    const wrap=_invSwipe.wrap;
+    const row=wrap.querySelector('.inv-row');
+    const acts=wrap.querySelector('.inv-row-actions');
+    if(row&&acts){
+      const m=row.style.transform.match(/-?\d+(\.\d+)?/);
+      const cur=m?parseFloat(m[0]):0;
+      const max=acts.offsetWidth||0;
+      row.style.transition='';
+      if(cur<-max*0.4){wrap.classList.add('swiped');row.style.transform=`translateX(-${max}px)`;}
+      else{wrap.classList.remove('swiped');row.style.transform='';}
+    }
+    _invSwipe=null;
+  };
+  c.addEventListener('touchstart',e=>{
+    const wrap=e.target.closest('.inv-swipe-wrap');if(!wrap)return;
+    // 若另一列已展開，先收回
+    document.querySelectorAll('.inv-swipe-wrap.swiped').forEach(el=>{if(el!==wrap)el.classList.remove('swiped');});
+    const t=e.touches[0];onStart(t.clientX,t.clientY,wrap);
+    _invSwipe.base=wrap.classList.contains('swiped')?-(wrap.querySelector('.inv-row-actions')?.offsetWidth||0):0;
+  },{passive:true});
+  c.addEventListener('touchmove',e=>{if(!_invSwipe)return;const t=e.touches[0];onMove(t.clientX,t.clientY,e);},{passive:false});
+  c.addEventListener('touchend',onEnd);
+  c.addEventListener('touchcancel',onEnd);
+  // 桌面 pointer 支援
+  c.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='touch')return;
+    if(e.target.closest('button,input,a,select,textarea,.inv-right'))return;
+    const wrap=e.target.closest('.inv-swipe-wrap');if(!wrap)return;
+    document.querySelectorAll('.inv-swipe-wrap.swiped').forEach(el=>{if(el!==wrap)el.classList.remove('swiped');});
+    onStart(e.clientX,e.clientY,wrap);
+    _invSwipe.base=wrap.classList.contains('swiped')?-(wrap.querySelector('.inv-row-actions')?.offsetWidth||0):0;
+  });
+  c.addEventListener('pointermove',e=>{if(!_invSwipe||e.pointerType==='touch')return;onMove(e.clientX,e.clientY,null);});
+  c.addEventListener('pointerup',e=>{if(e.pointerType==='touch')return;onEnd();});
+  c.addEventListener('pointercancel',e=>{if(e.pointerType==='touch')return;onEnd();});
 }
 function invToggleDetail(id){const d=document.getElementById('inv-detail-'+id);if(d)d.classList.toggle('open')}
 function invUpdateExpiry(id,val){
@@ -2152,7 +2722,7 @@ function invOpenEdit(id){
   document.getElementById('inv-modal-title').textContent='修改物品';document.getElementById('inv-edit-id').value=id;
   document.getElementById('inv-f-name').value=it.name;document.getElementById('inv-f-note').value=it.note||'';
   document.getElementById('inv-f-location').value=it.location;
-  const knownCats=['日常用品','保養品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
+  const knownCats=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
   if(knownCats.includes(it.category||'')){
     document.getElementById('inv-f-category').value=it.category||'其他';
     document.getElementById('inv-f-category-custom').style.display='none';
@@ -2177,6 +2747,8 @@ function invOpenEdit(id){
   if(knownSrc.includes(it.source||'')){document.getElementById('inv-f-source').value=it.source||'';document.getElementById('inv-f-source-custom').style.display='none';}
   else{document.getElementById('inv-f-source').value='__custom';document.getElementById('inv-f-source-custom').style.display='block';document.getElementById('inv-f-source-custom').value=it.source||'';}
   invPopulateSublocDropdown(it.location,it.subLocationId||null);
+  const rdSel=document.getElementById('inv-f-remind-days');
+  if(rdSel)rdSel.value=it.reminderDays||14;
   document.getElementById('invItemModal').classList.add('open');
 }
 function invSaveItem(){
@@ -2196,6 +2768,7 @@ function invSaveItem(){
     category,
     note:document.getElementById('inv-f-note').value.trim(),
     expiryDate:invCurrentType==='expiry'?document.getElementById('inv-f-expiry').value||null:null,
+    reminderDays:invCurrentType==='expiry'?parseInt(document.getElementById('inv-f-remind-days')?.value||'14'):null,
     restock:invRestockOn,qtyMode:invQtyMode,
     qty:invRestockOn&&invQtyMode==='qty'?(rawQty===''?0:parseInt(rawQty)):null,
     threshold:invRestockOn&&invQtyMode==='qty'?(rawThr===''?1:parseInt(rawThr)):null,
@@ -2326,11 +2899,13 @@ function saveSetting(key,val){appSettings[key]=val;localStorage.setItem('app_set
 function toggleSetting(key,btn){appSettings[key]=!appSettings[key];btn.classList.toggle('on',appSettings[key]);localStorage.setItem('app_settings',JSON.stringify(appSettings));renderAll()}
 function renderSettingsPage(){
   const sn=document.getElementById('set-name'),se=document.getElementById('set-email');
-  if(sn)sn.value=appSettings.userName||'';
-  if(se)se.value=appSettings.userEmail||'';
-  // 更新同步時間顯示
-  const ts = parseInt(localStorage.getItem('app_updatedAt')||'0');
-  if(ts) updateSyncTimeUI(ts, '雲端同步');
+  const sdf=document.getElementById('set-default-filter'),to=document.getElementById('tog-overdue');
+  const tn=document.getElementById('tog-notes'),td=document.getElementById('tog-desc');
+  if(sn)sn.value=appSettings.userName||'';if(se)se.value=appSettings.userEmail||'';
+  if(sdf)sdf.value=appSettings.defaultFilter||'all';
+  if(to)to.classList.toggle('on',appSettings.showOverdue!==false);
+  if(tn)tn.classList.toggle('on',appSettings.showNotes!==false);
+  if(td)td.classList.toggle('on',appSettings.showDesc!==false);
 }
 
 // ── TOAST / CONFIRM / INPUT ───────────────────────────────
@@ -2371,7 +2946,7 @@ function appInputOk(){
 }
 function appInputCancel(){document.getElementById('app-input-overlay').style.display='none';_inputCb=null;}
 
-function renderAll(){twRenderAll();renderTasksPage();renderHouseworkPage();}
+function renderAll(){twRenderAll();renderTasksPage();renderHouseworkPage();if(typeof renderDashCards==='function')renderDashCards();}
 
 // ── EXPORT / IMPORT ───────────────────────────────────────
 function copyShareLink(){const data=JSON.stringify({tasks,housework});const url=location.origin+location.pathname+'#data='+btoa(unescape(encodeURIComponent(data)));navigator.clipboard.writeText(url).then(()=>showToast('連結已複製')).catch(()=>showToast('複製失敗，請手動複製','error'));}
@@ -2408,19 +2983,89 @@ function twJumpToday(){twWeekOffset=0;twOpenDays.add(todayStr);twOpenDropDay=nul
 // Build schedule from tasks + housework
 function twGetSchedule(){
   const sched=[];
+  const today=new Date(NOW);
+
+  // ── 預處理：建立「月定期任務」的 instance 索引 ────────────────
+  // instanceMap: templateId+'_'+plannedDate → instance（自然日期上的已完成/待辦 instance）
+  // deferredNaturalDates: Set of templateId+'_'+originalMonthlyDate（被延後後用來封鎖自然日期 virtual 項目）
+  const monthlyInstanceMap={};
+  const deferredNaturalDates=new Set();
   tasks.forEach(t=>{
-    if(!t.plannedDate)return;
-    sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,status:t.status==='已完成'?'done':'pending',isTask:true});
+    if(!t.templateId)return;
+    const tmpl=tasks.find(x=>x.id===t.templateId&&!x.templateId);
+    if(!tmpl||tmpl.freqType!=='monthly')return;
+    if(t.originalMonthlyDate){
+      // 這筆 instance 是從自然日期延後出去的，封鎖自然日期 virtual
+      deferredNaturalDates.add(t.templateId+'_'+t.originalMonthlyDate);
+    } else if(t.plannedDate){
+      // 這筆 instance 坐在自然日期上（已完成或待辦）
+      monthlyInstanceMap[t.templateId+'_'+t.plannedDate]=t;
+    }
   });
+
+  // ── 主迴圈 ────────────────────────────────────────────────
+  tasks.forEach(t=>{
+    // ① 已是某模板的 instance
+    if(t.templateId){
+      if(!t.plannedDate)return;
+      const tmpl=tasks.find(x=>x.id===t.templateId&&!x.templateId);
+      if(!tmpl)return;
+      if(tmpl.freqType==='monthly'){
+        // 月定期的 instance 分兩種：
+        // a) 自然日期上（已由 monthlyInstanceMap 在下方月定期迴圈處理）
+        // b) 被延後至新日期（originalMonthlyDate 存在）→ 在此直接加入
+        if(t.originalMonthlyDate){
+          sched.push({id:t.id,type:'task',title:tmpl.title,date:t.plannedDate,
+            status:t.status==='已完成'?'done':'pending',isTask:true,isMonthly:true,
+            freqHint:'每月'+tmpl.freqVal+'號（延後）'});
+        }
+        // 自然日期的 instance 交由月定期段落處理，此處略過
+        return;
+      }
+      // 非月定期的 instance（例如透過 assignTaskToDay 建立的一次性排程）
+      sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
+        status:t.status==='已完成'?'done':'pending',isTask:true});
+      return;
+    }
+
+    // ② 月定期模板：自動為前後數個月的「每月X號」產生排程項目
+    if(t.freqType==='monthly'&&t.freqVal>0){
+      const dom=t.freqVal;
+      for(let mo=-2;mo<=6;mo++){
+        const d=new Date(today.getFullYear(),today.getMonth()+mo,dom);
+        if(d.getDate()!==dom)continue; // 該月無此日（如 2月沒有30號）
+        const dateStr=toLD(d);
+        const key=t.id+'_'+dateStr;
+        if(deferredNaturalDates.has(key))continue; // 此自然日期已被延後，略過 virtual
+        const inst=monthlyInstanceMap[key];
+        if(inst){
+          // 已有 instance：顯示其完成狀態
+          sched.push({id:inst.id,type:'task',title:t.title,date:dateStr,
+            status:inst.status==='已完成'?'done':'pending',isTask:true,isMonthly:true,
+            freqHint:'每月'+dom+'號'});
+        } else {
+          // 無 instance：建立 virtual 入口（尚未被使用者互動）
+          sched.push({id:'VIRTUAL::'+t.id+'::'+dateStr,type:'task',title:t.title,date:dateStr,
+            status:'pending',isTask:true,isMonthly:true,freqHint:'每月'+dom+'號'});
+        }
+      }
+      return;
+    }
+
+    // ③ 不重複 / 每N天 任務：維持原本邏輯（依 plannedDate 顯示）
+    if(!t.plannedDate)return;
+    sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
+      status:t.status==='已完成'?'done':'pending',isTask:true});
+  });
+
+  // ── 家事排程（維持原本邏輯）────────────────────────────────
   housework.forEach(h=>{
-    // 1. 尚未完成的排程
     if(h.reminderDate){
       sched.push({id:h.id,type:'hw',title:h.name,date:h.reminderDate,status:'pending',isHw:true});
     }
-    // 2. 已完成的歷史紀錄 (讓它留在畫面上顯示灰底劃線)
-    if(h.history && h.history.length > 0) {
-      h.history.forEach(d => {
-        if(d !== h.reminderDate) {
+    if(h.history&&h.history.length>0){
+      h.history.forEach(d=>{
+        if(d!==h.reminderDate){
           sched.push({id:h.id,type:'hw',title:h.name,date:d,status:'done',isHw:true});
         }
       });
@@ -2453,43 +3098,35 @@ function twRender(){
 function twRenderProg(days){
   const el=document.getElementById('tw-prog');if(!el)return;
   const sched=twGetSchedule();
-  let items=twProgMode==='day'?sched.filter(s=>s.date===todayStr):sched.filter(s=>days.includes(s.date));
+  const items=twProgMode==='day'?sched.filter(s=>s.date===todayStr):sched.filter(s=>days.includes(s.date));
   const done=items.filter(s=>s.status==='done').length;
   const total=items.length;
   const pct=total?Math.round(done/total*100):0;
-  const taskP=items.filter(s=>s.type==='task'&&s.status==='pending').length;
-  const hwP=items.filter(s=>s.type==='hw'&&s.status==='pending').length;
-  const ovCnt=twProgMode==='day'
-    ? sched.filter(s=>s.status==='pending'&&s.date<todayStr).length
-    : sched.filter(s=>s.status==='pending'&&s.date<todayStr&&days.includes(s.date)).length;
-  const r=17,circ=2*Math.PI*r,col=pct===100?'#10b981':'var(--primary)';
+  const ovCnt=sched.filter(s=>s.status==='pending'&&s.date<todayStr).length;
+  const r=13,circ=2*Math.PI*r,col=pct===100?'#10b981':'var(--primary)';
+  const highShop=typeof shopList!=='undefined'?shopList.filter(s=>!s.done&&s.prio===0).length:0;
+  const expUrgent=inventory.filter(it=>it.expiryDate&&invExpiryStatus(it)?.urgent).length;
+  const expChip=expUrgent>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(4)');switchPage('inventory',nb);setTimeout(()=>{const t=document.querySelector('.inv-tab');if(t){invSwitchTab('alert',t);}invAlertSubMode='expiry';_syncAlertSubBtns();renderInventoryPage();},80)" style="display:flex;align-items:center;gap:3px;background:#fff7ed;border:1px solid #fed7aa;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:#ea580c;cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">event</span>${expUrgent}</button>`:'';
+  const shopChip=highShop>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(4)');switchPage('inventory',nb);setTimeout(()=>{const t=document.getElementById('inv-tab-shopping');if(t)invSwitchTab('shopping',t);},80)" style="display:flex;align-items:center;gap:3px;background:#fef2f2;border:1px solid #fecaca;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:#dc2626;cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">shopping_cart</span>${highShop}</button>`:'';
   const dash=circ*pct/100,gap=circ-dash;
-  const label=twProgMode==='day'?'今日進度':'本週進度';
-  const sub=twProgMode==='day'?new Date().toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'short'}):fmtD(days[0])+' – '+fmtD(days[6]);
-  let ch='';
-  if(ovCnt>0)ch+=`<span class="tw-chip" style="background:var(--danger-light);color:var(--danger)">⚠️ ${ovCnt} 件逾期</span>`;
-  if(taskP>0)ch+=`<span class="tw-chip" style="background:var(--primary-light);color:var(--primary)">📝 任務 ${taskP}</span>`;
-  if(hwP>0)ch+=`<span class="tw-chip" style="background:#fffbeb;color:#d97706">🏠 家事 ${hwP}</span>`;
-  if(pct===100&&total>0)ch+=`<span class="tw-chip" style="background:#d1fae5;color:#059669">✓ 全完成！</span>`;
-  if(total===0&&ovCnt===0)ch+=`<span class="tw-chip" style="background:var(--border-light);color:var(--text-muted)">尚未安排</span>`;
+  // 右側資訊：done/total ＋ 逾期 chip（只在有逾期時才出現）
+  const countTxt=total>0?`<span style="font-size:12px;font-weight:700;color:var(--text-primary)">${done}<span style="font-weight:400;color:var(--text-muted)">/${total}</span></span>`:`<span style="font-size:11px;color:var(--text-muted)">尚未安排</span>`;
+  const ovChip=ovCnt>0?`<span class="tw-chip" style="background:var(--danger-light);color:var(--danger)">⚠️ ${ovCnt}</span>`:'';
+  const doneChip=pct===100&&total>0?`<span class="tw-chip" style="background:#d1fae5;color:#059669">✓</span>`:'';
   el.innerHTML=`
     <div class="tw-prog-ring">
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <circle cx="22" cy="22" r="${r}" fill="none" stroke="#e8edf5" stroke-width="4.5"/>
-        <circle cx="22" cy="22" r="${r}" fill="none" stroke="${col}" stroke-width="4.5" stroke-dasharray="${dash} ${gap}" stroke-linecap="round"/>
+      <svg width="36" height="36" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="${r}" fill="none" stroke="rgba(91,82,232,.18)" stroke-width="3.5"/>
+        <circle cx="18" cy="18" r="${r}" fill="none" stroke="${col}" stroke-width="3.5" stroke-dasharray="${dash} ${gap}" stroke-linecap="round"/>
       </svg>
       <div class="tw-prog-pct">${pct}%</div>
     </div>
     <div class="tw-prog-info">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-        <div class="tw-prog-t">${label}${total>0?' — '+done+'/'+total+' 件':''}</div>
-        <div style="display:flex;gap:2px;background:var(--border-light);border-radius:6px;padding:2px;flex-shrink:0">
-          <button onclick="twProgMode='day';twRender()" style="padding:3px 9px;border-radius:5px;border:none;background:${twProgMode==='day'?'var(--surface)':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='day'?'var(--text-primary)':'var(--text-muted)'};cursor:pointer;font-family:'Noto Sans TC',sans-serif">今日</button>
-          <button onclick="twProgMode='week';twRender()" style="padding:3px 9px;border-radius:5px;border:none;background:${twProgMode==='week'?'var(--surface)':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='week'?'var(--text-primary)':'var(--text-muted)'};cursor:pointer;font-family:'Noto Sans TC',sans-serif">本週</button>
-        </div>
+      <div style="display:flex;gap:2px;background:rgba(255,255,255,.55);border-radius:6px;padding:2px;flex-shrink:0">
+        <button onclick="twProgMode='day';twRender()" style="padding:2px 8px;border-radius:5px;border:none;background:${twProgMode==='day'?'#fff':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='day'?'var(--primary)':'#7c6fd0'};cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:${twProgMode==='day'?'0 1px 3px rgba(0,0,0,.1)':'none'}">今日</button>
+        <button onclick="twProgMode='week';twRender()" style="padding:2px 8px;border-radius:5px;border:none;background:${twProgMode==='week'?'#fff':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='week'?'var(--primary)':'#7c6fd0'};cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:${twProgMode==='week'?'0 1px 3px rgba(0,0,0,.1)':'none'}">本週</button>
       </div>
-      <div class="tw-prog-s">${sub}</div>
-      <div class="tw-prog-chips">${ch}</div>
+      ${countTxt}${ovChip}${doneChip}${expChip}${shopChip}
     </div>`;
 }
 
@@ -2509,7 +3146,7 @@ function twRenderDay(d){
       const isDone=s.status==='done',isOv=!isDone&&isPast;
       let cls=s.type==='hw'?'tw-hw-p':'tw-task-p';
       if(isDone)cls='tw-done-p';else if(isOv)cls='tw-ov-p';
-      const draggable=!isDone;
+      const draggable=!isDone&&!isVirtualTaskId(s.id); // virtual 定期任務不支援拖曳
       pillHtml+=`<span class="tw-mp ${cls}" data-sid="${s.id}" data-stype="${s.type}" data-date="${d}" data-draggable="${draggable}">${s.title}</span>`;
     });
     if(items.length>MAX)pillHtml+=`<span class="tw-morep">+${items.length-MAX}</span>`;
@@ -2520,6 +3157,8 @@ function twRenderDay(d){
   else{
     detHtml=items.map(s=>{
       const isDone=s.status==='done',isOv=!isDone&&isPast;
+      // 月定期任務徽章
+      const recurBadge=s.isMonthly?`<span style="font-size:9px;background:#ede9fe;color:#7c3aed;padding:1px 6px;border-radius:999px;font-weight:700;flex-shrink:0" title="${s.freqHint||'定期任務'}">♻ 定期</span>`:'';
       return`<div class="tw-irow">
         <div class="tw-icb ${isDone ? (s.type==='hw' ? 'tw-done tw-hw-done' : 'tw-done') : ''}" onclick="twToggleDone('${s.id}','${s.type}','${d}')"></div>
         <div class="tw-iinfo">
@@ -2527,6 +3166,7 @@ function twRenderDay(d){
           <div class="tw-imeta">
             <div class="tw-idot" style="background:${s.type==='hw'?'#d97706':'var(--primary)'}"></div>
             <span class="tw-ilbl">${s.type==='hw'?'家事':'任務'}</span>
+            ${recurBadge}
             ${isOv?`<span class="tw-ovbadge">逾期</span>`:''}
           </div>
         </div>
@@ -2587,8 +3227,8 @@ function twRenderDay(d){
         <div class="tw-dom">${dt.getDate()}</div>
       </div>
       <div class="tw-pstrip">${pillHtml}</div>
-      <div class="tw-dright" onclick="event.stopPropagation()">
-        <div class="tw-dawrap">
+      <div class="tw-dright">
+        <div class="tw-dawrap" onclick="event.stopPropagation()">
           <button class="tw-dabtn ${isDropOpen?'open':''}" onclick="twToggleDrop('${d}',event)">
             <span class="material-symbols-outlined" style="font-size:15px">${isDropOpen?'close':'add'}</span>
           </button>
@@ -2619,6 +3259,15 @@ function twAssignHw(hid,d,e){
 }
 function twToggleDone(sid, stype, dateStr){
   if(stype==='task'){
+    // ── 月定期 virtual 入口：先實體化再切換狀態 ──
+    if(isVirtualTaskId(sid)){
+      const {templateId,date}=parseVirtualTaskId(sid);
+      const inst=materializeMonthlyTask(templateId,date,'待辦',false);
+      if(!inst){showToast('找不到任務模板','error');return;}
+      tasks=tasks.map(t=>t.id===inst.id?{...t,status:'已完成'}:t);
+      saveData();showToast('✅ 定期任務已完成！下個月將再次出現');
+      twRender();return;
+    }
     tasks=tasks.map(t=>t.id===sid?{...t,status:t.status==='已完成'?'待辦':'已完成'}:t);
     saveData();showToast('任務狀態已更新');
   }else{
@@ -2649,8 +3298,17 @@ function twToggleDone(sid, stype, dateStr){
   twRender();
 }
 function twOpenDelay(sid,stype,e){
-  e.stopPropagation();twDelayTarget={sid,stype};
-  const name=stype==='task'?tasks.find(t=>t.id===sid)?.title:housework.find(h=>h.id===sid)?.name;
+  e.stopPropagation();
+  // ── 月定期 virtual 入口：先實體化（帶 forDelay=true，封鎖自然日期 virtual）──
+  let actualSid=sid;
+  if(stype==='task'&&isVirtualTaskId(sid)){
+    const {templateId,date}=parseVirtualTaskId(sid);
+    const inst=materializeMonthlyTask(templateId,date,'待辦',true);
+    if(!inst){showToast('找不到任務模板','error');return;}
+    actualSid=inst.id;
+  }
+  twDelayTarget={sid:actualSid,stype};
+  const name=stype==='task'?tasks.find(t=>t.id===actualSid)?.title:housework.find(h=>h.id===sid)?.name;
   document.getElementById('tw-dly-name').textContent=name||'';
   document.getElementById('tw-dlysh').classList.add('show');document.getElementById('tw-scrim').classList.add('show');
 }
@@ -2698,6 +3356,11 @@ function twApplyDelay(days){
 }
 function twRemoveItem(sid, stype, e) {
   e.stopPropagation();
+  // ── 月定期 virtual 入口：不允許直接刪除，引導使用者至任務設定 ──
+  if(stype==='task'&&isVirtualTaskId(sid)){
+    showToast('定期任務會自動出現，如需停用請至「任務」頁面修改頻率','warn');
+    return;
+  }
   appConfirm('移除項目', '確定要將此項目從這天移除嗎？', () => {
     if (stype === 'task') {
       tasks = tasks.map(t => t.id === sid ? {...t, plannedDate: '', status: '待辦'} : t); // 狀態順便改回待辦
@@ -2755,6 +3418,7 @@ function twOnMouseUp(e){
 function twStartDrag(el,x,y){
   twDrag.active=true;twDrag.sid=el.dataset.sid;twDrag.stype=el.dataset.stype;
   el.classList.add('tw-dragging');
+  const nav = document.querySelector('nav'); if(nav) nav.style.pointerEvents = 'none';
   const ghost=document.createElement('div');
   ghost.className='tw-drag-ghost '+(twDrag.stype==='hw'?'tw-hw-g':'tw-task-g');
   ghost.innerHTML=`<span class="material-symbols-outlined" style="font-size:14px">drag_indicator</span>${el.textContent.trim()}`;
@@ -2782,6 +3446,7 @@ function twDrop(x,y){
 }
 function twCleanup(){
   twDrag.active=false;twDrag.sid=null;twDrag.stype=null;
+  const nav = document.querySelector('nav'); if(nav) nav.style.pointerEvents = '';
   twDrag.startEl?.classList.remove('tw-dragging');twDrag.startEl=null;
   twDrag.ghost?.remove();twDrag.ghost=null;
   clearTimeout(twDrag.longPressTimer);twDrag.longPressTimer=null;
@@ -2855,9 +3520,13 @@ function renderFloorplanPage(){
   const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
   if(!fpCurrentRoom&&locations.length)fpCurrentRoom=locations[0].id;
   const room=locations.find(r=>r.id===fpCurrentRoom);
-  const roomOpts=locations.map(r=>`<option value="${r.id}" ${r.id===fpCurrentRoom?'selected':''}>${r.icon} ${r.name}</option>`).join('');
-  let html=`<div class="fp-wrap"><div class="fp-header"><select class="fp-room-sel" style="width:100%;font-size:14px" onchange="fpSelectRoom(this.value)">${roomOpts||'<option>（無房間）</option>'}</select></div>`;
-  if(!room){html+='<div style="padding:32px;text-align:center;color:var(--text-muted)">請先在「位置管理」新增房間</div></div>';content.innerHTML=html;return;}
+  // 房間選擇 chip 列（永遠顯示，不收合）
+  const roomChips=locations.length
+    ? locations.map(r=>`<button class="inv-chip${r.id===fpCurrentRoom?' active':''}" onclick="fpSelectRoom('${r.id}')">${r.icon||''} ${r.name}</button>`).join('')
+    : `<span style="font-size:11px;color:var(--text-muted)">（無房間，請至「位置管理」新增）</span>`;
+  let html=`<div class="fp-room-chip-bar">${roomChips}</div>`;
+  if(!room){html+='<div style="padding:32px;text-align:center;color:var(--text-muted)">請先在「位置管理」新增房間</div>';content.innerHTML=html;return;}
+  html+=`<div class="fp-wrap">`;
   const W=600,H=400;let svgInner='';
   room.subLocations.forEach(sl=>{
     const cnt=inventory.filter(it=>it.subLocationId===sl.id).length,isHL=fpHighlightSubloc===sl.id;
@@ -3140,6 +3809,368 @@ function fpEndDrag() {
   renderLocMgrPage();
 }
 
+// ══ SHOPPING LIST ════════════════════════════════════════════════════════
+let shopList=[];
+let shopSubTab='buy',shopSortMode='prio',shopFilterPrio='all',shopFilterCat='all',shopDoneSearch='',shopDoneCat='all',shopDoneDateFrom='',shopDoneDateTo='';
+let shopOpenCardId=null,shopOpenDotId=null;
+let shopActiveDdId=null,shopActiveDdField=null;
+let shopEditingId=null,shopFormPrio=1,shopFormSrc='蝦皮';
+let shopFilterOpen=false,shopReviewStar=3;
+const SHOP_CATS=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
+const SHOP_SRCS=['蝦皮','momo','全聯','實體店','其他'];
+const SHOP_PRIO_LABEL=['高','中','低'];
+const SHOP_PRIO_ICON=['🔴','🟡','🟢'];
+const SHOP_PRIO_CLS=['shop-b-high','shop-b-mid','shop-b-low'];
+
+function saveShopList(){fbSave('shoplist',shopList);}
+function loadShopList(){const s=localStorage.getItem('app_shoplist');shopList=s?JSON.parse(s):[];}
+
+function shopSyncRestock(){
+  const restockItems=inventory.filter(it=>{
+    if(!it.restock)return false;
+    if(it.qtyMode==='ratio')return(it.ratio??100)<=(it.ratioThr??25);
+    return(it.qty??0)<=(it.threshold??1);
+  });
+  const newCnt=restockItems.filter(inv=>!shopList.some(s=>s.restockId===inv.id&&!s.done)).length;
+  const badge=document.getElementById('shop-restock-badge');
+  const mainBadge=document.getElementById('shop-restock-new-cnt');
+  if(badge){badge.textContent=newCnt;badge.style.display=newCnt?'inline':'none';}
+  if(mainBadge){mainBadge.textContent=newCnt;mainBadge.style.display=newCnt?'inline':'none';}
+}
+
+function shopRenderRestock(){
+  const restockItems=inventory.filter(it=>{
+    if(!it.restock)return false;
+    if(it.qtyMode==='ratio')return(it.ratio??100)<=(it.ratioThr??25);
+    return(it.qty??0)<=(it.threshold??1);
+  });
+  const el=document.getElementById('shop-restock-list');
+  if(!el)return;
+  if(!restockItems.length){
+    el.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:13px">目前沒有待補貨項目</div>';
+    return;
+  }
+  el.innerHTML=restockItems.map(inv=>{
+    const already=shopList.some(s=>s.restockId===inv.id&&!s.done);
+    const col=areaColor(inv.area||'')||{bg:'#f1f5f9',dot:'#6b7280',icon:'📦'};
+    const qty=inv.qtyMode==='ratio'?`${inv.ratio??100}%`:`${inv.qty??0} 件`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;margin:0 14px 7px;background:var(--surface);border-radius:12px;border:1px solid var(--border-light)">
+      <span style="font-size:20px">${col.icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary)">${inv.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${inv.area||'未分區'}${inv.location?' ・ '+inv.location:''} ・ 剩 ${qty}</div>
+      </div>
+      ${already
+        ? `<span style="font-size:11px;color:var(--primary);font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--primary)">已加入</span>`
+        : `<button onclick="shopAddFromRestock('${inv.id}')" style="font-size:12px;font-weight:600;color:#fff;background:var(--primary);border:none;padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap">＋ 加入</button>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function shopAddFromRestock(invId){
+  const inv=inventory.find(i=>i.id===invId);
+  if(!inv)return;
+  if(shopList.some(s=>s.restockId===invId&&!s.done)){showToast('已在購物清單中');return;}
+  shopList.push({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),
+    name:inv.name,prio:1,cat:inv.category||'日常用品',src:inv.source||'',price:'',link:'',note:'',
+    done:false,restock:true,restockId:invId,
+    date:todayStr,stars:0,reviewNote:'',reviewPrice:''});
+  saveShopList();
+  shopSyncRestock();
+  shopRenderRestock();
+  showToast(inv.name+' 已加入購物清單 ✓');
+}
+
+function shopParsePrice(s){const n=parseInt((s||'').replace(/[^0-9]/g,''));return isNaN(n)?0:n;}
+
+function shopRender(){
+  const isDone=shopSubTab==='done';
+  let list=shopList.filter(i=>i.done===isDone);
+  if(!isDone){
+    if(shopFilterPrio!=='all') list=list.filter(i=>i.prio===shopFilterPrio);
+    if(shopFilterCat!=='all') list=list.filter(i=>i.cat===shopFilterCat);
+    if(shopSortMode==='prio') list.sort((a,b)=>a.prio-b.prio);
+    else if(shopSortMode==='price-asc') list.sort((a,b)=>shopParsePrice(a.price)-shopParsePrice(b.price));
+    else if(shopSortMode==='price-desc') list.sort((a,b)=>shopParsePrice(b.price)-shopParsePrice(a.price));
+  } else {
+    if(shopDoneSearch){const q=shopDoneSearch.toLowerCase();list=list.filter(i=>i.name.toLowerCase().includes(q)||i.note?.toLowerCase().includes(q));}
+    if(shopDoneCat!=='all') list=list.filter(i=>i.cat===shopDoneCat);
+    const dfFrom=document.getElementById('shop-done-date-from')?.value||'';
+    const dfTo=document.getElementById('shop-done-date-to')?.value||'';
+    if(dfFrom) list=list.filter(i=>i.buyDate&&i.buyDate>=dfFrom);
+    if(dfTo)   list=list.filter(i=>i.buyDate&&i.buyDate<=dfTo);
+    list.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); // newest first
+  }
+  const el=document.getElementById(isDone?'shop-done-list':'shop-buy-list');
+  if(!el)return;
+  if(!list.length){el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:13px">${isDone?'還沒有購買紀錄！':'清單空空的，點右上角新增吧！'}</div>`;return;}
+  el.innerHTML=list.map(it=>{
+    const open=shopOpenCardId===it.id;
+    const dotOpen=shopOpenDotId===it.id;
+    const subline=[it.store||'',it.price?'$'+it.price:''].filter(Boolean).join('・');
+    const starsHtml=it.stars?'⭐'.repeat(it.stars):'';
+    return `<div class="shop-card" id="shop-card-${it.id}">
+      <div class="shop-card-top" onclick="shopToggleCard('${it.id}',event)">
+        <div class="shop-cb ${it.done?'checked':''}" onclick="shopHandleCb('${it.id}',event)"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+            <span style="font-size:14px;font-weight:600;color:${it.done?'var(--text-muted)':'var(--text-primary)'};${it.done?'text-decoration:line-through;':''}">${it.name}</span>
+            ${it.done&&it.buyDate?`<span style="font-size:10px;color:var(--text-muted);font-weight:400">${it.buyDate.slice(5).replace('-','/')}</span>`:''}
+          </div>
+          ${subline?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${subline}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:3px">
+          ${it.restock?'<span class="badge shop-b-restock" style="font-size:9px">📦補貨</span>':''}
+          <span class="badge ${SHOP_PRIO_CLS[it.prio]}" style="font-size:9px">${SHOP_PRIO_LABEL[it.prio]}</span>
+          <button class="shop-dot-btn" onclick="shopToggleDot('${it.id}',event)"><span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8">more_vert</span></button>
+        </div>
+      </div>
+      <div class="shop-expand ${open?'open':''}" id="shop-expand-${it.id}" onclick="event.stopPropagation()">
+        <div class="shop-field-row">
+          <span class="shop-field-label">優先度</span>
+          <div class="shop-field-val" onclick="shopOpenDd('prio','${it.id}',this,event)">${SHOP_PRIO_ICON[it.prio]} ${SHOP_PRIO_LABEL[it.prio]}<span class="shop-field-arr">▾</span></div>
+        </div>
+        <div class="shop-field-row">
+          <span class="shop-field-label">分類</span>
+          <div class="shop-field-val" onclick="shopOpenDd('cat','${it.id}',this,event)">${it.cat}<span class="shop-field-arr">▾</span></div>
+        </div>
+        <div class="shop-field-row">
+          <span class="shop-field-label">購買來源</span>
+          <div class="shop-field-val" onclick="shopOpenDd('src','${it.id}',this,event)">${it.src||'未設定'}<span class="shop-field-arr">▾</span></div>
+        </div>
+        ${it.link?`<div class="shop-field-row"><span class="shop-field-label">連結</span><a href="${it.link}" target="_blank" style="font-size:12px;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:3px"><span class="material-symbols-outlined" style="font-size:13px">open_in_new</span>開啟連結</a></div>`:''}
+        ${it.note?`<div class="shop-field-row"><span class="shop-field-label">備註</span><span style="font-size:12px;color:var(--text-secondary)">${it.note}</span></div>`:''}
+        ${starsHtml?`<div class="shop-field-row"><span class="shop-field-label">評價</span><span style="font-size:13px">${starsHtml}</span></div>`:''}
+        ${it.reviewNote?`<div class="shop-field-row"><span class="shop-field-label">心得</span><span style="font-size:12px;color:var(--text-secondary)">${it.reviewNote}</span></div>`:''}
+      </div>
+      <div class="shop-dot-menu ${dotOpen?'open':''}" id="shop-dot-${it.id}" onclick="event.stopPropagation()">
+        <button onclick="shopOpenEdit('${it.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:var(--primary)">edit</span>修改</button>
+        <button onclick="shopDelete('${it.id}')"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function shopToggleCard(id,e){
+  if(e.target.closest('.shop-dot-btn')||e.target.closest('.shop-dot-menu')||e.target.closest('.shop-cb'))return;
+  shopCloseGlobalDd();
+  shopOpenCardId=shopOpenCardId===id?null:id; shopRender();
+}
+function shopHandleCb(id,e){
+  e.stopPropagation();
+  const it=shopList.find(x=>x.id===id); if(!it||it.done)return;
+  it.done=true; it.buyDate=todayStr; shopOpenCardId=null; saveShopList(); shopRender();
+  document.getElementById('shop-review-id').value=id;
+  shopReviewStar=3; shopSyncStars();
+  document.getElementById('shop-review-price').value='';
+  document.getElementById('shop-review-note').value='';
+  document.getElementById('shop-review-qty').value='';
+  // qty row: only show for restock items
+  const invItem=it.restockId?inventory.find(x=>x.id===it.restockId):null;
+  const qtyRow=document.getElementById('shop-review-qty-row');
+  const qtyLabel=document.getElementById('shop-review-qty-label');
+  const qtyMode=invItem?.qtyMode||'qty';
+  document.getElementById('shop-review-restock-inv-id').value=invItem?invItem.id:'';
+  document.getElementById('shop-review-qty-mode').value=qtyMode;
+  if(invItem){
+    qtyRow.style.display='block';
+    qtyLabel.textContent=qtyMode==='ratio'?'補充後庫存（%）':'補充數量（件）';
+    document.getElementById('shop-review-qty').placeholder=qtyMode==='ratio'?'例：80（代表80%）':'購買了幾件？';
+  } else {
+    qtyRow.style.display='none';
+  }
+  document.getElementById('shopReviewModal').classList.add('open');
+}
+function shopToggleDot(id,e){
+  e.stopPropagation(); shopCloseGlobalDd();
+  shopOpenDotId=shopOpenDotId===id?null:id; shopRender();
+}
+function shopDelete(id){
+  shopOpenDotId=null; shopRender();
+  appConfirm('刪除項目','確定要刪除這個購物項目嗎？',()=>{shopList=shopList.filter(x=>x.id!==id);saveShopList();shopRender();});
+}
+function shopOpenDd(field,id,trigEl,e){
+  e.stopPropagation();
+  const dd=document.getElementById('shop-global-dd');
+  const rect=trigEl.getBoundingClientRect();
+  shopActiveDdId=id; shopActiveDdField=field;
+  const it=shopList.find(x=>x.id===id); if(!it)return;
+  let opts=[];
+  if(field==='prio') opts=SHOP_PRIO_ICON.map((ic,i)=>({label:ic+' '+SHOP_PRIO_LABEL[i],val:i,sel:it.prio===i}));
+  else if(field==='cat') opts=SHOP_CATS.map(c=>({label:c,val:c,sel:it.cat===c}));
+  else if(field==='src') opts=SHOP_SRCS.map(s=>({label:s,val:s,sel:it.src===s}));
+  dd.innerHTML=opts.map(o=>`<div class="dd-opt ${o.sel?'sel':''}" onclick="shopApplyDd(${JSON.stringify(o.val)},event)">${o.label}</div>`).join('');
+  dd.style.right=(window.innerWidth-rect.right)+'px';
+  const spaceBelow=window.innerHeight-rect.bottom-100;
+  if(spaceBelow<130){dd.style.bottom=(window.innerHeight-rect.top)+'px';dd.style.top='auto';}
+  else{dd.style.top=(rect.bottom+4)+'px';dd.style.bottom='auto';}
+  dd.classList.add('open');
+}
+function shopApplyDd(val,e){
+  e.stopPropagation();
+  const it=shopList.find(x=>x.id===shopActiveDdId); if(!it)return;
+  if(shopActiveDdField==='prio') it.prio=val;
+  else if(shopActiveDdField==='cat') it.cat=val;
+  else if(shopActiveDdField==='src') it.src=val;
+  saveShopList(); shopCloseGlobalDd(); shopRender();
+}
+function shopCloseGlobalDd(){
+  shopActiveDdId=null; shopActiveDdField=null;
+  const dd=document.getElementById('shop-global-dd'); if(dd)dd.classList.remove('open');
+}
+function shopOpenAdd(){
+  shopEditingId=null; shopFormPrio=1; shopFormSrc='蝦皮';
+  document.getElementById('shop-modal-title').textContent='新增購物項目';
+  document.getElementById('shop-edit-id').value='';
+  ['shop-f-name','shop-f-link','shop-f-price','shop-f-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('shop-f-cat').value='日常用品';
+  document.querySelectorAll('#shop-form-prio-seg button').forEach((b,i)=>b.classList.toggle('on',i===1));
+  document.querySelectorAll('#shop-form-src-row .shop-chip').forEach((b,i)=>b.classList.toggle('on',i===0));
+  document.getElementById('shopItemModal').classList.add('open');
+}
+function shopOpenEdit(id){
+  const it=shopList.find(x=>x.id===id); if(!it)return;
+  shopEditingId=id; shopFormPrio=it.prio; shopFormSrc=it.src||'蝦皮';
+  shopOpenDotId=null;
+  document.getElementById('shop-modal-title').textContent='修改項目';
+  document.getElementById('shop-edit-id').value=id;
+  document.getElementById('shop-f-name').value=it.name;
+  document.getElementById('shop-f-link').value=it.link||'';
+  document.getElementById('shop-f-price').value=it.price||'';
+  document.getElementById('shop-f-note').value=it.note||'';
+  document.getElementById('shop-f-cat').value=it.cat||'其他';
+  document.querySelectorAll('#shop-form-prio-seg button').forEach((b,i)=>b.classList.toggle('on',i===shopFormPrio));
+  document.querySelectorAll('#shop-form-src-row .shop-chip').forEach(b=>b.classList.toggle('on',b.textContent.trim()===shopFormSrc));
+  document.getElementById('shopItemModal').classList.add('open');
+  shopRender();
+}
+function shopSetFormPrio(v,btn){shopFormPrio=v;document.querySelectorAll('#shop-form-prio-seg button').forEach((b,i)=>b.classList.toggle('on',i===v));}
+function shopUpdateStore(id,val){
+  const it=shopList.find(x=>x.id===id);if(!it)return;
+  it.store=val.trim();saveShopList();
+}
+function shopSetFormSrc(btn){
+  shopFormSrc=btn.textContent.trim();
+  document.querySelectorAll('#shop-form-src-row .shop-chip').forEach(b=>b.classList.toggle('on',b===btn));
+  const storeInput=document.getElementById('shop-f-store');
+  if(storeInput)storeInput.style.display=(shopFormSrc==='實體店'||shopFormSrc==='其他')?'block':'none';
+}
+function shopSaveItem(){
+  const name=document.getElementById('shop-f-name').value.trim(); if(!name){showToast('請輸入商品名稱','error');return;}
+  const price=document.getElementById('shop-f-price').value.trim();
+  if(shopEditingId){
+    const it=shopList.find(x=>x.id===shopEditingId);
+    if(it){it.name=name;it.prio=shopFormPrio;it.src=shopFormSrc;it.cat=document.getElementById('shop-f-cat').value;it.link=document.getElementById('shop-f-link').value.trim();it.price=price;it.note=document.getElementById('shop-f-note').value.trim();it.store=(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'';}
+  } else {
+    shopList.unshift({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),name,prio:shopFormPrio,cat:document.getElementById('shop-f-cat').value,src:shopFormSrc,store:(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'',link:document.getElementById('shop-f-link').value.trim(),price,note:document.getElementById('shop-f-note').value.trim(),done:false,restock:false,restockId:null,date:todayStr,stars:0,reviewNote:'',reviewPrice:''});
+  }
+  saveShopList(); closeModal('shopItemModal'); shopRender();
+  showToast(shopEditingId?'已更新':'已新增購物項目');
+}
+function shopSyncStars(){document.querySelectorAll('#shop-stars-row .shop-star').forEach((s,i)=>{s.style.color=i<shopReviewStar?'#f59e0b':'#e2e8f0';});}
+function shopSetStar(n){shopReviewStar=n;shopSyncStars();}
+function shopSaveReview(){
+  const id=document.getElementById('shop-review-id').value;
+  const it=shopList.find(x=>x.id===id);
+  if(it){it.stars=shopReviewStar;it.reviewNote=document.getElementById('shop-review-note').value.trim();it.reviewPrice=document.getElementById('shop-review-price').value.trim();}
+  // sync qty back to inventory
+  const invId=document.getElementById('shop-review-restock-inv-id').value;
+  const qtyVal=parseInt(document.getElementById('shop-review-qty').value||'');
+  if(invId&&!isNaN(qtyVal)&&qtyVal>0){
+    const invItem=inventory.find(x=>x.id===invId);
+    if(invItem){
+      if(invItem.qtyMode==='ratio'){
+        invItem.ratio=Math.min(100,qtyVal);
+      } else {
+        invItem.qty=(invItem.qty??0)+qtyVal;
+      }
+      saveInv();
+      shopSyncRestock();
+      if(currentPage==='inventory')renderInventoryPage();
+      showToast('庫存已更新 ✓');
+    }
+  } else {
+    showToast('評價已儲存');
+  }
+  saveShopList(); closeModal('shopReviewModal'); shopRender();
+}
+function shopSetDoneSearch(q){shopDoneSearch=q;shopRender();}
+function shopSetDoneCatAll(){
+  shopDoneCat='all';
+  document.getElementById('shop-done-cat-all-btn').classList.add('on');
+  document.getElementById('shop-done-cat-select').value='';
+  shopRender();
+}
+function shopSetDoneCatDd(val){
+  if(!val){shopSetDoneCatAll();return;}
+  shopDoneCat=val;
+  document.getElementById('shop-done-cat-all-btn').classList.remove('on');
+  shopRender();
+}
+function shopClearDateFilter(){
+  const f=document.getElementById('shop-done-date-from');
+  const t=document.getElementById('shop-done-date-to');
+  if(f)f.value=''; if(t)t.value='';
+  shopRender();
+}
+function shopCancelBuy(){
+  const id=document.getElementById('shop-review-id').value;
+  const it=shopList.find(x=>x.id===id); if(!it)return;
+  it.done=false; it.buyDate='';
+  saveShopList(); closeModal('shopReviewModal'); shopRender();
+  showToast('已取消購買，移回待購買');
+}
+function shopSetDoneCat(val,btn){
+  shopDoneCat=val;
+  document.querySelectorAll('#shop-done-cat-chips .shop-chip').forEach(c=>c.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  shopRender();
+}
+function shopSetCatAll(){
+  shopFilterCat='all';
+  document.getElementById('shop-cat-all-btn').classList.add('on');
+  document.getElementById('shop-cat-select').value='';
+  shopRender();
+}
+function shopSetCatDd(val){
+  if(!val){shopSetCatAll();return;}
+  shopFilterCat=val;
+  document.getElementById('shop-cat-all-btn').classList.remove('on');
+  shopRender();
+}
+function shopSetFilter(type,val,btn){
+  if(type==='prio'){shopFilterPrio=val;document.querySelectorAll('#shop-prio-filter-chips .shop-chip').forEach(c=>c.classList.remove('on'));}
+  else{shopFilterCat=val;document.querySelectorAll('#shop-cat-filter-chips .shop-chip').forEach(c=>c.classList.remove('on'));}
+  btn.classList.add('on'); shopRender();
+}
+function shopSetSort(m,btn){shopSortMode=m;document.querySelectorAll('#shop-sort-chips .shop-chip').forEach(c=>c.classList.remove('on'));btn.classList.add('on');shopRender();}
+function shopToggleDoneFilter(){
+  const body=document.getElementById('shop-done-filter-body');
+  const arrow=document.getElementById('shop-done-filter-arrow');
+  if(!body)return;
+  const open=body.classList.toggle('open');
+  if(arrow)arrow.textContent=open?'expand_less':'expand_more';
+}
+function shopToggleFilter(){
+  shopFilterOpen=!shopFilterOpen;
+  document.getElementById('shop-filter-body').classList.toggle('open',shopFilterOpen);
+  const arr=document.getElementById('shop-filter-arrow');
+  if(arr)arr.textContent=shopFilterOpen?'expand_less':'expand_more';
+}
+function shopSetSub(mode){
+  shopSubTab=mode; shopOpenCardId=null; shopCloseGlobalDd();
+  if(mode!=='done'){shopDoneSearch='';shopDoneCat='all';}
+  document.getElementById('shop-st-buy').classList.toggle('on',mode==='buy');
+  document.getElementById('shop-st-done').classList.toggle('on',mode==='done');
+  const stR=document.getElementById('shop-st-restock');if(stR)stR.classList.toggle('on',mode==='restock');
+  document.getElementById('shop-buy-panel').style.display=mode==='buy'?'flex':'none';
+  document.getElementById('shop-done-panel').style.display=mode==='done'?'block':'none';
+  const rPanel=document.getElementById('shop-restock-panel');if(rPanel)rPanel.style.display=mode==='restock'?'block':'none';
+  if(mode==='restock'){shopRenderRestock();}else{shopRender();}
+}
+// ══ END SHOPPING LIST ═══════════════════════════════════════════════════
+
 // ── INIT（由底部 initFirebase() 呼叫）──────────────────────
 function appInit(){
   loadData();
@@ -3158,14 +4189,14 @@ function appInit(){
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     db.ref('.info/connected').on('value', snap => {
-      fbSetStatus(snap.val() ? 'online' : 'offline');
+      if(!snap.val()) fbSetStatus('offline');
     });
     console.log('Firebase initialized OK');
   } catch(e) {
     console.error('Firebase init error:', e);
     fbSetStatus('error');
   }
-  appInit(); // 直接進入 app，不需要密碼畫面
+  appInit();
 })();
 </script>
 </body>
