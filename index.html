@@ -989,7 +989,14 @@
       <input type="text" id="shop-f-store" placeholder="店家名稱（如：Gracegift、寶雅…）"
         style="display:none;margin-top:8px;width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary)">
     </div>
-    <div class="form-group"><label>購買連結（選填）</label><input type="text" id="shop-f-link" placeholder="https://..."></div>
+    <div class="form-group">
+      <label>購買連結（選填，可新增多個）</label>
+      <div id="shop-links-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px"></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="text" id="shop-f-link-input" placeholder="https://..." style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary)">
+        <button type="button" onclick="shopAddLink()" style="padding:10px 14px;border:none;background:var(--primary);color:#fff;border-radius:var(--radius-sm);font-size:16px;cursor:pointer;line-height:1">＋</button>
+      </div>
+    </div>
     <div class="form-group"><label>預算（選填）</label><input type="text" id="shop-f-price" placeholder="NT$..."></div>
     <div class="form-group"><label>備註（選填）</label><input type="text" id="shop-f-note" placeholder="顏色、尺寸、等特價..."></div>
     <div class="form-group"><label>歸屬</label>
@@ -1459,7 +1466,26 @@ function fbSave(key, data){
 }
 
 // ── save 函數，全部走 Firebase ─────────────────────────────────
-function saveData(){fbSave('tasks',tasks);fbSave('housework',housework);}
+function saveData(){
+  // 一次性寫入 tasks + housework，避免兩次分開寫入導致中間狀態觸發 listener 覆蓋資料
+  const now = Date.now();
+  localStorage.setItem('app_tasks',     JSON.stringify(tasks));
+  localStorage.setItem('app_housework', JSON.stringify(housework));
+  localStorage.setItem('app_updatedAt', String(now));
+  fbSetStatus('saving');
+  if(!db||!_roomToken){ fbSetStatus('offline'); return; }
+  db.ref('rooms/'+_roomToken).update({
+    tasks: JSON.parse(JSON.stringify(tasks)),
+    housework: JSON.parse(JSON.stringify(housework)),
+    'meta/updatedAt': now
+  }).then(()=>{
+    fbSetStatus('online');
+    updateSyncTimeUI(now,'本機儲存');
+  }).catch(err=>{
+    console.error('Firebase save error:',err);
+    fbSetStatus('error');
+  });
+}
 function saveInv(){fbSave('inventory',inventory);}
 function saveLocations(){fbSave('locations',locations);}
 
@@ -1652,7 +1678,7 @@ function downloadInvSample(){
 // ── DRAWER ───────────────────────────────────────────────
 function openDrawer(){
   const _diSub=document.getElementById('di-identity-sub');
-  if(_diSub)_diSub.textContent='目前：'+(appIdentity==='sindy'?'Sindy':appIdentity==='bf'?'男友':'未設定');document.getElementById('drawer').classList.add('open');document.getElementById('drawer-scrim').classList.add('open');renderSettingsPage()}
+  if(_diSub)_diSub.textContent='目前：'+(appIdentity==='sindy'?'Sindy':appIdentity==='bf'?'Jack':'未設定');document.getElementById('drawer').classList.add('open');document.getElementById('drawer-scrim').classList.add('open');renderSettingsPage()}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawer-scrim').classList.remove('open')}
 
 // ── NAV / PAGE SWITCH ─────────────────────────────────────
@@ -3123,7 +3149,10 @@ function twGetSchedule(){
   // ── 家事排程（維持原本邏輯）────────────────────────────────
   housework.forEach(h=>{
     if(h.reminderDate){
-      sched.push({id:h.id,type:'hw',title:h.name,date:h.reminderDate,status:'pending',isHw:true});
+      const _hist=h.history||[];
+      const _rdDone=_hist.includes(h.reminderDate);
+      sched.push({id:h.id,type:'hw',title:h.name,date:h.reminderDate,
+        status:_rdDone?'done':'pending',isHw:true});
     }
     if(h.history&&h.history.length>0){
       h.history.forEach(d=>{
@@ -4180,7 +4209,7 @@ function setIdentity(id){
   const m=document.getElementById('identityModal');if(m)m.style.display='none';
   viewMode='mine';localStorage.setItem('app_viewMode','mine');
   updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();
-  showToast('已設定為 '+(id==='sindy'?'Sindy':'男友')+' 的視角');
+  showToast('已設定為 '+(id==='sindy'?'Sindy':'Jack')+' 的視角');
 }
 function cycleViewMode(){
   const modes=['mine','all','theirs'];
@@ -4216,7 +4245,7 @@ function ownerBadge(item){
   const owner=item.owner||'all';
   if(owner==='all'||viewMode!=='all')return '';
   const isSindy=owner==='sindy';
-  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#ede9fe':'#dbeafe'};color:${isSindy?'#6d28d9':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👩 Sindy':'👨 男友'}</span>`;
+  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#ede9fe':'#dbeafe'};color:${isSindy?'#6d28d9':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👩 Sindy':'👨 Jack'}</span>`;
 }
 function taskSetOwner(v,btn){
   taskOwnerForm=v;
@@ -4487,7 +4516,7 @@ function appInit(){
         <div style="font-size:28px;margin-bottom:6px">👩</div>Sindy
       </button>
       <button onclick="setIdentity('bf')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
-        <div style="font-size:28px;margin-bottom:6px">👨</div>男友
+        <div style="font-size:28px;margin-bottom:6px">👨</div>Jack
       </button>
     </div>
   </div>
