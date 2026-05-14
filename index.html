@@ -1295,11 +1295,11 @@
 <div class="modal-overlay" id="locRoomModal">
   <div class="modal-sheet"><div class="modal-handle"></div>
     <div class="flex items-center justify-between mb-4">
-      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="loc-room-modal-title">新增房間</h2>
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="loc-room-modal-title">新增區域</h2>
       <button onclick="closeModal('locRoomModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
     </div>
     <input type="hidden" id="loc-room-edit-id">
-    <div class="form-group"><label>房間名稱 *</label><input type="text" id="loc-room-name" placeholder="例：客廳、臥室"></div>
+    <div class="form-group"><label>區域名稱 *</label><input type="text" id="loc-room-name" placeholder="例：客廳、臥室、廚房"></div>
     <div class="form-group"><label>Emoji Icon</label><input type="text" id="loc-room-icon" placeholder="例：🏠" style="font-size:20px;width:80px"></div>
     <div class="form-group"><label>背景顏色</label><div style="display:flex;align-items:center;gap:10px"><input type="color" id="loc-room-bg" value="#E1F5EE" style="width:48px;height:36px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer"><input type="text" id="loc-room-bg-txt" placeholder="#E1F5EE" style="flex:1" oninput="document.getElementById('loc-room-bg').value=this.value"></div></div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('locRoomModal')">取消</button><button class="btn-primary flex-1" onclick="locSaveRoom()">儲存</button></div>
@@ -1314,15 +1314,37 @@
     </div>
     <input type="hidden" id="loc-sub-edit-id">
     <input type="hidden" id="loc-sub-room-id">
-    <div class="form-group"><label>位置名稱 *</label><input type="text" id="loc-sub-name" placeholder="例：沙發下、衣櫃一層"></div>
-    <div class="form-group"><label>顏色</label><div style="display:flex;align-items:center;gap:10px"><input type="color" id="loc-sub-color" value="#5b52e8" style="width:48px;height:36px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer"><span style="font-size:11px;color:var(--text-muted)">用於平面圖顯示</span></div></div>
+    <input type="hidden" id="loc-sub-x" value="30">
+    <input type="hidden" id="loc-sub-y" value="30">
+    <div class="form-group"><label>位置名稱 *</label><input type="text" id="loc-sub-name" placeholder="例：沙發下、衣櫃一層、床底"></div>
     <div class="form-group">
-      <label>SVG 座標 <span style="font-size:10px;font-weight:400;color:var(--text-muted)">（平面圖上的位置與大小）</span></label>
-      <div class="coord-grid">
-        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">X</div><input type="number" class="coord-inp" id="loc-sub-x" value="50" min="0" max="600"></div>
-        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">Y</div><input type="number" class="coord-inp" id="loc-sub-y" value="50" min="0" max="400"></div>
-        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">寬</div><input type="number" class="coord-inp" id="loc-sub-w" value="120" min="20" max="600"></div>
-        <div><div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:3px">高</div><input type="number" class="coord-inp" id="loc-sub-h" value="80" min="20" max="400"></div>
+      <label>顏色</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px" id="loc-sub-swatches">
+        <div class="loc-color-swatch" data-c="#5b52e8" onclick="locSubSetColor('#5b52e8')" style="width:28px;height:28px;border-radius:8px;background:#5b52e8;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#3b82f6" onclick="locSubSetColor('#3b82f6')" style="width:28px;height:28px;border-radius:8px;background:#3b82f6;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#10b981" onclick="locSubSetColor('#10b981')" style="width:28px;height:28px;border-radius:8px;background:#10b981;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#f59e0b" onclick="locSubSetColor('#f59e0b')" style="width:28px;height:28px;border-radius:8px;background:#f59e0b;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#ef4444" onclick="locSubSetColor('#ef4444')" style="width:28px;height:28px;border-radius:8px;background:#ef4444;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#ec4899" onclick="locSubSetColor('#ec4899')" style="width:28px;height:28px;border-radius:8px;background:#ec4899;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#8b5cf6" onclick="locSubSetColor('#8b5cf6')" style="width:28px;height:28px;border-radius:8px;background:#8b5cf6;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+        <div class="loc-color-swatch" data-c="#64748b" onclick="locSubSetColor('#64748b')" style="width:28px;height:28px;border-radius:8px;background:#64748b;cursor:pointer;border:2px solid transparent;flex-shrink:0"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="color" id="loc-sub-color" value="#5b52e8" style="width:36px;height:32px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer" oninput="locSubSyncSwatches(this.value)">
+        <span style="font-size:11px;color:var(--text-muted)">自訂顏色</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>大小</label>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button type="button" id="loc-size-s" onclick="locSubSetSize('s')" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:700;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;line-height:1.4">小<br><span style="font-size:9px;font-weight:400">80×60</span></button>
+        <button type="button" id="loc-size-m" onclick="locSubSetSize('m')" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--primary);background:#f0effe;cursor:pointer;font-size:11px;font-weight:700;color:var(--primary);font-family:'Noto Sans TC',sans-serif;line-height:1.4">中<br><span style="font-size:9px;font-weight:400">120×80</span></button>
+        <button type="button" id="loc-size-l" onclick="locSubSetSize('l')" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:700;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;line-height:1.4">大<br><span style="font-size:9px;font-weight:400">180×100</span></button>
+        <button type="button" id="loc-size-xl" onclick="locSubSetSize('xl')" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:700;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;line-height:1.4">特大<br><span style="font-size:9px;font-weight:400">240×120</span></button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">自訂寬 (px)</div><input type="number" class="coord-inp" id="loc-sub-w" value="120" min="20" max="580" oninput="locSubSyncSizeBtns()" style="width:100%"></div>
+        <div style="flex:1"><div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">自訂高 (px)</div><input type="number" class="coord-inp" id="loc-sub-h" value="80" min="20" max="380" oninput="locSubSyncSizeBtns()" style="width:100%"></div>
       </div>
     </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('locSubModal')">取消</button><button class="btn-primary flex-1" onclick="locSaveSubLoc()">儲存</button></div>
@@ -3090,6 +3112,7 @@ function twGetSchedule(){
         // a) 自然日期上（已由 monthlyInstanceMap 在下方月定期迴圈處理）
         // b) 被延後至新日期（originalMonthlyDate 存在）→ 在此直接加入
         if(t.originalMonthlyDate){
+          if(!matchOwner(tmpl))return;
           sched.push({id:t.id,type:'task',title:tmpl.title,date:t.plannedDate,
             status:t.status==='已完成'?'done':'pending',isTask:true,isMonthly:true,
             freqHint:'每月'+tmpl.freqVal+'號（延後）'});
@@ -3098,6 +3121,7 @@ function twGetSchedule(){
         return;
       }
       // 非月定期的 instance（例如透過 assignTaskToDay 建立的一次性排程）
+      if(!matchOwner(tmpl))return;
       sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
         status:t.status==='已完成'?'done':'pending',isTask:true});
       return;
@@ -3105,6 +3129,7 @@ function twGetSchedule(){
 
     // ② 月定期模板：自動為前後數個月的「每月X號」產生排程項目
     if(t.freqType==='monthly'&&t.freqVal>0){
+      if(!matchOwner(t))return;
       const dom=t.freqVal;
       for(let mo=-2;mo<=6;mo++){
         const d=new Date(today.getFullYear(),today.getMonth()+mo,dom);
@@ -3144,6 +3169,7 @@ function twGetSchedule(){
 
   // ── 家事排程（維持原本邏輯）────────────────────────────────
   housework.forEach(h=>{
+    if(!matchOwner(h))return;
     if(h.reminderDate){
       const _hist=h.history||[];
       const _rdDone=_hist.includes(h.reminderDate);
@@ -3642,7 +3668,7 @@ const DL=[
 
 let locations=[];
 let fpCurrentRoom=null,fpHighlightSubloc=null;
-let locMgrTab='rooms',locMgrRoom=null;
+let locMgrTab='rooms',locMgrRoom=null,locMgrOpenRooms=new Set();
 
 function locFindSubloc(sublocId){for(const room of locations){const s=room.subLocations.find(sl=>sl.id===sublocId);if(s)return s;}return null;}
 function locFindRoomBySubloc(sublocId){return locations.find(r=>r.subLocations.some(sl=>sl.id===sublocId))||null;}
@@ -3757,69 +3783,94 @@ function renderLocMgrPage(){
   const content=document.getElementById('inv-content');if(!content)return;
   const fp=document.getElementById('inv-filter-panel');if(fp)fp.style.display='none';
   const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
-  const TABS=[['rooms','🏠 房間設定'],['sublocs','📍 細分位置'],['preview','👁 預覽']];
-  let html=`<div class="lmgr-tab-bar">${TABS.map(([t,l])=>`<button class="lmgr-tab ${locMgrTab===t?'on':''}" onclick="locMgrSwitchTab('${t}')">${l}</button>`).join('')}</div>`;
-  if(locMgrTab==='rooms'){
-    html+=`<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button onclick="locOpenRoomModal(null)" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px"><span class="material-symbols-outlined" style="font-size:16px">add</span>新增房間</button></div>`;
-    if(!locations.length){html+=`<div style="text-align:center;padding:32px;color:var(--text-muted)">尚無房間，請新增</div>`;}
-    else locations.forEach(r=>{const cnt=inventory.filter(it=>r.subLocations.some(sl=>sl.id===it.subLocationId)).length;html+=`<div class="lmgr-room-card" onclick="locMgrRoom='${r.id}';locMgrTab='sublocs';renderLocMgrPage()"><div class="lmgr-room-icon" style="background:${r.bgColor}">${r.icon}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text-primary)">${r.name}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${r.subLocations.length} 個位置 · ${cnt} 件物品</div></div><button onclick="event.stopPropagation();locOpenRoomModal('${r.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted)"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button onclick="event.stopPropagation();locDeleteRoom('${r.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:#d1d5db"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button><span class="material-symbols-outlined" style="font-size:20px;color:var(--text-muted)">chevron_right</span></div>`;});
-  }else if(locMgrTab==='sublocs'){
-    if(!locMgrRoom&&locations.length)locMgrRoom=locations[0].id;
-    const rOpts=locations.map(r=>`<option value="${r.id}" ${r.id===locMgrRoom?'selected':''}>${r.icon} ${r.name}</option>`).join('');
-    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><select class="fp-room-sel" style="flex:1" onchange="locMgrRoom=this.value;renderLocMgrPage()">${rOpts}</select><button onclick="locOpenSubModal(null)" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px">add</span>新增位置</button></div>`;
-    const room=locations.find(r=>r.id===locMgrRoom);
-    if(!room){html+=`<div style="text-align:center;padding:24px;color:var(--text-muted)">請選擇房間</div>`;}
-    else if(!room.subLocations.length){html+=`<div style="text-align:center;padding:24px;color:var(--text-muted)">此房間尚無細分位置</div>`;}
-    else{
-      html+=`<div style="background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light);overflow:hidden;box-shadow:var(--shadow-sm)">`;
-      room.subLocations.forEach(sl=>{const cnt=inventory.filter(it=>it.subLocationId===sl.id).length;html+=`<div class="lmgr-subloc-row"><div class="lmgr-color-dot" style="background:${sl.color}"></div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text-primary)">${sl.name}</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px">座標: (${sl.x},${sl.y}) · ${sl.w}×${sl.h} · ${cnt} 件物品</div></div><button onclick="locOpenSubModal('${sl.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--text-muted)"><span class="material-symbols-outlined" style="font-size:18px">edit</span></button><button onclick="locDeleteSubloc('${sl.id}')" style="background:none;border:none;cursor:pointer;padding:4px;color:#d1d5db"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></div>`;});
-      html+=`</div>`;
-    }
-  }else{
-    if(!locMgrRoom&&locations.length)locMgrRoom=locations[0].id;
-    const rOpts=locations.map(r=>`<option value="${r.id}" ${r.id===locMgrRoom?'selected':''}>${r.icon} ${r.name}</option>`).join('');
-    html+=`<div style="margin-bottom:12px"><select class="fp-room-sel" style="width:100%" onchange="locMgrRoom=this.value;renderLocMgrPage()">${rOpts}</select></div>`;
-    const room=locations.find(r=>r.id===locMgrRoom);
-    if(room){
-      const W=600,H=400;let svgInner='';
-      room.subLocations.forEach(sl=>{
-        const cnt=inventory.filter(it=>it.subLocationId===sl.id).length;
-        svgInner+=`<g cursor="move" onmousedown="fpStartDrag(event,'${sl.id}','move')" ontouchstart="fpStartDrag(event,'${sl.id}','move')">
-          <rect x="${sl.x}" y="${sl.y}" width="${sl.w}" height="${sl.h}" fill="${sl.color}" fill-opacity="0.2" stroke="${sl.color}" stroke-width="1.5" rx="6"/>
-          <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2-6}" text-anchor="middle" font-size="11" font-weight="700" fill="${sl.color}" font-family="Noto Sans TC,sans-serif" style="pointer-events:none">${sl.name}</text>
-          <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2+10}" text-anchor="middle" font-size="10" fill="${sl.color}" font-family="Noto Sans TC,sans-serif" opacity="0.8" style="pointer-events:none">${cnt} 件</text>
-        </g>
-        <rect x="${sl.x+sl.w-12}" y="${sl.y+sl.h-12}" width="16" height="16" fill="${sl.color}" rx="8" cursor="nwse-resize" stroke="#fff" stroke-width="2" 
-          onmousedown="fpStartDrag(event,'${sl.id}','resize')" ontouchstart="fpStartDrag(event,'${sl.id}','resize')" />`;
-      });
+  if(!locMgrRoom&&locations.length)locMgrRoom=locations[0].id;
+  let html='';
 
-      // 🌟 畫出紅色的磁吸對齊輔助線
-      if(typeof fpSnapLines !== 'undefined') {
-        fpSnapLines.forEach(line => {
-          svgInner += `<line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" style="pointer-events:none" />`;
-        });
-      }
+  // ── 區域 chip 列 ────────────────────────────────────────────────
+  html+=`<div style="display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 12px;align-items:center">`;
+  locations.forEach(r=>{
+    const act=r.id===locMgrRoom;
+    html+=`<div style="display:flex;align-items:center;background:${act?'var(--primary)':'var(--surface)'};border:1px solid ${act?'var(--primary)':'var(--border)'};border-radius:99px;overflow:hidden">
+      <button onclick="locMgrRoom='${r.id}';renderLocMgrPage()" style="background:none;border:none;padding:5px 8px 5px 11px;font-size:12px;font-weight:600;color:${act?'#fff':'var(--text-primary)'};cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif">${r.icon||''} ${r.name}</button>
+      <button onclick="event.stopPropagation();locOpenRoomModal('${r.id}')" style="background:none;border:none;padding:3px 2px;cursor:pointer;color:${act?'rgba(255,255,255,.75)':'var(--text-muted)'}"><span class="material-symbols-outlined" style="font-size:13px">edit</span></button>
+      <button onclick="event.stopPropagation();locDeleteRoom('${r.id}')" style="background:none;border:none;padding:3px 7px 3px 1px;cursor:pointer;color:${act?'rgba(255,255,255,.55)':'#d1d5db'}"><span class="material-symbols-outlined" style="font-size:13px">close</span></button>
+    </div>`;
+  });
+  html+=`<button onclick="locOpenRoomModal(null)" title="新增區域" style="width:30px;height:30px;border-radius:50%;background:var(--surface);border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text-muted)"><span class="material-symbols-outlined" style="font-size:18px">add</span></button>`;
+  html+=`</div>`;
 
-      html+=`<div class="fp-wrap">
-        <div style="padding:10px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light);background:#f8fafc;display:flex;align-items:center;gap:6px">
-          <span class="material-symbols-outlined" style="font-size:16px">touch_app</span> 直接拖拉方塊，靠近其他方塊時會自動對齊
-        </div>
-        <div class="fp-svg-area" style="touch-action:none">
-          <svg id="lmgr-edit-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="background:${room.bgColor};border-radius:8px;max-width:100%" 
-               onmousemove="fpDoDrag(event)" ontouchmove="fpDoDrag(event)" onmouseup="fpEndDrag()" ontouchend="fpEndDrag()" onmouseleave="fpEndDrag()">
-            ${svgInner}
-          </svg>
-        </div>
-      </div>`;
-    }
+  const room=locations.find(r=>r.id===locMgrRoom);
+  if(!room){
+    html+=`<div style="text-align:center;padding:52px 24px;color:var(--text-muted)">
+      <span class="material-symbols-outlined" style="font-size:44px;display:block;margin-bottom:10px;opacity:.3">map</span>
+      ${locations.length?'請選擇區域':'點「＋」新增第一個區域'}
+    </div>`;
+    content.innerHTML=html;return;
   }
+
+  // ── 平面圖 SVG 編輯畫布 ─────────────────────────────────────────
+  const W=600,H=400;let svgInner='';
+  room.subLocations.forEach(sl=>{
+    const ER=10;
+    const ecx=sl.x+sl.w-ER, ecy=sl.y+ER;
+    svgInner+=`<g>
+      <rect x="${sl.x}" y="${sl.y}" width="${sl.w}" height="${sl.h}"
+        fill="${sl.color}" fill-opacity="0.2" stroke="${sl.color}" stroke-width="1.5" rx="6"
+        cursor="move"
+        onmousedown="fpStartDrag(event,'${sl.id}','move')"
+        ontouchstart="fpStartDrag(event,'${sl.id}','move')" style="touch-action:none"/>
+      <text x="${sl.x+sl.w/2}" y="${sl.y+sl.h/2+4}" text-anchor="middle" font-size="11"
+        font-weight="700" fill="${sl.color}" font-family="Noto Sans TC,sans-serif"
+        style="pointer-events:none;user-select:none">${sl.name}</text>
+      <rect x="${sl.x+sl.w-14}" y="${sl.y+sl.h-14}" width="14" height="14"
+        fill="${sl.color}" rx="3" cursor="nwse-resize" stroke="#fff" stroke-width="1.5"
+        onmousedown="fpStartDrag(event,'${sl.id}','resize')"
+        ontouchstart="fpStartDrag(event,'${sl.id}','resize')" style="touch-action:none"/>
+      <circle cx="${ecx}" cy="${ecy}" r="${ER}" fill="${sl.color}" fill-opacity="0.9"
+        cursor="pointer" onclick="locMgrRoom='${room.id}';locOpenSubModal('${sl.id}')"/>
+      <text x="${ecx}" y="${ecy+4}" text-anchor="middle" font-size="11"
+        fill="#fff" font-weight="700" style="pointer-events:none;user-select:none">✎</text>
+    </g>`;
+  });
+
+  // 對齊輔助線（畫在所有方塊上方）
+  if(typeof fpSnapLines!=='undefined'){
+    fpSnapLines.forEach(line=>{
+      svgInner+=`<line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="5 4" style="pointer-events:none"/>`;
+    });
+  }
+
+  html+=`<div class="fp-wrap">
+    <div style="padding:8px 12px;font-size:11px;color:var(--text-muted);border-bottom:1px solid var(--border-light);background:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="display:flex;align-items:center;gap:5px;flex:1;min-width:0;overflow:hidden">
+        <span class="material-symbols-outlined" style="font-size:14px;flex-shrink:0">touch_app</span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">拖拉移動 · 右下角縮放 · 右上角 ✎ 編輯</span>
+      </span>
+      <button onclick="locMgrRoom='${room.id}';locOpenSubModal(null)"
+        style="background:var(--primary);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:3px;white-space:nowrap;flex-shrink:0;font-family:'Noto Sans TC',sans-serif">
+        <span class="material-symbols-outlined" style="font-size:14px">add</span>細分位置
+      </button>
+    </div>
+    <div class="fp-svg-area" style="touch-action:none;padding:0">
+      <svg id="lmgr-edit-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
+        style="background:${room.bgColor};border-radius:0 0 8px 8px;max-width:100%;display:block"
+        onmousemove="fpDoDrag(event)" ontouchmove="fpDoDrag(event)"
+        onmouseup="fpEndDrag()" ontouchend="fpEndDrag()" onmouseleave="fpEndDrag()">
+        ${svgInner}
+      </svg>
+    </div>
+  </div>`;
+
   content.innerHTML=html;
 }
+function locMgrToggleRoom(id){if(locMgrOpenRooms.has(id))locMgrOpenRooms.delete(id);else locMgrOpenRooms.add(id);renderLocMgrPage();}
+function locMgrSwitchTab(t){locMgrTab=t;renderLocMgrPage();}
+function locMgrToggleRoom(id){if(locMgrOpenRooms.has(id))locMgrOpenRooms.delete(id);else locMgrOpenRooms.add(id);renderLocMgrPage();}
 function locMgrSwitchTab(t){locMgrTab=t;renderLocMgrPage();}
 
 function locOpenRoomModal(roomId){
   document.getElementById('loc-room-edit-id').value=roomId||'';
-  document.getElementById('loc-room-modal-title').textContent=roomId?'修改房間':'新增房間';
+  document.getElementById('loc-room-modal-title').textContent=roomId?'修改區域':'新增區域';
   const r=roomId?locations.find(x=>x.id===roomId):null;
   document.getElementById('loc-room-name').value=r?r.name:'';document.getElementById('loc-room-icon').value=r?r.icon:'🏠';
   document.getElementById('loc-room-bg').value=r?r.bgColor:'#E1F5EE';document.getElementById('loc-room-bg-txt').value=r?r.bgColor:'#E1F5EE';
@@ -3844,10 +3895,64 @@ function locOpenSubModal(sublocId){
   document.getElementById('loc-sub-room-id').value=roomId||'';document.getElementById('loc-sub-edit-id').value=sublocId||'';
   document.getElementById('loc-sub-modal-title').textContent=sublocId?'修改細分位置':'新增細分位置';
   const sl=sublocId?locFindSubloc(sublocId):null;
-  document.getElementById('loc-sub-name').value=sl?sl.name:'';document.getElementById('loc-sub-color').value=sl?sl.color:'#5b52e8';
-  document.getElementById('loc-sub-x').value=sl?sl.x:50;document.getElementById('loc-sub-y').value=sl?sl.y:50;
-  document.getElementById('loc-sub-w').value=sl?sl.w:120;document.getElementById('loc-sub-h').value=sl?sl.h:80;
+  const initColor=sl?sl.color:'#5b52e8';
+  document.getElementById('loc-sub-name').value=sl?sl.name:'';
+  document.getElementById('loc-sub-color').value=initColor;
+  document.getElementById('loc-sub-w').value=sl?sl.w:120;
+  document.getElementById('loc-sub-h').value=sl?sl.h:80;
+  // 自動定位（新建時自動找空位）
+  if(!sl&&roomId){
+    const ap=locAutoPosition(roomId);
+    document.getElementById('loc-sub-x').value=ap.x;
+    document.getElementById('loc-sub-y').value=ap.y;
+  }else{
+    document.getElementById('loc-sub-x').value=sl?sl.x:30;
+    document.getElementById('loc-sub-y').value=sl?sl.y:30;
+  }
   document.getElementById('locSubModal').classList.add('open');
+  // 初始化色票高亮
+  setTimeout(()=>{locSubSyncSwatches(initColor);locSubSyncSizeBtns();},10);
+}
+function locAutoPosition(roomId){
+  const room=locations.find(r=>r.id===roomId);
+  if(!room||!room.subLocations.length)return{x:30,y:30};
+  for(let y=30;y<320;y+=100){
+    for(let x=30;x<480;x+=140){
+      const ok=!room.subLocations.some(sl=>Math.abs(sl.x-x)<110&&Math.abs(sl.y-y)<75);
+      if(ok)return{x,y};
+    }
+  }
+  return{x:30,y:30};
+}
+function locSubSetColor(c){
+  document.getElementById('loc-sub-color').value=c;
+  locSubSyncSwatches(c);
+}
+function locSubSyncSwatches(c){
+  document.querySelectorAll('.loc-color-swatch').forEach(sw=>{
+    const match=sw.dataset.c===c;
+    sw.style.border=match?'2px solid var(--text-primary)':'2px solid transparent';
+    sw.style.transform=match?'scale(1.15)':'scale(1)';
+  });
+}
+function locSubSetSize(s){
+  const sizes={s:[80,60],m:[120,80],l:[180,100],xl:[240,120]};
+  const [w,h]=sizes[s]||[120,80];
+  document.getElementById('loc-sub-w').value=w;
+  document.getElementById('loc-sub-h').value=h;
+  locSubSyncSizeBtns();
+}
+function locSubSyncSizeBtns(){
+  const w=parseInt(document.getElementById('loc-sub-w').value)||120;
+  const map={s:80,m:120,l:180,xl:240};
+  ['s','m','l','xl'].forEach(k=>{
+    const btn=document.getElementById('loc-size-'+k);
+    if(!btn)return;
+    const on=w===map[k];
+    btn.style.borderColor=on?'var(--primary)':'var(--border)';
+    btn.style.background=on?'#f0effe':'var(--surface)';
+    btn.style.color=on?'var(--primary)':'var(--text-muted)';
+  });
 }
 function locSaveSubLoc(){
   const name=document.getElementById('loc-sub-name').value.trim();if(!name){showToast('請輸入位置名稱','error');return;}
@@ -4520,4 +4625,4 @@ function appInit(){
   </div>
 </div>
 </body>
-</html>
+</html>                              
