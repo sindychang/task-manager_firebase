@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <link rel="apple-touch-icon" href="kanahei.png">
-  <link rel="icon" type="image/png" href="kanahei.png">
+  <link rel="apple-touch-icon" href="chiikawa_task.png">
+  <link rel="icon" type="image/png" href="chiikawa_task.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -674,40 +674,34 @@
 <header style="background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:10px 14px 9px;padding-top:calc(10px + env(safe-area-inset-top,0px));box-shadow:0 2px 12px rgba(91,82,232,.2)">
   <div class="max-w-2xl mx-auto flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <button onclick="openDrawer()" style="background:rgba(255,255,255,.15);border:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+      <button onclick="openDrawer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
         <span class="material-symbols-outlined" style="font-size:20px;color:#fff">menu</span>
       </button>
-      <div>
-        <h1 class="text-white font-bold" id="pageTitle" style="font-size:15px;letter-spacing:.01em">To Do List</h1>
-      </div>
+      <h1 class="text-white font-bold" id="pageTitle" style="font-size:16px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">To Do List</h1>
     </div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <!-- 身份視角切換 -->
-      <button id="view-mode-btn" onclick="cycleViewMode()" title="切換顯示視角" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0">
-        <span id="view-mode-icon" style="font-size:14px">👤</span>
-        <span id="view-mode-label">我的</span>
+    <div style="display:flex;align-items:center;gap:4px">
+      <!-- 身份視角切換（icon only） -->
+      <button id="view-mode-btn" onclick="cycleViewMode()" title="切換顯示視角" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px">
+        <span id="view-mode-icon">👤</span>
       </button>
-      <!-- Firebase 同步狀態指示器 -->
-      <div id="fb-status" title="點擊查看同步資訊" onclick="fbStatusClick()" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 8px;cursor:pointer">
+      <!-- Firebase 同步狀態（單行 dot + 時間） -->
+      <div id="fb-status" title="點擊查看同步資訊" onclick="fbStatusClick()" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border-radius:8px;padding:0 8px;cursor:pointer;height:32px;flex-shrink:0">
         <span id="fb-status-dot" style="width:7px;height:7px;border-radius:50%;background:#fbbf24;flex-shrink:0;transition:background .3s"></span>
-        <div style="display:flex;flex-direction:column;align-items:flex-start">
-          <span id="fb-status-txt" style="font-size:10px;color:rgba(255,255,255,.8);font-weight:600;line-height:1.2">連線中</span>
-          <span id="fb-sync-time" style="font-size:9px;color:rgba(255,255,255,.4);line-height:1.2">-</span>
-        </div>
+        <span id="fb-sync-time" style="font-size:10px;color:rgba(255,255,255,.7);font-weight:600;white-space:nowrap;line-height:1">--:--</span>
       </div>
-      <button id="global-ics-btn" onclick="invExportICS(7)" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯出 .ics 行事曆提醒">
+      <button id="global-ics-btn" onclick="invExportICS(7)" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯出 .ics 行事曆提醒">
         <span class="material-symbols-outlined" style="font-size:18px">calendar_month</span>
       </button>
-      <button id="global-shop-btn" onclick="invShopExport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯出購物清單">
+      <button id="global-shop-btn" onclick="invShopExport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯出購物清單">
         <span class="material-symbols-outlined" style="font-size:18px">shopping_cart</span>
       </button>
-      <button id="global-import-btn" onclick="invOpenImport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;padding:8px 12px;align-items:center;gap:5px;cursor:pointer" title="匯入物品資料">
+      <button id="global-import-btn" onclick="invOpenImport()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="匯入物品資料">
         <span class="material-symbols-outlined" style="font-size:18px">upload_file</span>
       </button>
-      <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;align-items:center;gap:5px;cursor:pointer">
-        <span class="material-symbols-outlined" style="font-size:17px">send_to_mobile</span>傳送至 iPhone
+      <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;height:32px;padding:0 10px;font-size:12px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+        <span class="material-symbols-outlined" style="font-size:18px">send_to_mobile</span>
       </button>
-      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:none;align-items:center;gap:5px;cursor:pointer">
+      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:8px;padding:0 12px;font-size:13px;font-weight:700;display:none;align-items:center;gap:4px;cursor:pointer;height:32px;flex-shrink:0">
         <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
       </button>
     </div>
@@ -1001,9 +995,9 @@
     <div class="form-group"><label>備註（選填）</label><input type="text" id="shop-f-note" placeholder="顏色、尺寸、等特價..."></div>
     <div class="form-group"><label>歸屬</label>
       <div class="shop-prio-seg" id="shop-owner-seg">
-        <button onclick="shopSetOwner('sindy',this)">👩 我的</button>
+        <button onclick="shopSetOwner('sindy',this)">👧🏻 我的</button>
         <button class="on" onclick="shopSetOwner('all',this)">👥 共同</button>
-        <button onclick="shopSetOwner('bf',this)">👨 他的</button>
+        <button onclick="shopSetOwner('bf',this)">🎅🏻 他的</button>
       </div>
     </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('shopItemModal')">取消</button><button class="btn-primary flex-1" onclick="shopSaveItem()">儲存</button></div>
@@ -1128,9 +1122,9 @@
     <div class="form-group" id="task-freq-val-group" style="display:none"><label id="task-freq-val-label">天數</label><input type="number" id="task-freq-val" min="1" max="365" placeholder="輸入數字"></div>
     <div class="form-group"><label>歸屬</label>
       <div class="shop-prio-seg" id="task-owner-seg">
-        <button onclick="taskSetOwner('sindy',this)">👩 我的</button>
+        <button onclick="taskSetOwner('sindy',this)">👧🏻 我的</button>
         <button class="on" onclick="taskSetOwner('all',this)">👥 共同</button>
-        <button onclick="taskSetOwner('bf',this)">👨 他的</button>
+        <button onclick="taskSetOwner('bf',this)">🎅🏻 他的</button>
       </div>
     </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('taskModal')">取消</button><button class="btn-primary flex-1" onclick="saveTask()">儲存</button></div>
@@ -1423,9 +1417,9 @@ function forceUpload(){
 function updateSyncTimeUI(ts, source){
   if(!ts) return;
   const d = new Date(ts);
-  const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
   const dateStr = d.toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
-  const display = (d.toDateString()===new Date().toDateString()) ? timeStr : dateStr+' '+timeStr;
+  const display = (d.toDateString()===new Date().toDateString()) ? timeStr : dateStr;
   const el1 = document.getElementById('fb-sync-time');
   const el2 = document.getElementById('drawer-sync-time');
   const el3 = document.getElementById('drawer-data-source');
@@ -1439,17 +1433,19 @@ function fbStatusClick(){ openDrawer(); }
 
 // ── 同步狀態指示器 ────────────────────────────────────────────
 function fbSetStatus(state){
-  const dot=document.getElementById('fb-status-dot'),txt=document.getElementById('fb-status-txt');
-  if(!dot||!txt)return;
+  const dot=document.getElementById('fb-status-dot');
+  const fb=document.getElementById('fb-status');
+  if(!dot)return;
   const MAP={
-    connecting:{color:'#fbbf24',label:'連線中'},
-    online:{color:'#34d399',label:'已同步'},
-    saving:{color:'#60a5fa',label:'儲存中'},
-    offline:{color:'#f87171',label:'離線'},
-    error:{color:'#f87171',label:'錯誤'},
+    connecting:{color:'#fbbf24',tip:'連線中'},
+    online:{color:'#34d399',tip:'已同步'},
+    saving:{color:'#60a5fa',tip:'儲存中'},
+    offline:{color:'#f87171',tip:'離線'},
+    error:{color:'#f87171',tip:'錯誤'},
   };
   const m=MAP[state]||MAP.connecting;
-  dot.style.background=m.color; txt.textContent=m.label;
+  dot.style.background=m.color;
+  if(fb)fb.title='點擊查看 · '+m.tip;
 }
 
 // ── Firebase 讀寫封裝 ─────────────────────────────────────────
@@ -4220,18 +4216,20 @@ function cycleViewMode(){
 function updateViewBtn(){
   const btn=document.getElementById('view-mode-btn');
   const icon=document.getElementById('view-mode-icon');
-  const lbl=document.getElementById('view-mode-label');
   if(!btn)return;
   const isSindy=appIdentity==='sindy';
   if(viewMode==='mine'){
-    icon.textContent=isSindy?'👩':'👨';lbl.textContent='我的';
-    btn.style.background='rgba(255,255,255,.28)';
+    icon.textContent=isSindy?'👧🏻':'🎅🏻';
+    btn.style.background='rgba(255,255,255,.3)';
+    btn.title='視角：我的 (點擊切換)';
   }else if(viewMode==='theirs'){
-    icon.textContent=isSindy?'👨':'👩';lbl.textContent='他的';
+    icon.textContent=isSindy?'🎅🏻':'👧🏻';
     btn.style.background='rgba(255,255,255,.15)';
+    btn.title='視角：他的 (點擊切換)';
   }else{
-    icon.textContent='👥';lbl.textContent='全部';
+    icon.textContent='👥';
     btn.style.background='rgba(255,255,255,.15)';
+    btn.title='視角：全部 (點擊切換)';
   }
 }
 function matchOwner(item){
@@ -4245,7 +4243,7 @@ function ownerBadge(item){
   const owner=item.owner||'all';
   if(owner==='all'||viewMode!=='all')return '';
   const isSindy=owner==='sindy';
-  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#ede9fe':'#dbeafe'};color:${isSindy?'#6d28d9':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👩 Sindy':'👨 Jack'}</span>`;
+  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#ede9fe':'#dbeafe'};color:${isSindy?'#6d28d9':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👧🏻 Sindy':'🎅🏻 Jack'}</span>`;
 }
 function taskSetOwner(v,btn){
   taskOwnerForm=v;
@@ -4513,10 +4511,10 @@ function appInit(){
     <p style="font-size:13px;color:#64748b;margin-bottom:24px">設定後 app 會預設顯示你的項目<br>可在設定中隨時更改</p>
     <div style="display:flex;gap:12px">
       <button onclick="setIdentity('sindy')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
-        <div style="font-size:28px;margin-bottom:6px">👩</div>Sindy
+        <div style="font-size:28px;margin-bottom:6px">👧🏻</div>Sindy
       </button>
       <button onclick="setIdentity('bf')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
-        <div style="font-size:28px;margin-bottom:6px">👨</div>Jack
+        <div style="font-size:28px;margin-bottom:6px">🎅🏻</div>Jack
       </button>
     </div>
   </div>
