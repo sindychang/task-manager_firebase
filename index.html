@@ -1356,6 +1356,7 @@ function lockEnter(){
   lockHide();
   _fbListening = false;
   _roomToken = FIXED_TOKEN;
+  if(db) firebase.database().goOnline();
   loadData();
 }
 function lockSubmit(){ lockEnter(); }
@@ -1489,6 +1490,7 @@ function loadData(){
   }, err => {
     console.error('Firebase listen error:', err);
     fbSetStatus('error');
+    _fbListening = false; // 讓下次 visibilitychange 可以重新嘗試
   });
 }
 
@@ -4188,9 +4190,43 @@ function appInit(){
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
+
+    // ── 連線狀態監控：斷線自動重連 ──────────────────────
     db.ref('.info/connected').on('value', snap => {
-      if(!snap.val()) fbSetStatus('offline');
+      if(snap.val()){
+        fbSetStatus('online');
+        // 重新連上時，若監聽已中斷，重新建立
+        if(!_fbListening){
+          console.log('Firebase reconnected, re-establishing listener...');
+          loadData();
+        }
+      } else {
+        fbSetStatus('offline');
+      }
     });
+
+    // ── keepSynced：強制保持同步（iOS PWA 關鍵）──────────
+    db.ref('rooms/'+_roomToken).keepSynced(true);
+
+    // ── visibilitychange：回到前景時重連 ────────────────
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible' && db){
+        console.log('App visible, checking Firebase connection...');
+        firebase.database().goOnline();
+        setTimeout(() => {
+          if(!_fbListening){
+            console.log('Listener lost, reloading data...');
+            loadData();
+          }
+        }, 800);
+      }
+    });
+
+    // ── window focus：電腦切回視窗時重連 ────────────────
+    window.addEventListener('focus', () => {
+      if(db) firebase.database().goOnline();
+    });
+
     console.log('Firebase initialized OK');
   } catch(e) {
     console.error('Firebase init error:', e);
