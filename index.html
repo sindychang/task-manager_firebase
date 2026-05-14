@@ -656,6 +656,12 @@
       <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:6px">將此裝置的資料覆蓋雲端</p>
     </div>
     <div class="drawer-divider"></div>
+    <div class="drawer-section">身份</div>
+    <button class="drawer-item" onclick="document.getElementById('identityModal').style.display='flex'">
+      <div class="di-icon" style="background:#ede9fe"><span class="material-symbols-outlined" style="font-size:18px;color:#6d28d9">manage_accounts</span></div>
+      <div><div class="di-label">切換身份</div><div class="di-sub" id="di-identity-sub">載入中</div></div>
+    </button>
+    <div class="drawer-divider"></div>
     <div class="drawer-section">帳號</div>
     <button class="drawer-item" onclick="lockLogout()">
       <div class="di-icon" style="background:#fee2e2"><span class="material-symbols-outlined" style="font-size:18px;color:#dc2626">logout</span></div>
@@ -676,6 +682,11 @@
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:6px">
+      <!-- 身份視角切換 -->
+      <button id="view-mode-btn" onclick="cycleViewMode()" title="切換顯示視角" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0">
+        <span id="view-mode-icon" style="font-size:14px">👤</span>
+        <span id="view-mode-label">我的</span>
+      </button>
       <!-- Firebase 同步狀態指示器 -->
       <div id="fb-status" title="點擊查看同步資訊" onclick="fbStatusClick()" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 8px;cursor:pointer">
         <span id="fb-status-dot" style="width:7px;height:7px;border-radius:50%;background:#fbbf24;flex-shrink:0;transition:background .3s"></span>
@@ -981,6 +992,13 @@
     <div class="form-group"><label>購買連結（選填）</label><input type="text" id="shop-f-link" placeholder="https://..."></div>
     <div class="form-group"><label>預算（選填）</label><input type="text" id="shop-f-price" placeholder="NT$..."></div>
     <div class="form-group"><label>備註（選填）</label><input type="text" id="shop-f-note" placeholder="顏色、尺寸、等特價..."></div>
+    <div class="form-group"><label>歸屬</label>
+      <div class="shop-prio-seg" id="shop-owner-seg">
+        <button onclick="shopSetOwner('sindy',this)">👩 我的</button>
+        <button class="on" onclick="shopSetOwner('all',this)">👥 共同</button>
+        <button onclick="shopSetOwner('bf',this)">👨 他的</button>
+      </div>
+    </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('shopItemModal')">取消</button><button class="btn-primary flex-1" onclick="shopSaveItem()">儲存</button></div>
   </div>
 </div>
@@ -1101,6 +1119,13 @@
     <div class="form-group"><label>緊急程度</label><select id="task-priority"><option value="緊急">🔴 緊急</option><option value="普通" selected>🔵 普通</option><option value="低">🟢 低</option></select></div>
     <div class="form-group"><label>頻率</label><select id="task-freq-type" onchange="onTaskFreqTypeChange()"><option value="none">不重複</option><option value="days">每 N 天</option><option value="monthly">每月 X 號</option></select></div>
     <div class="form-group" id="task-freq-val-group" style="display:none"><label id="task-freq-val-label">天數</label><input type="number" id="task-freq-val" min="1" max="365" placeholder="輸入數字"></div>
+    <div class="form-group"><label>歸屬</label>
+      <div class="shop-prio-seg" id="task-owner-seg">
+        <button onclick="taskSetOwner('sindy',this)">👩 我的</button>
+        <button class="on" onclick="taskSetOwner('all',this)">👥 共同</button>
+        <button onclick="taskSetOwner('bf',this)">👨 他的</button>
+      </div>
+    </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('taskModal')">取消</button><button class="btn-primary flex-1" onclick="saveTask()">儲存</button></div>
   </div>
 </div>
@@ -1625,7 +1650,9 @@ function downloadInvSample(){
 }
 
 // ── DRAWER ───────────────────────────────────────────────
-function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawer-scrim').classList.add('open');renderSettingsPage()}
+function openDrawer(){
+  const _diSub=document.getElementById('di-identity-sub');
+  if(_diSub)_diSub.textContent='目前：'+(appIdentity==='sindy'?'Sindy':appIdentity==='bf'?'男友':'未設定');document.getElementById('drawer').classList.add('open');document.getElementById('drawer-scrim').classList.add('open');renderSettingsPage()}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawer-scrim').classList.remove('open')}
 
 // ── NAV / PAGE SWITCH ─────────────────────────────────────
@@ -1734,10 +1761,12 @@ function openTaskModal(id){
     document.getElementById('task-title').value=t.title||'';document.getElementById('task-desc').value=t.description||'';
     document.getElementById('task-date').value=t.plannedDate||'';document.getElementById('task-priority').value=t.priority||'普通';
     document.getElementById('task-freq-type').value=t.freqType||'none';document.getElementById('task-freq-val').value=t.freqVal||'';
+    taskOwnerForm=t.owner||'all';syncOwnerSeg('task-owner-seg',taskOwnerForm);
   }else{
     document.getElementById('task-title').value='';document.getElementById('task-desc').value='';
     document.getElementById('task-date').value='';document.getElementById('task-priority').value='普通';
     document.getElementById('task-freq-type').value='none';document.getElementById('task-freq-val').value='';
+    taskOwnerForm=appIdentity||'all';syncOwnerSeg('task-owner-seg',taskOwnerForm);
   }
   onTaskFreqTypeChange();document.getElementById('taskModal').classList.add('open');
 }
@@ -1787,7 +1816,7 @@ function saveTask(){
   const title=document.getElementById('task-title').value.trim();if(!title){showToast('請輸入任務名稱','error');return}
   const id=document.getElementById('taskEditId').value,ex=id?tasks.find(x=>x.id==id):null;
   const ft=document.getElementById('task-freq-type').value,fv=ft!=='none'?parseInt(document.getElementById('task-freq-val').value)||0:0;
-  const obj={id:id||Date.now().toString(),title,description:document.getElementById('task-desc').value.trim(),plannedDate:document.getElementById('task-date').value,priority:document.getElementById('task-priority').value,freqType:ft,freqVal:fv,status:ex?ex.status:'待辦',createdAt:ex?ex.createdAt:new Date().toISOString()};
+  const obj={id:id||Date.now().toString(),title,description:document.getElementById('task-desc').value.trim(),plannedDate:document.getElementById('task-date').value,priority:document.getElementById('task-priority').value,freqType:ft,freqVal:fv,status:ex?ex.status:'待辦',createdAt:ex?ex.createdAt:new Date().toISOString(),owner:taskOwnerForm};
   if(id)tasks=tasks.map(x=>x.id==id?obj:x);else tasks.push(obj);
   saveData();closeModal('taskModal');renderAll();
 }
@@ -1919,7 +1948,7 @@ function renderDbRow(t){
   const pc={'緊急':'#dc2626','普通':'#2563eb','低':'#5b52e8'}[t.priority]||'#6b7280';
   return `<div class="task-db-row">
     <div style="min-width:0">
-      <p style="font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.title}</p>
+      <div style="display:flex;align-items:center;gap:6px"><p style="font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.title}</p>${ownerBadge(t)}</div>
       <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
         ${fl?`<span class="freq-badge"><span class="material-symbols-outlined" style="font-size:11px">repeat</span>${fl}</span>`:''}
         ${t.description?`<span style="font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px">${t.description}</span>`:''}
@@ -1960,7 +1989,7 @@ function toggleAssignDropdown(dateStr){openAssignDay=(openAssignDay===dateStr)?n
 const DOW_LABELS=['一','二','三','四','五','六','日'];
 function renderTasksPage(){
   // 濾出資料庫內的任務
-  const activeTasks=tasks.filter(t=>!t.templateId); 
+  const activeTasks=tasks.filter(t=>!t.templateId&&matchOwner(t)); 
   const recurring=activeTasks.filter(t=>t.freqType&&t.freqType!=='none');
   const once=activeTasks.filter(t=>!t.freqType||t.freqType==='none');
   const emptyRow='<p style="padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px">目前沒有任務</p>';
@@ -3077,6 +3106,7 @@ function twGetSchedule(){
     }
 
     // ③ 不重複 / 每N天 任務：依 plannedDate + extraDates 顯示
+    if(!matchOwner(t))return;
     if(!t.plannedDate)return;
     sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
       status:t.status==='已完成'?'done':'pending',isTask:true});
@@ -3925,7 +3955,10 @@ let shopList=[];
 let shopSubTab='buy',shopSortMode='prio',shopFilterPrio='all',shopFilterCat='all',shopDoneSearch='',shopDoneCat='all',shopDoneDateFrom='',shopDoneDateTo='';
 let shopOpenCardId=null,shopOpenDotId=null;
 let shopActiveDdId=null,shopActiveDdField=null;
-let shopEditingId=null,shopFormPrio=1,shopFormSrc='蝦皮';
+let appIdentity=localStorage.getItem('app_identity')||'';
+let viewMode=localStorage.getItem('app_viewMode')||'mine';
+let taskOwnerForm='all',shopOwnerForm='all';
+let shopEditingId=null,shopFormPrio=1,shopFormSrc='蝦皮',shopFormLinks=[];
 let shopFilterOpen=false,shopReviewStar=3;
 const SHOP_CATS=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
 const SHOP_SRCS=['蝦皮','momo','全聯','實體店','其他'];
@@ -3997,7 +4030,7 @@ function shopParsePrice(s){const n=parseInt((s||'').replace(/[^0-9]/g,''));retur
 
 function shopRender(){
   const isDone=shopSubTab==='done';
-  let list=shopList.filter(i=>i.done===isDone);
+  let list=shopList.filter(i=>i.done===isDone&&matchOwner(i));
   if(!isDone){
     if(shopFilterPrio!=='all') list=list.filter(i=>i.prio===shopFilterPrio);
     if(shopFilterCat!=='all') list=list.filter(i=>i.cat===shopFilterCat);
@@ -4028,6 +4061,7 @@ function shopRender(){
           <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
             <span style="font-size:14px;font-weight:600;color:${it.done?'var(--text-muted)':'var(--text-primary)'};${it.done?'text-decoration:line-through;':''}">${it.name}</span>
             ${it.done&&it.buyDate?`<span style="font-size:10px;color:var(--text-muted);font-weight:400">${it.buyDate.slice(5).replace('-','/')}</span>`:''}
+            ${ownerBadge(it)}
           </div>
           ${subline?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${subline}</div>`:''}
         </div>
@@ -4050,7 +4084,11 @@ function shopRender(){
           <span class="shop-field-label">購買來源</span>
           <div class="shop-field-val" onclick="shopOpenDd('src','${it.id}',this,event)">${it.src||'未設定'}<span class="shop-field-arr">▾</span></div>
         </div>
-        ${it.link?`<div class="shop-field-row"><span class="shop-field-label">連結</span><a href="${it.link}" target="_blank" style="font-size:12px;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:3px"><span class="material-symbols-outlined" style="font-size:13px">open_in_new</span>開啟連結</a></div>`:''}
+        ${(()=>{
+          const links=(it.links&&it.links.length)?it.links:(it.link?[it.link]:[]);
+          if(!links.length)return '';
+          return links.map((l,i)=>`<div class="shop-field-row"><span class="shop-field-label">${links.length>1?'連結 '+(i+1):'連結'}</span><a href="${l}" target="_blank" style="font-size:12px;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:3px"><span class="material-symbols-outlined" style="font-size:13px">open_in_new</span>開啟連結</a></div>`).join('');
+        })()}
         ${it.note?`<div class="shop-field-row"><span class="shop-field-label">備註</span><span style="font-size:12px;color:var(--text-secondary)">${it.note}</span></div>`:''}
         ${starsHtml?`<div class="shop-field-row"><span class="shop-field-label">評價</span><span style="font-size:13px">${starsHtml}</span></div>`:''}
         ${it.reviewNote?`<div class="shop-field-row"><span class="shop-field-label">心得</span><span style="font-size:12px;color:var(--text-secondary)">${it.reviewNote}</span></div>`:''}
@@ -4130,11 +4168,97 @@ function shopCloseGlobalDd(){
   shopActiveDdId=null; shopActiveDdField=null;
   const dd=document.getElementById('shop-global-dd'); if(dd)dd.classList.remove('open');
 }
+// ── IDENTITY & VIEW MODE ───────────────────────────────────────────────────
+function initIdentity(){
+  updateViewBtn();
+  if(!appIdentity){
+    setTimeout(()=>{const m=document.getElementById('identityModal');if(m)m.style.display='flex';},600);
+  }
+}
+function setIdentity(id){
+  appIdentity=id;localStorage.setItem('app_identity',id);
+  const m=document.getElementById('identityModal');if(m)m.style.display='none';
+  viewMode='mine';localStorage.setItem('app_viewMode','mine');
+  updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();
+  showToast('已設定為 '+(id==='sindy'?'Sindy':'男友')+' 的視角');
+}
+function cycleViewMode(){
+  const modes=['mine','all','theirs'];
+  viewMode=modes[(modes.indexOf(viewMode)+1)%3];
+  localStorage.setItem('app_viewMode',viewMode);
+  updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();
+}
+function updateViewBtn(){
+  const btn=document.getElementById('view-mode-btn');
+  const icon=document.getElementById('view-mode-icon');
+  const lbl=document.getElementById('view-mode-label');
+  if(!btn)return;
+  const isSindy=appIdentity==='sindy';
+  if(viewMode==='mine'){
+    icon.textContent=isSindy?'👩':'👨';lbl.textContent='我的';
+    btn.style.background='rgba(255,255,255,.28)';
+  }else if(viewMode==='theirs'){
+    icon.textContent=isSindy?'👨':'👩';lbl.textContent='他的';
+    btn.style.background='rgba(255,255,255,.15)';
+  }else{
+    icon.textContent='👥';lbl.textContent='全部';
+    btn.style.background='rgba(255,255,255,.15)';
+  }
+}
+function matchOwner(item){
+  if(!appIdentity||viewMode==='all')return true;
+  const owner=item.owner||'all';
+  if(viewMode==='mine')return owner==='all'||owner===appIdentity;
+  const other=appIdentity==='sindy'?'bf':'sindy';
+  return owner==='all'||owner===other;
+}
+function ownerBadge(item){
+  const owner=item.owner||'all';
+  if(owner==='all'||viewMode!=='all')return '';
+  const isSindy=owner==='sindy';
+  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#ede9fe':'#dbeafe'};color:${isSindy?'#6d28d9':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👩 Sindy':'👨 男友'}</span>`;
+}
+function taskSetOwner(v,btn){
+  taskOwnerForm=v;
+  document.querySelectorAll('#task-owner-seg button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function shopSetOwner(v,btn){
+  shopOwnerForm=v;
+  document.querySelectorAll('#shop-owner-seg button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function syncOwnerSeg(segId,val){
+  const map={'sindy':0,'all':1,'bf':2};
+  document.querySelectorAll('#'+segId+' button').forEach((b,i)=>b.classList.toggle('on',i===(map[val]??1)));
+}
+function shopRenderLinksList(){
+  const el=document.getElementById('shop-links-list');if(!el)return;
+  if(!shopFormLinks.length){el.innerHTML='';return;}
+  el.innerHTML=shopFormLinks.map((l,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg-secondary,#f4f4f8);border-radius:8px;padding:7px 10px">
+      <span class="material-symbols-outlined" style="font-size:14px;color:var(--primary);flex-shrink:0">link</span>
+      <span style="flex:1;font-size:12px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l}</span>
+      <button type="button" onclick="shopRemoveLink(${i})" style="border:none;background:none;padding:2px 4px;cursor:pointer;color:#aaa;font-size:15px;line-height:1;flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+function shopAddLink(){
+  const inp=document.getElementById('shop-f-link-input');
+  const v=inp.value.trim();
+  if(!v){showToast('請輸入連結網址','warn');return;}
+  if(!v.startsWith('http')&&!v.startsWith('/')){showToast('請輸入有效網址（http 開頭）','warn');return;}
+  if(shopFormLinks.includes(v)){showToast('此連結已存在','warn');return;}
+  shopFormLinks.push(v);inp.value='';shopRenderLinksList();
+}
+function shopRemoveLink(idx){shopFormLinks.splice(idx,1);shopRenderLinksList();}
 function shopOpenAdd(){
   shopEditingId=null; shopFormPrio=1; shopFormSrc='蝦皮';
   document.getElementById('shop-modal-title').textContent='新增購物項目';
   document.getElementById('shop-edit-id').value='';
-  ['shop-f-name','shop-f-link','shop-f-price','shop-f-note'].forEach(id=>document.getElementById(id).value='');
+  ['shop-f-name','shop-f-price','shop-f-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('shop-f-link-input').value='';
+  shopFormLinks=[];shopRenderLinksList();
+  shopOwnerForm=appIdentity||'all';syncOwnerSeg('shop-owner-seg',shopOwnerForm);
   document.getElementById('shop-f-cat').value='日常用品';
   document.querySelectorAll('#shop-form-prio-seg button').forEach((b,i)=>b.classList.toggle('on',i===1));
   document.querySelectorAll('#shop-form-src-row .shop-chip').forEach((b,i)=>b.classList.toggle('on',i===0));
@@ -4147,7 +4271,10 @@ function shopOpenEdit(id){
   document.getElementById('shop-modal-title').textContent='修改項目';
   document.getElementById('shop-edit-id').value=id;
   document.getElementById('shop-f-name').value=it.name;
-  document.getElementById('shop-f-link').value=it.link||'';
+  document.getElementById('shop-f-link-input').value='';
+  shopFormLinks=it.links?[...it.links]:(it.link?[it.link]:[]);
+  shopRenderLinksList();
+  shopOwnerForm=it.owner||'all';syncOwnerSeg('shop-owner-seg',shopOwnerForm);
   document.getElementById('shop-f-price').value=it.price||'';
   document.getElementById('shop-f-note').value=it.note||'';
   document.getElementById('shop-f-cat').value=it.cat||'其他';
@@ -4170,11 +4297,14 @@ function shopSetFormSrc(btn){
 function shopSaveItem(){
   const name=document.getElementById('shop-f-name').value.trim(); if(!name){showToast('請輸入商品名稱','error');return;}
   const price=document.getElementById('shop-f-price').value.trim();
+  const pendingLink=document.getElementById('shop-f-link-input').value.trim();
+  if(pendingLink&&!shopFormLinks.includes(pendingLink))shopFormLinks.push(pendingLink);
+  const finalLinks=[...shopFormLinks];
   if(shopEditingId){
     const it=shopList.find(x=>x.id===shopEditingId);
-    if(it){it.name=name;it.prio=shopFormPrio;it.src=shopFormSrc;it.cat=document.getElementById('shop-f-cat').value;it.link=document.getElementById('shop-f-link').value.trim();it.price=price;it.note=document.getElementById('shop-f-note').value.trim();it.store=(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'';}
+    if(it){it.name=name;it.prio=shopFormPrio;it.src=shopFormSrc;it.cat=document.getElementById('shop-f-cat').value;it.links=finalLinks;it.link='';it.price=price;it.note=document.getElementById('shop-f-note').value.trim();it.store=(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'';it.owner=shopOwnerForm;}
   } else {
-    shopList.unshift({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),name,prio:shopFormPrio,cat:document.getElementById('shop-f-cat').value,src:shopFormSrc,store:(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'',link:document.getElementById('shop-f-link').value.trim(),price,note:document.getElementById('shop-f-note').value.trim(),done:false,restock:false,restockId:null,date:todayStr,stars:0,reviewNote:'',reviewPrice:''});
+    shopList.unshift({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),name,prio:shopFormPrio,cat:document.getElementById('shop-f-cat').value,src:shopFormSrc,store:(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'',links:finalLinks,link:'',price,note:document.getElementById('shop-f-note').value.trim(),done:false,restock:false,restockId:null,date:todayStr,stars:0,reviewNote:'',reviewPrice:'',owner:shopOwnerForm});
   }
   saveShopList(); closeModal('shopItemModal'); shopRender();
   showToast(shopEditingId?'已更新':'已新增購物項目');
@@ -4285,6 +4415,7 @@ function shopSetSub(mode){
 // ── INIT（由底部 initFirebase() 呼叫）──────────────────────
 function appInit(){
   loadData();
+  initIdentity();
   renderAll();
   setTimeout(()=>{
     twRender();
@@ -4344,5 +4475,22 @@ function appInit(){
   appInit();
 })();
 </script>
+
+<!-- ── IDENTITY PICKER ── -->
+<div id="identityModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:24px">
+  <div style="background:#fff;border-radius:20px;padding:32px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+    <div style="font-size:36px;margin-bottom:12px">👋</div>
+    <h2 style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:8px">你是誰？</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:24px">設定後 app 會預設顯示你的項目<br>可在設定中隨時更改</p>
+    <div style="display:flex;gap:12px">
+      <button onclick="setIdentity('sindy')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
+        <div style="font-size:28px;margin-bottom:6px">👩</div>Sindy
+      </button>
+      <button onclick="setIdentity('bf')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
+        <div style="font-size:28px;margin-bottom:6px">👨</div>男友
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
