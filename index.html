@@ -696,7 +696,7 @@
       <button id="global-iphone-btn" onclick="sendAllProgressToShortcut()" style="display:none;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;align-items:center;gap:5px;cursor:pointer">
         <span class="material-symbols-outlined" style="font-size:17px">send_to_mobile</span>傳送至 iPhone
       </button>
-      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:pointer">
+      <button id="global-add-btn" onclick="openAddModal()" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;display:none;align-items:center;gap:5px;cursor:pointer">
         <span class="material-symbols-outlined" style="font-size:18px">add</span>新增
       </button>
     </div>
@@ -1667,7 +1667,11 @@ function switchPage(p,b){
     if(iphoneBtn)iphoneBtn.style.setProperty('display','flex','important');
   } else if(p==='inventory'){
     if(addBtn)addBtn.style.setProperty('display','flex','important');
-    if(importBtn)importBtn.style.setProperty('display','flex','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
+  } else if(p==='todo'){
+    if(addBtn)addBtn.style.setProperty('display','none','important');
+    if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   } else {
     if(addBtn)addBtn.style.setProperty('display','flex','important');
@@ -1691,11 +1695,29 @@ function switchPage(p,b){
 function openAddModal(){
   if(currentPage==='housework')openHouseworkModal();
   else if(currentPage==='inventory'){
-    if(invCurrentTab==='shopping')shopOpenAdd();
-    else invOpenAdd();
+    _invAddDropdown();
   }
   else if(currentPage==='todo'){twOpenDropDay=todayStr;twRender();}
   else openTaskModal();
+}
+function _invAddDropdown(){
+  const existing=document.getElementById('inv-add-dd');
+  if(existing){existing.remove();return;}
+  const btn=document.getElementById('global-add-btn');
+  const rect=btn.getBoundingClientRect();
+  const dd=document.createElement('div');
+  dd.id='inv-add-dd';
+  dd.style.cssText='position:fixed;top:'+(rect.bottom+6)+'px;right:'+(window.innerWidth-rect.right)+'px;background:#fff;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.18);z-index:9999;overflow:hidden;min-width:150px;';
+  dd.innerHTML=`
+    <button onclick="document.getElementById('inv-add-dd')?.remove();invCurrentTab==='shopping'?shopOpenAdd():invOpenAdd()" style="display:block;width:100%;padding:13px 16px;border:none;background:none;text-align:left;font-size:14px;cursor:pointer;font-family:inherit;color:#1a1a2e">＋ 新增物品</button>
+    <div style="height:1px;background:#f0f0f0;margin:0 12px"></div>
+    <button onclick="document.getElementById('inv-add-dd')?.remove();invOpenImport()" style="display:block;width:100%;padding:13px 16px;border:none;background:none;text-align:left;font-size:14px;cursor:pointer;font-family:inherit;color:#1a1a2e">📥 匯入 CSV</button>
+  `;
+  document.body.appendChild(dd);
+  function outsideClick(e){
+    if(!dd.contains(e.target)&&e.target!==btn){dd.remove();document.removeEventListener('click',outsideClick);}
+  }
+  setTimeout(()=>document.addEventListener('click',outsideClick),10);
 }
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 function closeAllPopups(){document.querySelectorAll('.popup-menu').forEach(p=>{p.classList.remove('show','flip-up');p.style.position='';p.style.top='';p.style.bottom='';p.style.right='';});document.getElementById('inv-global-popup')?.remove();shopCloseGlobalDd();shopOpenDotId=null;}
@@ -3054,10 +3076,18 @@ function twGetSchedule(){
       return;
     }
 
-    // ③ 不重複 / 每N天 任務：維持原本邏輯（依 plannedDate 顯示）
+    // ③ 不重複 / 每N天 任務：依 plannedDate + extraDates 顯示
     if(!t.plannedDate)return;
     sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
       status:t.status==='已完成'?'done':'pending',isTask:true});
+    // 額外排程日
+    if(t.extraDates&&t.extraDates.length){
+      t.extraDates.forEach(ed=>{
+        const edSt=(t.extraDatesStatus&&t.extraDatesStatus[ed])==='已完成'?'done':'pending';
+        sched.push({id:t.id+'::extra::'+ed,type:'task',title:t.title,date:ed,
+          status:edSt,isTask:true});
+      });
+    }
   });
 
   // ── 家事排程（維持原本邏輯）────────────────────────────────
@@ -3070,6 +3100,16 @@ function twGetSchedule(){
         if(d!==h.reminderDate){
           sched.push({id:h.id,type:'hw',title:h.name,date:d,status:'done',isHw:true});
         }
+      });
+    }
+    // 額外排程日（不重複顯示主日期與歷史）
+    if(h.extraDates&&h.extraDates.length){
+      const hist=h.history||[];
+      h.extraDates.forEach(ed=>{
+        if(ed===h.reminderDate)return; // 已由主日期顯示
+        const edSt=hist.includes(ed)?'done':'pending';
+        sched.push({id:h.id+'::extra::'+ed,type:'hw',title:h.name,date:ed,
+          status:edSt,isHw:true});
       });
     }
   });
@@ -3180,9 +3220,14 @@ function twRenderDay(d){
     }).join('');
   }
   // 抓取當天已排的任務與家事 ID，用來將選單中的項目標示為「已排」並反灰
-  const tasksToday = tasks.filter(t => t.plannedDate === d);
-  const assignedTaskTemplateIds = new Set(tasksToday.map(t => t.templateId || t.id));
-  const assignedHwIds = new Set(housework.filter(h => h.reminderDate === d).map(h => h.id));
+  const assignedTaskIds = new Set([
+    ...tasks.filter(t=>t.plannedDate===d).map(t=>t.templateId||t.id),
+    ...tasks.filter(t=>t.extraDates&&t.extraDates.includes(d)).map(t=>t.id)
+  ]);
+  const assignedHwIds = new Set([
+    ...housework.filter(h=>h.reminderDate===d).map(h=>h.id),
+    ...housework.filter(h=>h.extraDates&&h.extraDates.includes(d)).map(h=>h.id)
+  ]);
 
   // 抓取「完整」的任務模板與家事清單
   const allTaskTemplates = tasks.filter(t => !t.templateId); 
@@ -3203,7 +3248,7 @@ function twRenderDay(d){
     if (twDropTab === 'task') {
       if(allTaskTemplates.length){
         allTaskTemplates.forEach(t=>{
-          const already = assignedTaskTemplateIds.has(t.id);
+          const already = assignedTaskIds.has(t.id);
           inner+=`<button onclick="twAssignTask('${t.id}','${d}',event)" class="${already?'tw-alr':''}">${t.title}${already?'<span class="tw-anote">已排</span>':''}</button>`;
         });
       }else{
@@ -3249,18 +3294,54 @@ function twToggleDrop(d,e){
   e.stopPropagation();twOpenDropDay=(twOpenDropDay===d)?null:d;twRender();
   if(twOpenDropDay){requestAnimationFrame(()=>{const el=document.getElementById('tw-adrop-'+d);if(!el)return;if(el.getBoundingClientRect().bottom>window.innerHeight-100)el.classList.add('flip');});}
 }
+function _isXDid(sid){return sid.includes('::extra::');}
+function _parseXDid(sid){const p=sid.split('::extra::');return{realId:p[0],date:p[1]};}
+
 function twAssignTask(tid,d,e){
   e.stopPropagation();
-  tasks=tasks.map(t=>t.id===tid?{...t,plannedDate:d,status:'待辦'}:t);
+  tasks=tasks.map(t=>{
+    if(t.id!==tid)return t;
+    // 尚未有日期 → 直接設主日期
+    if(!t.plannedDate)return{...t,plannedDate:d,status:'待辦'};
+    // 該天已在主日期
+    if(t.plannedDate===d)return t;
+    // 該天已在 extraDates
+    const extra=t.extraDates||[];
+    if(extra.includes(d))return t;
+    // 新增到 extraDates
+    return{...t,extraDates:[...extra,d]};
+  });
   saveData();twOpenDropDay=null;twOpenDays.add(d);showToast('已排入 '+fmtD(d));twRender();
 }
 function twAssignHw(hid,d,e){
   e.stopPropagation();
-  housework=housework.map(h=>h.id===hid?{...h,reminderDate:d}:h);
+  housework=housework.map(h=>{
+    if(h.id!==hid)return h;
+    // 尚未有提醒日 → 直接設
+    if(!h.reminderDate)return{...h,reminderDate:d};
+    // 該天已是主提醒日
+    if(h.reminderDate===d)return h;
+    // 該天已在 extraDates
+    const extra=h.extraDates||[];
+    if(extra.includes(d))return h;
+    // 新增到 extraDates
+    return{...h,extraDates:[...extra,d]};
+  });
   saveData();twOpenDropDay=null;twOpenDays.add(d);showToast('已排入 '+fmtD(d));twRender();
 }
 function twToggleDone(sid, stype, dateStr){
   if(stype==='task'){
+    // ── 額外排程日 (extraDates) 入口 ──
+    if(_isXDid(sid)){
+      const{realId,date}=_parseXDid(sid);
+      tasks=tasks.map(t=>{
+        if(t.id!==realId)return t;
+        const eds=t.extraDatesStatus||{};
+        const cur=eds[date]==='已完成'?'待辦':'已完成';
+        return{...t,extraDatesStatus:{...eds,[date]:cur}};
+      });
+      saveData();showToast('任務狀態已更新');twRender();return;
+    }
     // ── 月定期 virtual 入口：先實體化再切換狀態 ──
     if(isVirtualTaskId(sid)){
       const {templateId,date}=parseVirtualTaskId(sid);
@@ -3273,6 +3354,20 @@ function twToggleDone(sid, stype, dateStr){
     tasks=tasks.map(t=>t.id===sid?{...t,status:t.status==='已完成'?'待辦':'已完成'}:t);
     saveData();showToast('任務狀態已更新');
   }else{
+    // ── 家事額外排程日 ──
+    if(_isXDid(sid)){
+      const{realId,date}=_parseXDid(sid);
+      housework=housework.map(h=>{
+        if(h.id!==realId)return h;
+        const hist=h.history||[];
+        if(hist.includes(date)){
+          return{...h,history:hist.filter(x=>x!==date)};
+        }else{
+          return{...h,history:[...hist,date]};
+        }
+      });
+      saveData();showToast('家事狀態已更新');twRender();return;
+    }
     const hw = housework.find(h => h.id === sid);
     if(!hw) return;
     const hist = hw.history || [];
@@ -3303,7 +3398,11 @@ function twOpenDelay(sid,stype,e){
   e.stopPropagation();
   // ── 月定期 virtual 入口：先實體化（帶 forDelay=true，封鎖自然日期 virtual）──
   let actualSid=sid;
-  if(stype==='task'&&isVirtualTaskId(sid)){
+  if(stype==='task'&&_isXDid(sid)){
+    // 對 extraDates 項目延後時，操作主任務即可
+    actualSid=_parseXDid(sid).realId;
+  }
+  if(stype==='task'&&isVirtualTaskId(actualSid)){
     const {templateId,date}=parseVirtualTaskId(sid);
     const inst=materializeMonthlyTask(templateId,date,'待辦',true);
     if(!inst){showToast('找不到任務模板','error');return;}
@@ -3365,9 +3464,19 @@ function twRemoveItem(sid, stype, e) {
   }
   appConfirm('移除項目', '確定要將此項目從這天移除嗎？', () => {
     if (stype === 'task') {
-      tasks = tasks.map(t => t.id === sid ? {...t, plannedDate: '', status: '待辦'} : t); // 狀態順便改回待辦
+      if(_isXDid(sid)){
+        const{realId,date}=_parseXDid(sid);
+        tasks=tasks.map(t=>t.id===realId?{...t,extraDates:(t.extraDates||[]).filter(x=>x!==date)}:t);
+      } else {
+        tasks = tasks.map(t => t.id === sid ? {...t, plannedDate: '', status: '待辦'} : t);
+      }
     } else {
-      housework = housework.map(h => h.id === sid ? {...h, reminderDate: ''} : h);
+      if(_isXDid(sid)){
+        const{realId,date}=_parseXDid(sid);
+        housework=housework.map(h=>h.id===realId?{...h,extraDates:(h.extraDates||[]).filter(x=>x!==date)}:h);
+      } else {
+        housework = housework.map(h => h.id === sid ? {...h, reminderDate: ''} : h);
+      }
     }
     saveData();
     twRender();
