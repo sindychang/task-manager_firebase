@@ -1447,9 +1447,9 @@ function loadData(){
   const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
   const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
   const s=localStorage.getItem('app_shoplist');
-  tasks    = t ? JSON.parse(t) : JSON.parse(JSON.stringify(DT));
-  housework= h ? JSON.parse(h) : JSON.parse(JSON.stringify(DH));
-  inventory= i ? JSON.parse(i) : JSON.parse(JSON.stringify(DI));
+  tasks    = t ? JSON.parse(t) : [];
+  housework= h ? JSON.parse(h) : [];
+  inventory= i ? JSON.parse(i) : [];
   locations= l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL));
   if(typeof shopList !== 'undefined') shopList = s ? JSON.parse(s) : [];
   _localSnapshot = t ? true : false;
@@ -4194,10 +4194,10 @@ function appInit(){
     // ── 連線狀態監控：斷線自動重連 ──────────────────────
     db.ref('.info/connected').on('value', snap => {
       if(snap.val()){
-        fbSetStatus('online');
-        // 重新連上時，若監聽已中斷，重新建立
+        // 僅在監聽已中斷時重建（不更新狀態，避免假的「已同步」）
         if(!_fbListening){
           console.log('Firebase reconnected, re-establishing listener...');
+          fbSetStatus('connecting');
           loadData();
         }
       } else {
