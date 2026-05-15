@@ -974,9 +974,11 @@
     <div class="form-group"><label>分類</label><select id="shop-f-cat"><option  selected>日常用品</option><option>保養品</option><option>化妝品</option><option>糧食/飲品</option><option>藥品保健</option><option>清潔用品</option><option>文具工具</option><option>調味料</option><option>其他</option></select></div>
     <div class="form-group"><label>購買來源</label>
       <div class="shop-src-row" id="shop-form-src-row">
-        <button class="shop-chip on" onclick="shopSetFormSrc(this)">蝦皮</button>
-        <button class="shop-chip" onclick="shopSetFormSrc(this)">momo</button>
-        <button class="shop-chip" onclick="shopSetFormSrc(this)">全聯</button>
+        <button class="shop-chip on" onclick="shopSetFormSrc(this)">全聯</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">蝦皮</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">酷彭</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">屈臣氏</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">MOMO</button>
         <button class="shop-chip" onclick="shopSetFormSrc(this)">實體店</button>
         <button class="shop-chip" onclick="shopSetFormSrc(this)">其他</button>
       </div>
@@ -999,6 +1001,20 @@
         <button class="on" onclick="shopSetOwner('all',this)">👥 共同</button>
         <button onclick="shopSetOwner('bf',this)">🎅🏻 他的</button>
       </div>
+    </div>
+    <div id="shop-done-review-section" style="display:none">
+      <div style="border-top:1px solid var(--border-light);margin:14px 0 12px"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.05em;margin-bottom:10px">購買評價</div>
+      <div class="form-group"><label>滿意度</label>
+        <div style="display:flex;gap:8px;margin-top:6px" id="shop-f-stars-row">
+          <span class="shop-f-star" onclick="shopSetEditStar(1)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+          <span class="shop-f-star" onclick="shopSetEditStar(2)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+          <span class="shop-f-star" onclick="shopSetEditStar(3)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+          <span class="shop-f-star" onclick="shopSetEditStar(4)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+          <span class="shop-f-star" onclick="shopSetEditStar(5)" style="font-size:28px;cursor:pointer;color:#e2e8f0">★</span>
+        </div>
+      </div>
+      <div class="form-group"><label>心得備註</label><input type="text" id="shop-f-review-note" placeholder="品質如何？值得嗎？"></div>
     </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('shopItemModal')">取消</button><button class="btn-primary flex-1" onclick="shopSaveItem()">儲存</button></div>
   </div>
@@ -4088,10 +4104,11 @@ let shopActiveDdId=null,shopActiveDdField=null;
 let appIdentity=localStorage.getItem('app_identity')||'';
 let viewMode=localStorage.getItem('app_viewMode')||'mine';
 let taskOwnerForm='all',shopOwnerForm='all';
-let shopEditingId=null,shopFormPrio=1,shopFormSrc='蝦皮',shopFormLinks=[];
+let shopEditingId=null,shopFormPrio=1,shopFormSrc='全聯',shopFormLinks=[],shopEditStar=0;
 let shopFilterOpen=false,shopReviewStar=3;
 const SHOP_CATS=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
-const SHOP_SRCS=['蝦皮','momo','全聯','實體店','其他'];
+const SHOP_SRCS=['全聯','蝦皮','酷彭','屈臣氏','MOMO','實體店','其他'];
+let _shopDdVals=[];
 const SHOP_PRIO_LABEL=['高','中','低'];
 const SHOP_PRIO_ICON=['🔴','🟡','🟢'];
 const SHOP_PRIO_CLS=['shop-b-high','shop-b-mid','shop-b-low'];
@@ -4214,6 +4231,7 @@ function shopRender(){
           <span class="shop-field-label">購買來源</span>
           <div class="shop-field-val" onclick="shopOpenDd('src','${it.id}',this,event)">${it.src||'未設定'}<span class="shop-field-arr">▾</span></div>
         </div>
+        ${(['實體店','其他'].includes(it.src))?`<div class="shop-field-row"><span class="shop-field-label">店家名稱</span><input type="text" style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 8px;background:var(--surface);color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;max-width:140px;text-align:right" value="${(it.store||'').replace(/"/g,'&quot;')}" placeholder="填入店名" onchange="shopUpdateStore('${it.id}',this.value)" onclick="event.stopPropagation()"></div>`:''}
         ${(()=>{
           const links=(it.links&&it.links.length)?it.links:(it.link?[it.link]:[]);
           if(!links.length)return '';
@@ -4242,7 +4260,7 @@ function shopHandleCb(id,e){
   it.done=true; it.buyDate=todayStr; shopOpenCardId=null; saveShopList(); shopRender();
   document.getElementById('shop-review-id').value=id;
   shopReviewStar=3; shopSyncStars();
-  document.getElementById('shop-review-price').value='';
+  document.getElementById('shop-review-price').value=it.price||'';
   document.getElementById('shop-review-note').value='';
   document.getElementById('shop-review-qty').value='';
   // qty row: only show for restock items
@@ -4279,19 +4297,21 @@ function shopOpenDd(field,id,trigEl,e){
   if(field==='prio') opts=SHOP_PRIO_ICON.map((ic,i)=>({label:ic+' '+SHOP_PRIO_LABEL[i],val:i,sel:it.prio===i}));
   else if(field==='cat') opts=SHOP_CATS.map(c=>({label:c,val:c,sel:it.cat===c}));
   else if(field==='src') opts=SHOP_SRCS.map(s=>({label:s,val:s,sel:it.src===s}));
-  dd.innerHTML=opts.map(o=>`<div class="dd-opt ${o.sel?'sel':''}" onclick="shopApplyDd(${JSON.stringify(o.val)},event)">${o.label}</div>`).join('');
+  _shopDdVals=opts.map(o=>o.val);
+  dd.innerHTML=opts.map((o,i)=>`<div class="dd-opt ${o.sel?'sel':''}" onclick="shopApplyDd(${i},event)">${o.label}</div>`).join('');
   dd.style.right=(window.innerWidth-rect.right)+'px';
   const spaceBelow=window.innerHeight-rect.bottom-100;
   if(spaceBelow<130){dd.style.bottom=(window.innerHeight-rect.top)+'px';dd.style.top='auto';}
   else{dd.style.top=(rect.bottom+4)+'px';dd.style.bottom='auto';}
   dd.classList.add('open');
 }
-function shopApplyDd(val,e){
+function shopApplyDd(idx,e){
   e.stopPropagation();
+  const val=_shopDdVals[idx];
   const it=shopList.find(x=>x.id===shopActiveDdId); if(!it)return;
   if(shopActiveDdField==='prio') it.prio=val;
   else if(shopActiveDdField==='cat') it.cat=val;
-  else if(shopActiveDdField==='src') it.src=val;
+  else if(shopActiveDdField==='src'){it.src=val;if(!['實體店','其他'].includes(val))it.store='';}
   saveShopList(); shopCloseGlobalDd(); shopRender();
 }
 function shopCloseGlobalDd(){
@@ -4384,7 +4404,7 @@ function shopAddLink(){
 }
 function shopRemoveLink(idx){shopFormLinks.splice(idx,1);shopRenderLinksList();}
 function shopOpenAdd(){
-  shopEditingId=null; shopFormPrio=1; shopFormSrc='蝦皮';
+  shopEditingId=null; shopFormPrio=1; shopFormSrc='全聯'; shopEditStar=0; const _rs=document.getElementById('shop-done-review-section');if(_rs)_rs.style.display='none';
   document.getElementById('shop-modal-title').textContent='新增購物項目';
   document.getElementById('shop-edit-id').value='';
   ['shop-f-name','shop-f-price','shop-f-note'].forEach(id=>document.getElementById(id).value='');
@@ -4412,10 +4432,24 @@ function shopOpenEdit(id){
   document.getElementById('shop-f-cat').value=it.cat||'其他';
   document.querySelectorAll('#shop-form-prio-seg button').forEach((b,i)=>b.classList.toggle('on',i===shopFormPrio));
   document.querySelectorAll('#shop-form-src-row .shop-chip').forEach(b=>b.classList.toggle('on',b.textContent.trim()===shopFormSrc));
+  const _storeInp=document.getElementById('shop-f-store');
+  if(_storeInp){_storeInp.value=it.store||'';_storeInp.style.display=(['實體店','其他'].includes(shopFormSrc))?'block':'none';}
+  const _revSec=document.getElementById('shop-done-review-section');
+  if(_revSec){
+    if(it.done){
+      _revSec.style.display='block';
+      shopEditStar=it.stars||0;
+      shopSetEditStar(shopEditStar);
+      document.getElementById('shop-f-review-note').value=it.reviewNote||'';
+    }else{
+      _revSec.style.display='none';
+    }
+  }
   document.getElementById('shopItemModal').classList.add('open');
   shopRender();
 }
 function shopSetFormPrio(v,btn){shopFormPrio=v;document.querySelectorAll('#shop-form-prio-seg button').forEach((b,i)=>b.classList.toggle('on',i===v));}
+function shopSetEditStar(n){shopEditStar=n;document.querySelectorAll('#shop-f-stars-row .shop-f-star').forEach((s,i)=>{s.style.color=i<n?'#f59e0b':'#e2e8f0';});}
 function shopUpdateStore(id,val){
   const it=shopList.find(x=>x.id===id);if(!it)return;
   it.store=val.trim();saveShopList();
@@ -4434,7 +4468,7 @@ function shopSaveItem(){
   const finalLinks=[...shopFormLinks];
   if(shopEditingId){
     const it=shopList.find(x=>x.id===shopEditingId);
-    if(it){it.name=name;it.prio=shopFormPrio;it.src=shopFormSrc;it.cat=document.getElementById('shop-f-cat').value;it.links=finalLinks;it.link='';it.price=price;it.note=document.getElementById('shop-f-note').value.trim();it.store=(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'';it.owner=shopOwnerForm;}
+    if(it){it.name=name;it.prio=shopFormPrio;it.src=shopFormSrc;it.cat=document.getElementById('shop-f-cat').value;it.links=finalLinks;it.link='';it.price=price;it.note=document.getElementById('shop-f-note').value.trim();it.store=(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'';it.owner=shopOwnerForm;if(it.done){it.stars=shopEditStar;it.reviewNote=document.getElementById('shop-f-review-note').value.trim();}}
   } else {
     shopList.unshift({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),name,prio:shopFormPrio,cat:document.getElementById('shop-f-cat').value,src:shopFormSrc,store:(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'',links:finalLinks,link:'',price,note:document.getElementById('shop-f-note').value.trim(),done:false,restock:false,restockId:null,date:todayStr,stars:0,reviewNote:'',reviewPrice:'',owner:shopOwnerForm});
   }
@@ -4446,7 +4480,13 @@ function shopSetStar(n){shopReviewStar=n;shopSyncStars();}
 function shopSaveReview(){
   const id=document.getElementById('shop-review-id').value;
   const it=shopList.find(x=>x.id===id);
-  if(it){it.stars=shopReviewStar;it.reviewNote=document.getElementById('shop-review-note').value.trim();it.reviewPrice=document.getElementById('shop-review-price').value.trim();}
+  if(it){
+    it.stars=shopReviewStar;
+    it.reviewNote=document.getElementById('shop-review-note').value.trim();
+    const _rp=document.getElementById('shop-review-price').value.trim();
+    it.reviewPrice=_rp;
+    if(_rp)it.price=_rp; // 實際花費取代預算顯示
+  }
   // sync qty back to inventory
   const invId=document.getElementById('shop-review-restock-inv-id').value;
   const qtyVal=parseInt(document.getElementById('shop-review-qty').value||'');
@@ -4625,4 +4665,4 @@ function appInit(){
   </div>
 </div>
 </body>
-</html>                              
+</html>
