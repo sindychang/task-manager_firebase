@@ -3171,10 +3171,12 @@ function twGetSchedule(){
 
     // ③ 不重複 / 每N天 任務：依 plannedDate + extraDates 顯示
     if(!matchOwner(t))return;
-    if(!t.plannedDate)return;
-    sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
-      status:t.status==='已完成'?'done':'pending',isTask:true});
-    // 額外排程日
+    // plannedDate 可能因「從該天移除」而被清空，此時只跳過那天，不能跳過整筆
+    if(t.plannedDate){
+      sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
+        status:t.status==='已完成'?'done':'pending',isTask:true});
+    }
+    // 額外排程日（即使 plannedDate 已清空，也必須繼續處理）
     if(t.extraDates&&t.extraDates.length){
       t.extraDates.forEach(ed=>{
         const edSt=(t.extraDatesStatus&&t.extraDatesStatus[ed])==='已完成'?'done':'pending';
