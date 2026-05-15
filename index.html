@@ -78,6 +78,7 @@
     .shop-cb{width:20px;height:20px;border-radius:5px;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--surface);cursor:pointer}
     .shop-cb.checked{background:var(--primary);border-color:var(--primary)}
     .shop-cb.checked::after{content:'';width:4px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg) translateY(-1px);display:block}
+    .shop-cb.transit{background:#fff7ed;border-color:#f97316;color:#f97316;font-size:13px;user-select:none;line-height:1}
     .shop-b-high{background:#fee2e2;color:#dc2626}
     .shop-b-mid{background:#fef3c7;color:#b45309}
     .shop-b-low{background:#d1fae5;color:#059669}
@@ -4184,6 +4185,8 @@ function shopRender(){
     if(shopSortMode==='prio') list.sort((a,b)=>a.prio-b.prio);
     else if(shopSortMode==='price-asc') list.sort((a,b)=>shopParsePrice(a.price)-shopParsePrice(b.price));
     else if(shopSortMode==='price-desc') list.sort((a,b)=>shopParsePrice(b.price)-shopParsePrice(a.price));
+    // 待取貨永遠置頂（穩定排序）
+    list.sort((a,b)=>(a.shopStatus==='transit'?0:1)-(b.shopStatus==='transit'?0:1));
   } else {
     if(shopDoneSearch){const q=shopDoneSearch.toLowerCase();list=list.filter(i=>i.name.toLowerCase().includes(q)||i.note?.toLowerCase().includes(q));}
     if(shopDoneCat!=='all') list=list.filter(i=>i.cat===shopDoneCat);
@@ -4203,7 +4206,7 @@ function shopRender(){
     const starsHtml=it.stars?'⭐'.repeat(it.stars):'';
     return `<div class="shop-card" id="shop-card-${it.id}">
       <div class="shop-card-top" onclick="shopToggleCard('${it.id}',event)">
-        <div class="shop-cb ${it.done?'checked':''}" onclick="shopHandleCb('${it.id}',event)"></div>
+        <div class="shop-cb ${it.done?'checked':(it.shopStatus==='transit'?'transit':'')}" onclick="shopAdvanceStatus('${it.id}',event)">${it.shopStatus==='transit'&&!it.done?'🚚':''}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
             <span style="font-size:14px;font-weight:600;color:${it.done?'var(--text-muted)':'var(--text-primary)'};${it.done?'text-decoration:line-through;':''}">${it.name}</span>
@@ -4213,6 +4216,7 @@ function shopRender(){
           ${subline?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${subline}</div>`:''}
         </div>
         <div style="display:flex;align-items:center;gap:3px">
+          ${it.shopStatus==='transit'&&!it.done?'<span class="badge" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;font-size:9px;font-weight:700">🚚 途中</span>':''}
           ${it.restock?'<span class="badge shop-b-restock" style="font-size:9px">📦補貨</span>':''}
           <span class="badge ${SHOP_PRIO_CLS[it.prio]}" style="font-size:9px">${SHOP_PRIO_LABEL[it.prio]}</span>
           <button class="shop-dot-btn" onclick="shopToggleDot('${it.id}',event)"><span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8">more_vert</span></button>
@@ -4254,16 +4258,14 @@ function shopToggleCard(id,e){
   shopCloseGlobalDd();
   shopOpenCardId=shopOpenCardId===id?null:id; shopRender();
 }
-function shopHandleCb(id,e){
-  e.stopPropagation();
-  const it=shopList.find(x=>x.id===id); if(!it||it.done)return;
-  it.done=true; it.buyDate=todayStr; shopOpenCardId=null; saveShopList(); shopRender();
+function shopHandleCb(id,e){shopAdvanceStatus(id,e);}
+function _shopOpenReview(id){
+  const it=shopList.find(x=>x.id===id);if(!it)return;
   document.getElementById('shop-review-id').value=id;
-  shopReviewStar=3; shopSyncStars();
+  shopReviewStar=it.stars||3;shopSyncStars();
   document.getElementById('shop-review-price').value=it.price||'';
   document.getElementById('shop-review-note').value='';
   document.getElementById('shop-review-qty').value='';
-  // qty row: only show for restock items
   const invItem=it.restockId?inventory.find(x=>x.id===it.restockId):null;
   const qtyRow=document.getElementById('shop-review-qty-row');
   const qtyLabel=document.getElementById('shop-review-qty-label');
@@ -4274,10 +4276,22 @@ function shopHandleCb(id,e){
     qtyRow.style.display='block';
     qtyLabel.textContent=qtyMode==='ratio'?'補充後庫存（%）':'補充數量（件）';
     document.getElementById('shop-review-qty').placeholder=qtyMode==='ratio'?'例：80（代表80%）':'購買了幾件？';
-  } else {
-    qtyRow.style.display='none';
-  }
+  }else{qtyRow.style.display='none';}
   document.getElementById('shopReviewModal').classList.add('open');
+}
+function shopAdvanceStatus(id,e){
+  e.stopPropagation();
+  const it=shopList.find(x=>x.id===id);if(!it||it.done)return;
+  if(it.shopStatus==='transit'){
+    // 待取貨 → 已取得（開評價）
+    it.done=true;it.buyDate=todayStr;it.shopStatus='done';
+    shopOpenCardId=null;saveShopList();shopRender();
+    _shopOpenReview(id);
+  }else{
+    // 任何其他狀態（待購買/未設定/例外值）→ 統一推進到待取貨
+    it.shopStatus='transit';saveShopList();shopRender();
+    showToast('已標記為待取貨 🚚');
+  }
 }
 function shopToggleDot(id,e){
   e.stopPropagation(); shopCloseGlobalDd();
@@ -4470,7 +4484,7 @@ function shopSaveItem(){
     const it=shopList.find(x=>x.id===shopEditingId);
     if(it){it.name=name;it.prio=shopFormPrio;it.src=shopFormSrc;it.cat=document.getElementById('shop-f-cat').value;it.links=finalLinks;it.link='';it.price=price;it.note=document.getElementById('shop-f-note').value.trim();it.store=(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'';it.owner=shopOwnerForm;if(it.done){it.stars=shopEditStar;it.reviewNote=document.getElementById('shop-f-review-note').value.trim();}}
   } else {
-    shopList.unshift({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),name,prio:shopFormPrio,cat:document.getElementById('shop-f-cat').value,src:shopFormSrc,store:(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'',links:finalLinks,link:'',price,note:document.getElementById('shop-f-note').value.trim(),done:false,restock:false,restockId:null,date:todayStr,stars:0,reviewNote:'',reviewPrice:'',owner:shopOwnerForm});
+    shopList.unshift({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),name,prio:shopFormPrio,cat:document.getElementById('shop-f-cat').value,src:shopFormSrc,store:(shopFormSrc==='實體店'||shopFormSrc==='其他')?document.getElementById('shop-f-store').value.trim():'',links:finalLinks,link:'',price,note:document.getElementById('shop-f-note').value.trim(),done:false,shopStatus:'buy',restock:false,restockId:null,date:todayStr,stars:0,reviewNote:'',reviewPrice:'',owner:shopOwnerForm});
   }
   saveShopList(); closeModal('shopItemModal'); shopRender();
   showToast(shopEditingId?'已更新':'已新增購物項目');
