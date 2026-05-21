@@ -714,9 +714,11 @@
   <div class="tw-pg">
     <div class="tw-wnav">
       <button class="tw-wnbtn" onclick="twShiftW(-1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_left</span></button>
-      <div class="tw-wnc">
-        <div class="tw-wnl" id="tw-wnl"></div>
-        <div class="tw-wns" id="tw-wns"></div>
+      <div class="tw-wnc" style="position:relative;cursor:pointer" title="點擊選擇日期">
+        <div class="tw-wnl" id="tw-wnl" style="display:flex;align-items:center;justify-content:center;gap:4px;pointer-events:none"></div>
+        <div class="tw-wns" id="tw-wns" style="pointer-events:none"></div>
+        <!-- 透明日曆選擇器覆蓋整個區塊，點擊可開啟 -->
+        <input type="date" id="tw-date-picker" style="position:absolute;opacity:0;top:0;left:0;width:100%;height:100%;cursor:pointer;border:none;padding:0;margin:0" onchange="twJumpToDate(this.value)">
       </div>
       <button class="tw-wnbtn" onclick="twShiftW(1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_right</span></button>
     </div>
@@ -1223,6 +1225,7 @@
     </div>
     <div class="form-group"><label>物品名稱 *</label><input type="text" id="inv-f-name" placeholder="例：感冒藥、洗碗精"></div>
     <div class="form-group"><label>存放位置</label><select id="inv-f-location" onchange="invOnLocationChange()"><option>廚房</option><option>浴室</option><option>臥室</option><option>客廳</option><option>陽台</option><option>其他</option></select></div>
+    <!-- 存放位置選項由 invPopulateLocationDropdown() 動態填入 -->
     <div class="form-group" id="inv-f-subloc-group"><label>細分位置 <span style="font-size:10px;color:var(--text-muted);font-weight:400">（選填）</span></label><select id="inv-f-subloc"><option value="">未設定</option></select></div>
     <div class="form-group"><label>物品類別</label>
       <select id="inv-f-category" onchange="invOnCatChange()">
@@ -1536,7 +1539,7 @@ function loadData(){
   tasks    = t ? JSON.parse(t) : [];
   housework= h ? JSON.parse(h) : [];
   inventory= i ? JSON.parse(i) : [];
-  locations= l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL));
+  locations= (l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL))).map(r=>({...r,subLocations:r.subLocations||[]}));
   if(typeof shopList !== 'undefined') shopList = s ? JSON.parse(s) : [];
   _localSnapshot = t ? true : false;
   renderAll();
@@ -1584,7 +1587,7 @@ function applyRemoteData(d){
   if(d.tasks)     tasks     = d.tasks;
   if(d.housework) housework = d.housework;
   if(d.inventory) inventory = d.inventory;
-  if(d.locations) locations = d.locations;
+  if(d.locations) locations = d.locations.map(r=>({...r,subLocations:r.subLocations||[]}));
   if(d.shoplist && typeof shopList !== 'undefined') shopList = d.shoplist;
   localStorage.setItem('app_tasks',     JSON.stringify(tasks));
   localStorage.setItem('app_housework', JSON.stringify(housework));
@@ -2808,9 +2811,9 @@ function invOpenAdd(prefillLoc = null, prefillSub = null){
   document.getElementById('inv-edit-id').value='';
   document.getElementById('inv-f-name').value='';document.getElementById('inv-f-note').value='';
 
-  // 🌟 修正點 1：自動帶入存放位置
-  const targetLoc = prefillLoc || '廚房';
-  document.getElementById('inv-f-location').value = targetLoc;
+  // 🌟 修正點 1：自動帶入存放位置（動態包含自訂房間）
+  const targetLoc = prefillLoc || (locations.length ? locations[0].name : '廚房');
+  invPopulateLocationDropdown(targetLoc);
 
   document.getElementById('inv-f-category').value='日常用品';
   document.getElementById('inv-f-category-custom').style.display='none';document.getElementById('inv-f-category-custom').value='';
@@ -2835,7 +2838,7 @@ function invOpenEdit(id){
   const it=inventory.find(x=>x.id===id);if(!it)return;invEditingId=id;
   document.getElementById('inv-modal-title').textContent='修改物品';document.getElementById('inv-edit-id').value=id;
   document.getElementById('inv-f-name').value=it.name;document.getElementById('inv-f-note').value=it.note||'';
-  document.getElementById('inv-f-location').value=it.location;
+  invPopulateLocationDropdown(it.location); // 動態填充（含自訂房間）
   const knownCats=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
   if(knownCats.includes(it.category||'')){
     document.getElementById('inv-f-category').value=it.category||'其他';
@@ -3093,6 +3096,19 @@ function twGetWeekDays(off){
 }
 function twShiftW(d){twWeekOffset+=d;twOpenDropDay=null;twRender()}
 function twJumpToday(){twWeekOffset=0;twOpenDays.add(todayStr);twOpenDropDay=null;twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+function twJumpToDate(dateStr){
+  if(!dateStr)return;
+  const target=new Date(dateStr+'T00:00:00');
+  const todayDow=new Date(todayStr+'T00:00:00').getDay();
+  const thisMonday=new Date(todayStr+'T00:00:00');
+  thisMonday.setDate(thisMonday.getDate()-(todayDow===0?6:todayDow-1));
+  const targetDow=target.getDay();
+  const targetMonday=new Date(target);
+  targetMonday.setDate(target.getDate()-(targetDow===0?6:targetDow-1));
+  twWeekOffset=Math.round((targetMonday-thisMonday)/(7*86400000));
+  twOpenDays.add(dateStr);twOpenDropDay=null;twRender();
+  setTimeout(()=>document.getElementById('tw-dr-'+dateStr)?.scrollIntoView({behavior:'smooth',block:'center'}),80);
+}
 
 // Build schedule from tasks + housework
 function twGetSchedule(){
@@ -3171,6 +3187,31 @@ function twGetSchedule(){
 
     // ③ 不重複 / 每N天 任務：依 plannedDate + extraDates 顯示
     if(!matchOwner(t))return;
+    // ── 每N天定期任務：顯示完整系列（起始日 + 每X天往後） ──
+    if(t.freqType==='days'&&t.freqVal>0){
+      // 起始日（若未設定則以建立日或今天為準）
+      const daysBase=t.plannedDate||(t.createdAt?t.createdAt.slice(0,10):todayStr);
+      // 已完成的歷史紀錄（顯示為 done）
+      (t.completionHistory||[]).forEach(d=>{
+        sched.push({id:t.id+'::days::'+d,type:'task',title:t.title,date:d,
+          status:'done',isTask:true,freqHint:`每${t.freqVal}天`});
+      });
+      // 從 daysBase 往後每 freqVal 天，顯示最多 90 天內、最多 15 筆待辦
+      const maxDate=addD(todayStr,90);
+      let cur=daysBase,idx=0;
+      while(cur<=maxDate&&idx<15){
+        // 已在 completionHistory 的日期跳過（已用 ::days:: 顯示）
+        if(!(t.completionHistory||[]).includes(cur)){
+          // 第一筆用 t.id（可正常延後/完成），後續用 DAYSFUT 虛擬 id
+          const entryId=idx===0?t.id:'DAYSFUT::'+t.id+'::'+cur;
+          sched.push({id:entryId,type:'task',title:t.title,date:cur,
+            status:'pending',isTask:true,freqHint:`每${t.freqVal}天`});
+          idx++;
+        }
+        cur=addD(cur,t.freqVal);
+      }
+      return;
+    }
     // plannedDate 可能因「從該天移除」而被清空，此時只跳過那天，不能跳過整筆
     if(t.plannedDate){
       sched.push({id:t.id,type:'task',title:t.title,date:t.plannedDate,
@@ -3227,7 +3268,8 @@ function twRender(){
   const wnl=document.getElementById('tw-wnl');
   const wns=document.getElementById('tw-wns');
   if(!wnl)return;
-  wnl.textContent=twWeekOffset===0?'本週':twWeekOffset===-1?'上週':twWeekOffset===1?'下週':fmtD(days[0])+' 那週';
+  const weekLabel=twWeekOffset===0?'本週':twWeekOffset===-1?'上週':twWeekOffset===1?'下週':fmtD(days[0])+' 那週';
+  wnl.innerHTML=weekLabel+'<span class="material-symbols-outlined" style="font-size:14px;color:var(--text-muted);margin-left:3px;vertical-align:-2px">calendar_month</span>';
   wns.textContent=fmtD(days[0])+' – '+fmtD(days[6]);
   twRenderProg(days);
   const hint=document.getElementById('tw-drag-hint');
@@ -3253,7 +3295,8 @@ function twRenderProg(days){
   const dash=circ*pct/100,gap=circ-dash;
   // 右側資訊：done/total ＋ 逾期 chip（只在有逾期時才出現）
   const countTxt=total>0?`<span style="font-size:12px;font-weight:700;color:var(--text-primary)">${done}<span style="font-weight:400;color:var(--text-muted)">/${total}</span></span>`:`<span style="font-size:11px;color:var(--text-muted)">尚未安排</span>`;
-  const ovChip=ovCnt>0?`<span class="tw-chip" style="background:var(--danger-light);color:var(--danger)">⚠️ ${ovCnt}</span>`:'';
+  const firstOvDate=sched.filter(s=>s.status==='pending'&&s.date<todayStr).sort((a,b)=>a.date.localeCompare(b.date))[0]?.date;
+  const ovChip=ovCnt>0?`<button onclick="twJumpToDate('${firstOvDate||todayStr}')" style="display:inline-flex;align-items:center;gap:2px;background:var(--danger-light);color:var(--danger);border:none;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">⚠️ ${ovCnt} 逾期</button>`:'';
   const doneChip=pct===100&&total>0?`<span class="tw-chip" style="background:#d1fae5;color:#059669">✓</span>`:'';
   el.innerHTML=`
     <div class="tw-prog-ring">
@@ -3429,8 +3472,39 @@ function twAssignHw(hid,d,e){
   });
   saveData();twOpenDropDay=null;twOpenDays.add(d);showToast('已排入 '+fmtD(d));twRender();
 }
+// ── 每N天完成歷史 ID 工具 ─────────────────────────────────────
+function _isDaysDid(sid){return typeof sid==='string'&&sid.includes('::days::');}
+function _parseDaysDid(sid){const i=sid.indexOf('::days::');return{realId:sid.slice(0,i),date:sid.slice(i+8)};}
+
 function twToggleDone(sid, stype, dateStr){
   if(stype==='task'){
+    // ── 每N天完成歷史取消 ──
+    if(_isDaysDid(sid)){
+      const{realId,date}=_parseDaysDid(sid);
+      tasks=tasks.map(t=>{
+        if(t.id!==realId)return t;
+        return{...t,completionHistory:(t.completionHistory||[]).filter(d=>d!==date)};
+      });
+      saveData();showToast('已取消完成記錄');twRender();return;
+    }
+    // ── 每N天未來虛擬入口完成（DAYSFUT）：記錄到 completionHistory ──
+    if(typeof sid==='string'&&sid.startsWith('DAYSFUT::')){
+      const parts=sid.split('::');
+      const realId=parts[1],date=parts[2]||dateStr;
+      const hist=[...(tasks.find(t=>t.id===realId)?.completionHistory||[])];
+      if(!hist.includes(date))hist.push(date);
+      tasks=tasks.map(t=>t.id===realId?{...t,completionHistory:hist}:t);
+      saveData();showToast('✅ 已完成！');twRender();return;
+    }
+    // ── 每N天定期任務完成（當次 plannedDate）→ 前進到下次日期 ──
+    const daysTask=tasks.find(t=>t.id===sid&&t.freqType==='days'&&t.freqVal>0);
+    if(daysTask&&daysTask.status!=='已完成'){
+      const nextDate=addD(dateStr,daysTask.freqVal);
+      const hist=[...(daysTask.completionHistory||[])];
+      if(!hist.includes(dateStr))hist.push(dateStr);
+      tasks=tasks.map(t=>t.id===sid?{...t,plannedDate:nextDate,completionHistory:hist,status:'待辦'}:t);
+      saveData();showToast(`✅ 完成！下次在 ${fmtD(nextDate)}`);twRender();return;
+    }
     // ── 額外排程日 (extraDates) 入口 ──
     if(_isXDid(sid)){
       const{realId,date}=_parseXDid(sid);
@@ -3496,24 +3570,30 @@ function twToggleDone(sid, stype, dateStr){
 }
 function twOpenDelay(sid,stype,e){
   e.stopPropagation();
-  // ── 月定期 virtual 入口：先實體化（帶 forDelay=true，封鎖自然日期 virtual）──
   let actualSid=sid;
-  if(stype==='task'&&_isXDid(sid)){
-    // 對 extraDates 項目延後時，操作主任務即可
+  // ── extraDates 項目（任務 & 家事）：取出真實 id ──
+  if(_isXDid(sid)){
     actualSid=_parseXDid(sid).realId;
   }
+  // ── 每N天未來虛擬入口：取出真實 task id ──
+  if(stype==='task'&&typeof sid==='string'&&sid.startsWith('DAYSFUT::')){
+    actualSid=sid.split('::')[1];
+  }
+  // ── 月定期 virtual 入口：先實體化 ──
   if(stype==='task'&&isVirtualTaskId(actualSid)){
     const {templateId,date}=parseVirtualTaskId(sid);
     const inst=materializeMonthlyTask(templateId,date,'待辦',true);
     if(!inst){showToast('找不到任務模板','error');return;}
     actualSid=inst.id;
   }
-  twDelayTarget={sid:actualSid,stype};
-  const name=stype==='task'?tasks.find(t=>t.id===actualSid)?.title:housework.find(h=>h.id===sid)?.name;
+  // origSid 保留原始 id，用於 applyDelay 判斷要修改哪個欄位
+  twDelayTarget={sid:actualSid,stype,origSid:sid};
+  const name=stype==='task'?tasks.find(t=>t.id===actualSid)?.title:housework.find(h=>h.id===actualSid)?.name;
   document.getElementById('tw-dly-name').textContent=name||'';
   document.getElementById('tw-dlysh').classList.add('show');document.getElementById('tw-scrim').classList.add('show');
 }
 function twCloseDelay() {
+  twDelayTarget = null; // 清除目標，防止幽靈點擊重複觸發延後
   document.getElementById('tw-dlysh').classList.remove('show');
   document.getElementById('tw-scrim').classList.remove('show');
   const sec = document.getElementById('twCustomDateSection');
@@ -3531,34 +3611,84 @@ function twToggleCustomDate() {
   }
 }
 
+// ── 延後共用：根據 origSid 決定修改哪個欄位 ─────────────────────
+function _applyDelayTo(newDate, target){
+  const{sid,stype,origSid}=(target||twDelayTarget);
+  if(stype==='task'){
+    if(_isXDid(origSid)){
+      // extraDates 項目：把該 extra date 移到新日期
+      const{realId,date:oldDate}=_parseXDid(origSid);
+      tasks=tasks.map(t=>{
+        if(t.id!==realId)return t;
+        const extra=(t.extraDates||[]).filter(d=>d!==oldDate);
+        const extraStatus={...(t.extraDatesStatus||{})};delete extraStatus[oldDate];
+        return{...t,extraDates:[...extra,newDate],extraDatesStatus:extraStatus};
+      });
+    } else {
+      // 主日期（plannedDate）或 DAYSFUT/VIRTUAL → 改 plannedDate
+      tasks=tasks.map(x=>x.id===sid?{...x,plannedDate:newDate,status:'延後'}:x);
+    }
+  } else {
+    if(_isXDid(origSid)){
+      // 家事 extraDates 項目：把該 extra date 移到新日期
+      const{realId,date:oldDate}=_parseXDid(origSid);
+      housework=housework.map(h=>{
+        if(h.id!==realId)return h;
+        const extra=(h.extraDates||[]).filter(d=>d!==oldDate);
+        return{...h,extraDates:[...extra,newDate]};
+      });
+    } else {
+      // 家事主日期（reminderDate）
+      housework=housework.map(x=>x.id===sid?{...x,reminderDate:newDate}:x);
+    }
+  }
+}
 function twApplyCustomDelay() {
   const val = document.getElementById('twCustomDelayDate').value;
   if (!val) { showToast('請選擇日期', 'error'); return; }
   if (!twDelayTarget) return;
-
-  const {sid, stype} = twDelayTarget;
-  if (stype === 'task') {
-    tasks = tasks.map(t => t.id === sid ? {...t, plannedDate: val, status: '延後'} : t);
-  } else {
-    housework = housework.map(h => h.id === sid ? {...h, reminderDate: val} : h);
-  }
-
+  const savedTarget = twDelayTarget;
+  twDelayTarget = null; // 立即清除，防止幽靈點擊重複執行
+  _applyDelayTo(val, savedTarget);
   saveData();
   twCloseDelay();
-  showToast('已延後至 ' + fmtD(val)); 
-  twRender();
+  showToast('已延後至 ' + fmtD(val));
+  twJumpToDate(val);
 }
 function twApplyDelay(days){
   if(!twDelayTarget)return;
-  const{sid,stype}=twDelayTarget;
-  if(stype==='task'){tasks=tasks.map(t=>t.id===sid?{...t,plannedDate:addD(t.plannedDate||todayStr,days),status:'延後'}:t);}
-  else{housework=housework.map(h=>h.id===sid?{...h,reminderDate:addD(h.reminderDate||todayStr,days)}:h);}
-  saveData();twCloseDelay();showToast('已延後 '+days+' 天');twRender();
+  const savedTarget = twDelayTarget;
+  twDelayTarget = null; // 立即清除，防止幽靈點擊重複執行
+  const{sid,stype,origSid}=savedTarget;
+  // 計算基準日：extraDates 用原始日期，DAYSFUT 用虛擬日期，主日期用 max(plannedDate,today)
+  let base=todayStr;
+  if(_isXDid(origSid)){
+    const{date:od}=_parseXDid(origSid);
+    base=od>=todayStr?od:todayStr;
+  } else if(typeof origSid==='string'&&origSid.startsWith('DAYSFUT::')){
+    const futDate=origSid.split('::')[2];
+    base=futDate>=todayStr?futDate:todayStr;
+  } else if(stype==='task'){
+    const t=tasks.find(x=>x.id===sid);
+    base=(t?.plannedDate&&t.plannedDate>=todayStr)?t.plannedDate:todayStr;
+  } else {
+    const h=housework.find(x=>x.id===sid);
+    base=(h?.reminderDate&&h.reminderDate>=todayStr)?h.reminderDate:todayStr;
+  }
+  const newDate=addD(base,days);
+  _applyDelayTo(newDate, savedTarget);
+  saveData();twCloseDelay();showToast('已延後至 '+fmtD(newDate));
+  twJumpToDate(newDate);
 }
 function twRemoveItem(sid, stype, e) {
   e.stopPropagation();
   // ── 月定期 virtual 入口：不允許直接刪除，引導使用者至任務設定 ──
   if(stype==='task'&&isVirtualTaskId(sid)){
+    showToast('定期任務會自動出現，如需停用請至「任務」頁面修改頻率','warn');
+    return;
+  }
+  // ── 每N天未來虛擬入口：不允許刪除個別出現，提示至任務設定 ──
+  if(stype==='task'&&typeof sid==='string'&&sid.startsWith('DAYSFUT::')){
     showToast('定期任務會自動出現，如需停用請至「任務」頁面修改頻率','warn');
     return;
   }
@@ -3689,23 +3819,33 @@ let locations=[];
 let fpCurrentRoom=null,fpHighlightSubloc=null;
 let locMgrTab='rooms',locMgrRoom=null,locMgrOpenRooms=new Set();
 
-function locFindSubloc(sublocId){for(const room of locations){const s=room.subLocations.find(sl=>sl.id===sublocId);if(s)return s;}return null;}
-function locFindRoomBySubloc(sublocId){return locations.find(r=>r.subLocations.some(sl=>sl.id===sublocId))||null;}
+function locFindSubloc(sublocId){for(const room of locations){const s=(room.subLocations||[]).find(sl=>sl.id===sublocId);if(s)return s;}return null;}
+function locFindRoomBySubloc(sublocId){return locations.find(r=>(r.subLocations||[]).some(sl=>sl.id===sublocId))||null;}
 function locFindRoomByName(name){return locations.find(r=>r.name===name)||null;}
 function locGenId(prefix){return prefix+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 
 function invOnLocationChange(){const loc=document.getElementById('inv-f-location')?.value||'';invPopulateSublocDropdown(loc,null);}
+
+// ── 動態填充存放位置選單（含自定義房間）─────────────────────────
+function invPopulateLocationDropdown(selectedLoc){
+  const sel=document.getElementById('inv-f-location');if(!sel)return;
+  // 基本位置 + locations 陣列中的自訂房間（避免重複）
+  const defaults=['廚房','浴室','臥室','客廳','陽台','其他'];
+  const locNames=locations.map(r=>r.name);
+  const all=[...new Set([...locNames,...defaults])];
+  sel.innerHTML=all.map(n=>`<option value="${n}"${n===selectedLoc?' selected':''}>${n}</option>`).join('');
+}
 function invPopulateSublocDropdown(locationName,selectedId){
   const sel=document.getElementById('inv-f-subloc'),grp=document.getElementById('inv-f-subloc-group');
   if(!sel||!grp)return;
   const room=locFindRoomByName(locationName);
   sel.innerHTML='<option value="">未設定</option>';
-  if(room&&room.subLocations.length){
-    room.subLocations.forEach(sl=>{const opt=document.createElement('option');opt.value=sl.id;opt.textContent=sl.name;if(sl.id===selectedId)opt.selected=true;sel.appendChild(opt);});
+  if(room&&(room.subLocations||[]).length){
+    (room.subLocations||[]).forEach(sl=>{const opt=document.createElement('option');opt.value=sl.id;opt.textContent=sl.name;if(sl.id===selectedId)opt.selected=true;sel.appendChild(opt);});
     grp.style.display='block';
   }else{
     let any=false;
-    locations.forEach(r=>r.subLocations.forEach(sl=>{const opt=document.createElement('option');opt.value=sl.id;opt.textContent=r.name+' · '+sl.name;if(sl.id===selectedId)opt.selected=true;sel.appendChild(opt);any=true;}));
+    locations.forEach(r=>(r.subLocations||[]).forEach(sl=>{const opt=document.createElement('option');opt.value=sl.id;opt.textContent=r.name+' · '+sl.name;if(sl.id===selectedId)opt.selected=true;sel.appendChild(opt);any=true;}));
     grp.style.display=any?'block':'none';
   }
 }
@@ -3739,7 +3879,7 @@ function renderFloorplanPage(){
   if(!room){html+='<div style="padding:32px;text-align:center;color:var(--text-muted)">請先在「位置管理」新增房間</div>';content.innerHTML=html;return;}
   html+=`<div class="fp-wrap">`;
   const W=600,H=400;let svgInner='';
-  room.subLocations.forEach(sl=>{
+  (room.subLocations||[]).forEach(sl=>{
     const cnt=inventory.filter(it=>it.subLocationId===sl.id).length,isHL=fpHighlightSubloc===sl.id;
     const hasUrgent=inventory.filter(it=>it.subLocationId===sl.id).some(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
     svgInner+=`<g onclick="fpClickSubloc('${sl.id}',event)" style="cursor:pointer">
@@ -3810,7 +3950,7 @@ function renderLocMgrPage(){
   locations.forEach(r=>{
     const act=r.id===locMgrRoom;
     html+=`<div style="display:flex;align-items:center;background:${act?'var(--primary)':'var(--surface)'};border:1px solid ${act?'var(--primary)':'var(--border)'};border-radius:99px;overflow:hidden">
-      <button onclick="locMgrRoom='${r.id}';renderLocMgrPage()" style="background:none;border:none;padding:5px 8px 5px 11px;font-size:12px;font-weight:600;color:${act?'#fff':'var(--text-primary)'};cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif">${r.icon||''} ${r.name}</button>
+      <button onclick="locSetRoom('${r.id}')" style="background:none;border:none;padding:5px 8px 5px 11px;font-size:12px;font-weight:600;color:${act?'#fff':'var(--text-primary)'};cursor:pointer;white-space:nowrap;font-family:'Noto Sans TC',sans-serif">${r.icon||''} ${r.name}</button>
       <button onclick="event.stopPropagation();locOpenRoomModal('${r.id}')" style="background:none;border:none;padding:3px 2px;cursor:pointer;color:${act?'rgba(255,255,255,.75)':'var(--text-muted)'}"><span class="material-symbols-outlined" style="font-size:13px">edit</span></button>
       <button onclick="event.stopPropagation();locDeleteRoom('${r.id}')" style="background:none;border:none;padding:3px 7px 3px 1px;cursor:pointer;color:${act?'rgba(255,255,255,.55)':'#d1d5db'}"><span class="material-symbols-outlined" style="font-size:13px">close</span></button>
     </div>`;
@@ -3829,7 +3969,7 @@ function renderLocMgrPage(){
 
   // ── 平面圖 SVG 編輯畫布 ─────────────────────────────────────────
   const W=600,H=400;let svgInner='';
-  room.subLocations.forEach(sl=>{
+  (room.subLocations||[]).forEach(sl=>{
     const ER=10;
     const ecx=sl.x+sl.w-ER, ecy=sl.y+ER;
     svgInner+=`<g>
@@ -3846,7 +3986,7 @@ function renderLocMgrPage(){
         onmousedown="fpStartDrag(event,'${sl.id}','resize')"
         ontouchstart="fpStartDrag(event,'${sl.id}','resize')" style="touch-action:none"/>
       <circle cx="${ecx}" cy="${ecy}" r="${ER}" fill="${sl.color}" fill-opacity="0.9"
-        cursor="pointer" onclick="locMgrRoom='${room.id}';locOpenSubModal('${sl.id}')"/>
+        cursor="pointer" onclick="locSetRoomOpenSub('${room.id}','${sl.id}')"/>
       <text x="${ecx}" y="${ecy+4}" text-anchor="middle" font-size="11"
         fill="#fff" font-weight="700" style="pointer-events:none;user-select:none">✎</text>
     </g>`;
@@ -3865,7 +4005,7 @@ function renderLocMgrPage(){
         <span class="material-symbols-outlined" style="font-size:14px;flex-shrink:0">touch_app</span>
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">拖拉移動 · 右下角縮放 · 右上角 ✎ 編輯</span>
       </span>
-      <button onclick="locMgrRoom='${room.id}';locOpenSubModal(null)"
+      <button onclick="locSetRoomOpenSub('${room.id}',null)"
         style="background:var(--primary);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:3px;white-space:nowrap;flex-shrink:0;font-family:'Noto Sans TC',sans-serif">
         <span class="material-symbols-outlined" style="font-size:14px">add</span>細分位置
       </button>
@@ -3884,8 +4024,9 @@ function renderLocMgrPage(){
 }
 function locMgrToggleRoom(id){if(locMgrOpenRooms.has(id))locMgrOpenRooms.delete(id);else locMgrOpenRooms.add(id);renderLocMgrPage();}
 function locMgrSwitchTab(t){locMgrTab=t;renderLocMgrPage();}
-function locMgrToggleRoom(id){if(locMgrOpenRooms.has(id))locMgrOpenRooms.delete(id);else locMgrOpenRooms.add(id);renderLocMgrPage();}
-function locMgrSwitchTab(t){locMgrTab=t;renderLocMgrPage();}
+// ── 必須透過函式修改 let 變數，inline onclick 無法直接讀寫 let ──
+function locSetRoom(id){locMgrRoom=id;renderLocMgrPage();}
+function locSetRoomOpenSub(roomId,subId){locMgrRoom=roomId;locOpenSubModal(subId||null);}
 
 function locOpenRoomModal(roomId){
   document.getElementById('loc-room-edit-id').value=roomId||'';
@@ -3903,7 +4044,7 @@ function locSaveRoom(){
 }
 function locDeleteRoom(roomId){
   const room=locations.find(r=>r.id===roomId);if(!room)return;
-  const subIds=room.subLocations.map(sl=>sl.id),aff=inventory.filter(it=>subIds.includes(it.subLocationId));
+  const subIds=(room.subLocations||[]).map(sl=>sl.id),aff=inventory.filter(it=>subIds.includes(it.subLocationId));
   appConfirm('刪除房間',aff.length?`「${room.name}」下有 ${aff.length} 件物品，刪除後將清除其細分位置設定。確定刪除？`:`確定刪除「${room.name}」？`,()=>{
     if(aff.length){inventory=inventory.map(it=>subIds.includes(it.subLocationId)?{...it,subLocationId:null}:it);saveInv();}
     locations=locations.filter(r=>r.id!==roomId);saveLocations();if(locMgrRoom===roomId)locMgrRoom=null;renderLocMgrPage();showToast('已刪除');
@@ -4283,7 +4424,16 @@ function _shopOpenReview(id){
 }
 function shopAdvanceStatus(id,e){
   e.stopPropagation();
-  const it=shopList.find(x=>x.id===id);if(!it||it.done)return;
+  const it=shopList.find(x=>x.id===id);if(!it)return;
+  // ── 已購買：點勾勾可取消（防誤觸確認視窗）──
+  if(it.done){
+    appConfirm('取消已購買',`將「${it.name}」移回待購買清單？`,()=>{
+      it.done=false;it.buyDate='';it.shopStatus='';
+      saveShopList();shopRender();
+      showToast('已移回待購買 ✓');
+    },{danger:false,icon:'shopping_cart'});
+    return;
+  }
   if(it.shopStatus==='transit'){
     // 待取貨 → 已取得（開評價）
     it.done=true;it.buyDate=todayStr;it.shopStatus='done';
