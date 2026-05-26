@@ -799,7 +799,8 @@
   <!-- 待注意子篩選列（只在 alert tab 時顯示） -->
   <div id="inv-alert-sub-bar" style="display:none;padding:8px 14px 0;max-width:640px;margin:0 auto">
     <div style="display:flex;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px">
-      <button id="alertsub-btn-expiry" class="lmgr-tab on" onclick="invSwitchAlertSub('expiry')">效期管理</button>
+      <button id="alertsub-btn-all" class="lmgr-tab on" onclick="invSwitchAlertSub('all')">全部</button>
+      <button id="alertsub-btn-expiry" class="lmgr-tab" onclick="invSwitchAlertSub('expiry')">效期管理</button>
       <button id="alertsub-btn-restock" class="lmgr-tab" onclick="invSwitchAlertSub('restock')">補貨追蹤</button>
     </div>
   </div>
@@ -2177,7 +2178,7 @@ let invLocFilter=null,invCatFilter=null,invSrcFilter=null,invDateFrom=null,invDa
 let invQtyMode='qty',invRestockOn=false,invFilterOpen=false,invLocFilterOpen=false,invPendingImport=[];
 
 let invLocMode='list'; // 'list' or 'fp'
-let invAlertSubMode='expiry'; // 預設效期管理
+let invAlertSubMode='all'; // 預設全部（效期＋補貨追蹤低庫存合併顯示）
 
 function invSwitchTab(tab,btn){
   invCurrentTab=tab;invLocFilter=null;invCatFilter=null;invSrcFilter=null;invDateFrom=null;invDateTo=null;
@@ -2210,7 +2211,7 @@ function invSwitchTab(tab,btn){
     if(invContent)invContent.style.display='';
   }
   if(tab==='alert'){
-    invAlertSubMode='expiry'; // 預設效期管理
+    invAlertSubMode='all'; // 預設全部（效期＋補貨追蹤低庫存合併顯示）
     _syncAlertSubBtns();
     renderInventoryPage();return;
   }
@@ -2233,7 +2234,7 @@ function invSwitchAlertSub(mode){
 }
 
 function _syncAlertSubBtns(){
-  ['expiry','restock'].forEach(m=>{
+  ['all','expiry','restock'].forEach(m=>{
     const b=document.getElementById('alertsub-btn-'+m);
     if(b)b.classList.toggle('on',invAlertSubMode===m);
   });
@@ -2340,8 +2341,13 @@ function invFilterByTab(){
       if(it.qtyMode==='ratio')return(it.ratio??100)<=(it.ratioThr??25);
       return(it.qty??0)<=(it.threshold??1);
     });
-    // all: 效期 ∪ 補貨
-    return inventory.filter(it=>it.type==='expiry'||it.restock);
+    // all: 效期 ∪ 補貨低庫存（只納入真正低於門檻的補貨追蹤項目，非所有補貨追蹤）
+    return inventory.filter(it=>{
+      if(it.type==='expiry')return true;
+      if(!it.restock)return false;
+      const rs=invRestockStatus(it);
+      return rs&&rs.cls!=='muted'; // 低於門檻（orange/red）才納入
+    });
   }
   if(invCurrentTab==='expiry')return inventory.filter(it=>it.type==='expiry');
   if(invCurrentTab==='restock')return inventory.filter(it=>it.restock);
@@ -2362,9 +2368,12 @@ function invFilterPool(){
 function renderInventoryPage(){
   const strip=document.getElementById('inv-alert-strip'),content=document.getElementById('inv-content');
   if(!strip||!content)return;
-  // 待注意徽章：有效期限物品 ∪ 需補貨物品 的聯集數
-  const alertCnt=inventory.filter(i=>{if(!i.restock)return false;if(i.qtyMode==='ratio')return(i.ratio??100)<=(i.ratioThr??25);return(i.qty??0)<=(i.threshold??1);}).length;
-  const cntAlertEl=document.getElementById('inv-cnt-alert');if(cntAlertEl)cntAlertEl.textContent=alertCnt;
+  // 待注意徽章：效期緊急/逾期 ∪ 補貨低於門檻 的聯集數
+  const alertCnt=inventory.filter(i=>{
+    const es=invExpiryStatus(i);const rs=invRestockStatus(i);
+    return(es&&es.cls!=='muted')||(rs&&rs.cls!=='muted');
+  }).length;
+  const cntAlertEl=document.getElementById('inv-cnt-alert');if(cntAlertEl)cntAlertEl.textContent=alertCnt||'';
   const cntLocEl=document.getElementById('inv-cnt-loc');if(cntLocEl)cntLocEl.textContent=inventory.length;
   // 確保進入頁面時 alert sub-bar 在 alert 頁簽下顯示
   const _alertBar=document.getElementById('inv-alert-sub-bar');
@@ -2401,28 +2410,50 @@ function renderInventoryPage(){
   const lp=document.getElementById('inv-loc-filter-panel');if(lp)lp.style.display='none';
 
   let pool=invFilterPool();
-  // 🌟 把「未填效期」獨立成一個分區，不混在 urgent 裡
-  const missingDate=pool.filter(it=>it.type==='expiry'&&!it.expiryDate);
+  // 補貨追蹤模式 / 效期模式 判斷
+  const isRestockMode=(invCurrentTab==='alert'&&invAlertSubMode==='restock')||invCurrentTab==='restock';
+  const isExpiryMode=(invCurrentTab==='alert'&&invAlertSubMode==='expiry')||(invCurrentTab==='expiry');
+  // 🌟 把「未填效期」獨立成一個分區，不混在 urgent 裡（補貨模式下不顯示）
+  const missingDate=isRestockMode?[]:pool.filter(it=>it.type==='expiry'&&!it.expiryDate);
   const datedPool=pool.filter(it=>!(it.type==='expiry'&&!it.expiryDate));
-  datedPool.sort((a,b)=>{
-    function s(it){if(invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent)return 0;if(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange')return 1;return 2;}
-    return s(a)-s(b)||a.name.localeCompare(b.name);
-  });
+
+  // ── 排序輔助函式 ────────────────────────────────────────────
+  // 效期排序鍵：逾期(負天數升冪)→近期到期(天數升冪)→無效期
+  function expiryKey(it){const d=it.expiryDate?daysBetween(todayStr,it.expiryDate):9999;return d;}
+  // 補貨剩餘比例排序鍵（升冪：最少的在前）
+  function restockKey(it){if(it.qtyMode==='ratio')return it.ratio??100;return it.qty??0;}
+
   const urgent=datedPool.filter(it=>invExpiryStatus(it)?.urgent||invRestockStatus(it)?.urgent);
   const warn=datedPool.filter(it=>!urgent.includes(it)&&(invExpiryStatus(it)?.cls==='orange'||invRestockStatus(it)?.cls==='orange'));
   const normal=datedPool.filter(it=>!urgent.includes(it)&&!warn.includes(it));
-  let html='';
-  // 顯示順序：需要注意 → 即將到期 → 待補效期 → 其他
-  // 補貨追蹤模式下不顯示「待補效期」區塊
-  const isRestockMode=(invCurrentTab==='alert'&&invAlertSubMode==='restock')||invCurrentTab==='restock';
-  const isExpiryMode=(invCurrentTab==='alert'&&(invAlertSubMode==='expiry'||invAlertSubMode==='all'));
-  // ── 頂端工具列：把「購物清單」和「ICS 匯出」合併成一條細列 ──
+
+  // "需要注意"排序：先過期（days < 0，由小到大）再依到期天數升冪；補貨零庫存排最後
+  urgent.sort((a,b)=>{
+    const ae=invExpiryStatus(a)?.urgent,be=invExpiryStatus(b)?.urgent;
+    if(ae&&!be)return -1;if(!ae&&be)return 1; // 效期緊急優先於補貨緊急
+    if(ae&&be)return expiryKey(a)-expiryKey(b); // 兩者都是效期：天數少的在前
+    return restockKey(a)-restockKey(b); // 兩者都是補貨：剩餘少的在前
+  });
+  // "即將到期/快用完"排序：補貨模式→剩餘量升冪；效期/全部→到期天數升冪
+  warn.sort((a,b)=>{
+    if(isRestockMode)return restockKey(a)-restockKey(b);
+    const ae=invExpiryStatus(a)?.cls==='orange',be=invExpiryStatus(b)?.cls==='orange';
+    const ar=invRestockStatus(a)?.cls==='orange',br=invRestockStatus(b)?.cls==='orange';
+    if(ae&&!be)return -1;if(!ae&&be)return 1; // 效期警告優先
+    if(ae&&be)return expiryKey(a)-expiryKey(b);
+    return restockKey(a)-restockKey(b);
+  });
+  // 補貨追蹤模式下：全部列表依剩餘量升冪
+  if(isRestockMode)normal.sort((a,b)=>restockKey(a)-restockKey(b));
+
+  // ── 頂端工具列：購物清單等輔助資料 ──
   const lowItems=pool.filter(it=>{
     if(!it.restock)return false;
     if(it.qtyMode==='ratio'){const r=it.ratio??100,t=it.ratioThr??25;return r<=t;}
     const q=it.qty??0,thr=it.threshold??1;return q<=thr;
   });
   const expiryItems=pool.filter(it=>it.type==='expiry'&&it.expiryDate);
+  let html='';
   if(urgent.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title red">需要注意</span><span style="font-size:11px;color:var(--text-muted)">${urgent.length}</span></div><div class="inv-list">${urgent.map(it=>invRenderRow(it)).join('')}</div>`;
   if(warn.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title orange">即將到期 / 快用完</span><span style="font-size:11px;color:var(--text-muted)">${warn.length}</span></div><div class="inv-list">${warn.map(it=>invRenderRow(it)).join('')}</div>`;
   if(!isRestockMode&&missingDate.length)html+=`<div class="inv-sec-head missing-head"><span class="inv-sec-title amber">📝 待補效期</span><span style="font-size:11px;color:#a16207">${missingDate.length} 項，請點選日期補填</span></div><div class="inv-list missing-list">${missingDate.map(it=>invRenderRow(it,true,true)).join('')}</div>`;
@@ -3660,20 +3691,20 @@ function twApplyDelay(days){
   const savedTarget = twDelayTarget;
   twDelayTarget = null; // 立即清除，防止幽靈點擊重複執行
   const{sid,stype,origSid}=savedTarget;
-  // 計算基準日：extraDates 用原始日期，DAYSFUT 用虛擬日期，主日期用 max(plannedDate,today)
+  // 計算基準日：一律從任務/家事的「原定日期」起算，確保延後N天=原定日+N
   let base=todayStr;
   if(_isXDid(origSid)){
     const{date:od}=_parseXDid(origSid);
-    base=od>=todayStr?od:todayStr;
+    base=od; // 從 extraDate 的原始日期起算
   } else if(typeof origSid==='string'&&origSid.startsWith('DAYSFUT::')){
     const futDate=origSid.split('::')[2];
-    base=futDate>=todayStr?futDate:todayStr;
+    base=futDate>=todayStr?futDate:todayStr; // DAYSFUT 為未來虛擬日，維持 max
   } else if(stype==='task'){
     const t=tasks.find(x=>x.id===sid);
-    base=(t?.plannedDate&&t.plannedDate>=todayStr)?t.plannedDate:todayStr;
+    base=t?.plannedDate||todayStr; // 直接從任務原定日期起算，不強制改為今天
   } else {
     const h=housework.find(x=>x.id===sid);
-    base=(h?.reminderDate&&h.reminderDate>=todayStr)?h.reminderDate:todayStr;
+    base=h?.reminderDate||todayStr; // 直接從家事原定日期起算
   }
   const newDate=addD(base,days);
   _applyDelayTo(newDate, savedTarget);
