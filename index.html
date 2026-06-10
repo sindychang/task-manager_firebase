@@ -519,6 +519,10 @@
     .tw-ib.tw-dly{color:#d97706}
     .tw-ib.tw-del{color:#d1d5db}
     .tw-ib.tw-del:hover{background:var(--danger-light);color:var(--danger)}
+    .tw-ib.tw-note-btn{color:#9ca3af}
+    .tw-ib.tw-note-btn.has-note{color:#d97706}
+    .tw-ib.tw-note-btn.has-note:hover{background:#fff7ed}
+    .tw-occ-note{margin-top:3px;font-size:11px;color:#92400e;background:#fef9ee;border-radius:5px;padding:2px 7px;white-space:normal;word-break:break-word;line-height:1.4}
     /* Add dropdown */
     .tw-adrop{position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:400;min-width:180px;max-height:290px;overflow-y:auto}
     .tw-adrop.flip{top:auto;bottom:calc(100% + 4px)}
@@ -727,7 +731,7 @@
   </div>
 </div>
 <!-- TW Delay sheet -->
-<div class="tw-scrim" id="tw-scrim" onclick="twCloseDelay()"></div>
+<div class="tw-scrim" id="tw-scrim" onclick="twCloseAnySheet()"></div>
 <div class="tw-dlysh" id="tw-dlysh">
   <div class="tw-dlyh"></div>
   <div style="display:flex;align-items:center;gap:10px">
@@ -754,6 +758,26 @@
   </div>
 
   <button class="tw-dlycancel" onclick="twCloseDelay()">取消</button>
+</div>
+
+<!-- 本次備註 sheet -->
+<div class="tw-dlysh" id="tw-notesh">
+  <div class="tw-dlyh"></div>
+  <div style="display:flex;align-items:center;gap:10px;padding:0 20px 4px">
+    <div style="width:34px;height:34px;background:#fef9ee;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <span class="material-symbols-outlined" style="color:#d97706;font-size:19px">edit_note</span>
+    </div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary)">本次備註</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="tw-note-item-name"></div>
+    </div>
+  </div>
+  <div style="padding:8px 20px 16px">
+    <textarea id="tw-note-input" rows="3" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:'Noto Sans TC',sans-serif;resize:none;box-sizing:border-box;color:var(--text-primary);background:var(--surface);outline:none" placeholder="輸入本次執行的備註…"></textarea>
+    <button onclick="twSaveNote()" class="btn-primary w-full" style="font-size:14px;padding:11px;margin-top:8px">儲存備註</button>
+    <button onclick="twClearNote()" style="font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:8px 0;display:block;width:100%;text-align:center;font-family:'Noto Sans TC',sans-serif">清除備註</button>
+  </div>
+  <button class="tw-dlycancel" onclick="twCloseNote()">取消</button>
 </div>
 
 <div id="page-tasks" class="page max-w-2xl mx-auto px-4 py-3">
@@ -1849,7 +1873,7 @@ function openHouseworkModal(id){
     document.getElementById('hw-reminder').value=h.reminderDate||'';document.getElementById('hw-notes').value=h.notes||'';
     const wm=!!h.weekendMode;wToggle.classList.toggle('on',wm);wRow.classList.toggle('active',wm);
   }else{
-    document.getElementById('hw-name').value='';document.getElementById('hw-area').value='所有空間';
+    document.getElementById('hw-name').value='';document.getElementById('hw-area').value=hwAreaFilter||'所有空間';
     document.getElementById('hw-frequency').value='';document.getElementById('hw-last-date').value='';
     document.getElementById('hw-reminder').value='';document.getElementById('hw-notes').value='';
     document.getElementById('hw-custom-area-group').style.display='none';wToggle.classList.remove('on');wRow.classList.remove('active');
@@ -2119,7 +2143,7 @@ function renderHouseworkRow(h){
   </div>`;
 }
 function renderHouseworkPage(){
-  const allAreas=[...new Set(housework.map(h=>h.area))].sort((a,b)=>{if(a==='所有空間')return 1;if(b==='所有空間')return -1;return a.localeCompare(b,'zh-TW');});
+  const allAreas=[...new Set(housework.map(h=>h.area))].sort((a,b)=>{if(a==='所有空間')return -1;if(b==='所有空間')return 1;return a.localeCompare(b,'zh-TW');});
   const tabBar=document.getElementById('hw-area-tab-bar');
   if(tabBar)tabBar.innerHTML=[null,...allAreas].map(a=>{const isAll=a===null,sel=(isAll&&!hwAreaFilter)||(hwAreaFilter===a),cnt=isAll?housework.length:housework.filter(h=>h.area===a).length,col=isAll?null:areaColor(a);
     return `<button class="area-tab ${sel?'active':''}" onclick="toggleAreaFilter(${a===null?'null':`'${a}'`})" style="${sel&&!isAll?`background:${col.dot};`:''}">
@@ -2368,6 +2392,7 @@ function invFilterPool(){
 function renderInventoryPage(){
   const strip=document.getElementById('inv-alert-strip'),content=document.getElementById('inv-content');
   if(!strip||!content)return;
+  content.style.display=''; // 確保不因 inline style 遮蔽內容
   // 待注意徽章：效期緊急/逾期 ∪ 補貨低於門檻 的聯集數
   const alertCnt=inventory.filter(i=>{
     const es=invExpiryStatus(i);const rs=invRestockStatus(i);
@@ -2454,12 +2479,17 @@ function renderInventoryPage(){
   });
   const expiryItems=pool.filter(it=>it.type==='expiry'&&it.expiryDate);
   let html='';
-  if(urgent.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title red">需要注意</span><span style="font-size:11px;color:var(--text-muted)">${urgent.length}</span></div><div class="inv-list">${urgent.map(it=>invRenderRow(it)).join('')}</div>`;
-  if(warn.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title orange">即將到期 / 快用完</span><span style="font-size:11px;color:var(--text-muted)">${warn.length}</span></div><div class="inv-list">${warn.map(it=>invRenderRow(it)).join('')}</div>`;
-  if(!isRestockMode&&missingDate.length)html+=`<div class="inv-sec-head missing-head"><span class="inv-sec-title amber">📝 待補效期</span><span style="font-size:11px;color:#a16207">${missingDate.length} 項，請點選日期補填</span></div><div class="inv-list missing-list">${missingDate.map(it=>invRenderRow(it,true,true)).join('')}</div>`;
-  if(normal.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title">其他</span><span style="font-size:11px;color:var(--text-muted)">${normal.length}</span></div><div class="inv-list">${normal.map(it=>invRenderRow(it)).join('')}</div>`;
-  if(!pool.length)html='<p style="text-align:center;padding:32px 0;color:var(--text-muted)">目前沒有項目</p>';
-  content.innerHTML=html;
+  try{
+    if(urgent.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title red">需要注意</span><span style="font-size:11px;color:var(--text-muted)">${urgent.length}</span></div><div class="inv-list">${urgent.map(it=>invRenderRow(it)).join('')}</div>`;
+    if(warn.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title orange">即將到期 / 快用完</span><span style="font-size:11px;color:var(--text-muted)">${warn.length}</span></div><div class="inv-list">${warn.map(it=>invRenderRow(it)).join('')}</div>`;
+    if(!isRestockMode&&missingDate.length)html+=`<div class="inv-sec-head missing-head"><span class="inv-sec-title amber">📝 待補效期</span><span style="font-size:11px;color:#a16207">${missingDate.length} 項，請點選日期補填</span></div><div class="inv-list missing-list">${missingDate.map(it=>invRenderRow(it,true,true)).join('')}</div>`;
+    if(normal.length)html+=`<div class="inv-sec-head"><span class="inv-sec-title">其他</span><span style="font-size:11px;color:var(--text-muted)">${normal.length}</span></div><div class="inv-list">${normal.map(it=>invRenderRow(it)).join('')}</div>`;
+    if(!pool.length)html='<p style="text-align:center;padding:32px 0;color:var(--text-muted)">目前沒有項目</p>';
+    content.innerHTML=html;
+  }catch(e){
+    console.error('renderInventoryPage 渲染錯誤:',e);
+    content.innerHTML='<p style="text-align:center;padding:32px 0;color:var(--text-muted)">載入失敗，請點分頁切換後再試</p>';
+  }
   if(typeof _invSwipeBind==='function')_invSwipeBind();
   _syncInvHeaderBtns();
 }
@@ -3348,7 +3378,7 @@ function twRenderProg(days){
 
 function twRenderDay(d){
   const sched=twGetSchedule();
-  const items=sched.filter(s=>s.date===d);
+  const items=sched.filter(s=>s.date===d).sort((a,b)=>(a.status==='done'?1:0)-(b.status==='done'?1:0));
   const pending=items.filter(s=>s.status==='pending');
   const isToday=d===todayStr,isPast=d<todayStr;
   const hasOv=isPast&&pending.length>0;
@@ -3375,6 +3405,9 @@ function twRenderDay(d){
       const isDone=s.status==='done',isOv=!isDone&&isPast;
       // 月定期任務徽章
       const recurBadge=s.isMonthly?`<span style="font-size:9px;background:#ede9fe;color:#7c3aed;padding:1px 6px;border-radius:999px;font-weight:700;flex-shrink:0" title="${s.freqHint||'定期任務'}">♻ 定期</span>`:'';
+      // 本次備註
+      const note=twGetOccurrenceNote(s.id,s.type,d);
+      const noteRow=note?`<div class="tw-occ-note">📝 ${note}</div>`:'';
       return`<div class="tw-irow">
         <div class="tw-icb ${isDone ? (s.type==='hw' ? 'tw-done tw-hw-done' : 'tw-done') : ''}" onclick="twToggleDone('${s.id}','${s.type}','${d}')"></div>
         <div class="tw-iinfo">
@@ -3385,9 +3418,11 @@ function twRenderDay(d){
             ${recurBadge}
             ${isOv?`<span class="tw-ovbadge">逾期</span>`:''}
           </div>
+          ${noteRow}
         </div>
         <div class="tw-ibtns">
           ${!isDone?`<button class="tw-ib tw-dly" onclick="twOpenDelay('${s.id}','${s.type}',event)"><span class="material-symbols-outlined" style="font-size:17px">schedule</span></button>`:''}
+          <button class="tw-ib tw-note-btn ${note?'has-note':''}" onclick="twOpenNote('${s.id}','${s.type}','${d}',event)" title="本次備註"><span class="material-symbols-outlined" style="font-size:17px">edit_note</span></button>
           <button class="tw-ib tw-del" onclick="twRemoveItem('${s.id}','${s.type}',event)"><span class="material-symbols-outlined" style="font-size:17px">delete</span></button>
         </div>
       </div>`;
@@ -3630,6 +3665,64 @@ function twCloseDelay() {
   const sec = document.getElementById('twCustomDateSection');
   if(sec) sec.classList.remove('show');
 }
+function twCloseAnySheet(){
+  if(document.getElementById('tw-notesh')?.classList.contains('show'))twCloseNote();
+  else twCloseDelay();
+}
+// ── 本次備註 ────────────────────────────────────────────────
+let twNoteTarget=null;
+function _twBaseId(sid,stype){
+  if(_isXDid(sid))return _parseXDid(sid).realId;
+  if(stype==='task'){
+    if(typeof sid==='string'&&sid.startsWith('DAYSFUT::'))return sid.split('::')[1];
+    if(typeof sid==='string'&&sid.startsWith('VIRTUAL::'))return parseVirtualTaskId(sid)?.templateId||sid;
+  }
+  return sid;
+}
+function twGetOccurrenceNote(sid,stype,date){
+  const bid=_twBaseId(sid,stype);
+  if(stype==='hw')return housework.find(h=>h.id===bid)?.occurrenceNotes?.[date]||'';
+  return tasks.find(t=>t.id===bid)?.occurrenceNotes?.[date]||'';
+}
+function twOpenNote(sid,stype,date,e){
+  if(e)e.stopPropagation();
+  const bid=_twBaseId(sid,stype);
+  const name=stype==='hw'?housework.find(h=>h.id===bid)?.name:tasks.find(t=>t.id===bid)?.title;
+  const existNote=twGetOccurrenceNote(sid,stype,date);
+  twNoteTarget={sid,stype,date,bid};
+  document.getElementById('tw-note-item-name').textContent=name||'';
+  document.getElementById('tw-note-input').value=existNote;
+  document.getElementById('tw-notesh').classList.add('show');
+  document.getElementById('tw-scrim').classList.add('show');
+  setTimeout(()=>document.getElementById('tw-note-input').focus(),150);
+}
+function twCloseNote(){
+  twNoteTarget=null;
+  document.getElementById('tw-notesh').classList.remove('show');
+  document.getElementById('tw-scrim').classList.remove('show');
+}
+function twSaveNote(){
+  if(!twNoteTarget)return;
+  const{bid,stype,date}=twNoteTarget;twNoteTarget=null;
+  const text=document.getElementById('tw-note-input').value.trim();
+  if(stype==='hw'){
+    const h=housework.find(x=>x.id===bid);if(!h)return;
+    if(!h.occurrenceNotes)h.occurrenceNotes={};
+    if(text)h.occurrenceNotes[date]=text;else delete h.occurrenceNotes[date];
+  }else{
+    const t=tasks.find(x=>x.id===bid);if(!t)return;
+    if(!t.occurrenceNotes)t.occurrenceNotes={};
+    if(text)t.occurrenceNotes[date]=text;else delete t.occurrenceNotes[date];
+  }
+  saveData();twCloseNote();showToast(text?'備註已儲存':'備註已清除');twRender();
+}
+function twClearNote(){
+  if(!twNoteTarget)return;
+  const{bid,stype,date}=twNoteTarget;twNoteTarget=null;
+  if(stype==='hw'){const h=housework.find(x=>x.id===bid);if(h?.occurrenceNotes)delete h.occurrenceNotes[date];}
+  else{const t=tasks.find(x=>x.id===bid);if(t?.occurrenceNotes)delete t.occurrenceNotes[date];}
+  saveData();twCloseNote();showToast('備註已清除');twRender();
+}
 
 function twToggleCustomDate() {
   const sec = document.getElementById('twCustomDateSection');
@@ -3850,7 +3943,7 @@ let locations=[];
 let fpCurrentRoom=null,fpHighlightSubloc=null;
 let locMgrTab='rooms',locMgrRoom=null,locMgrOpenRooms=new Set();
 
-function locFindSubloc(sublocId){for(const room of locations){const s=(room.subLocations||[]).find(sl=>sl.id===sublocId);if(s)return s;}return null;}
+function locFindSubloc(sublocId){for(const room of locations){if(!room)continue;const s=(room.subLocations||[]).find(sl=>sl.id===sublocId);if(s)return s;}return null;}
 function locFindRoomBySubloc(sublocId){return locations.find(r=>(r.subLocations||[]).some(sl=>sl.id===sublocId))||null;}
 function locFindRoomByName(name){return locations.find(r=>r.name===name)||null;}
 function locGenId(prefix){return prefix+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
@@ -4781,85 +4874,10 @@ function shopSetSub(mode){
 }
 // ══ END SHOPPING LIST ═══════════════════════════════════════════════════
 
-// ── INIT（由底部 initFirebase() 呼叫）──────────────────────
-function appInit(){
-  loadData();
-  initIdentity();
-  renderAll();
-  setTimeout(()=>{
-    twRender();
-    document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'});
-  },200);
-}
+// ── INIT ──────────────────────────────────────────────────
+loadData();renderAll();
+// Init TW weekly on load
+setTimeout(()=>{twRender();document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'});},200);
 </script>
-
-<!-- Firebase 初始化：放在 body 最底部，確保 SDK 完全載入後才執行 -->
-<script>
-(function initFirebase(){
-  try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-
-    // ── 連線狀態監控：斷線自動重連 ──────────────────────
-    db.ref('.info/connected').on('value', snap => {
-      if(snap.val()){
-        // 僅在監聽已中斷時重建（不更新狀態，避免假的「已同步」）
-        if(!_fbListening){
-          console.log('Firebase reconnected, re-establishing listener...');
-          fbSetStatus('connecting');
-          loadData();
-        }
-      } else {
-        fbSetStatus('offline');
-      }
-    });
-
-    // ── keepSynced：強制保持同步（iOS PWA 關鍵）──────────
-    db.ref('rooms/'+_roomToken).keepSynced(true);
-
-    // ── visibilitychange：回到前景時重連 ────────────────
-    document.addEventListener('visibilitychange', () => {
-      if(document.visibilityState === 'visible' && db){
-        console.log('App visible, checking Firebase connection...');
-        firebase.database().goOnline();
-        setTimeout(() => {
-          if(!_fbListening){
-            console.log('Listener lost, reloading data...');
-            loadData();
-          }
-        }, 800);
-      }
-    });
-
-    // ── window focus：電腦切回視窗時重連 ────────────────
-    window.addEventListener('focus', () => {
-      if(db) firebase.database().goOnline();
-    });
-
-    console.log('Firebase initialized OK');
-  } catch(e) {
-    console.error('Firebase init error:', e);
-    fbSetStatus('error');
-  }
-  appInit();
-})();
-</script>
-
-<!-- ── IDENTITY PICKER ── -->
-<div id="identityModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:24px">
-  <div style="background:#fff;border-radius:20px;padding:32px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25)">
-    <div style="font-size:36px;margin-bottom:12px">👋</div>
-    <h2 style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:8px">你是誰？</h2>
-    <p style="font-size:13px;color:#64748b;margin-bottom:24px">設定後 app 會預設顯示你的項目<br>可在設定中隨時更改</p>
-    <div style="display:flex;gap:12px">
-      <button onclick="setIdentity('sindy')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
-        <div style="font-size:28px;margin-bottom:6px">👧🏻</div>Sindy
-      </button>
-      <button onclick="setIdentity('bf')" style="flex:1;padding:16px 8px;border:2px solid #e2e8f0;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:15px;font-weight:700;color:#1e293b">
-        <div style="font-size:28px;margin-bottom:6px">🎅🏻</div>Jack
-      </button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
