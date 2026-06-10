@@ -1436,6 +1436,8 @@ const firebaseConfig = {
   appId: "1:792978110342:web:8dde74d7ca02af00561e07"
 };
 let db = null;
+// ── Firebase 初始化 ───────────────────────────────────────────
+try { firebase.initializeApp(firebaseConfig); db = firebase.database(); } catch(e) { console.error('Firebase init:',e); }
 
 // ── 存取控制：固定 token ──────────────────────────────────────
 const FIXED_TOKEN = 'e7ce730391515c7c7377b12f0e867ccfb7c85e12a71c6f9da3a68e6e215ef4d0';
@@ -2392,6 +2394,15 @@ function invFilterPool(){
 function renderInventoryPage(){
   const strip=document.getElementById('inv-alert-strip'),content=document.getElementById('inv-content');
   if(!strip||!content)return;
+  // 購物清單 tab：只刷新購物清單，不動 inv-content 顯示狀態（避免 Firebase 回呼覆蓋）
+  if(invCurrentTab==='shopping'){
+    const _sp=document.getElementById('inv-shopping-panel');
+    if(_sp)_sp.style.display='block';
+    content.style.display='none';
+    shopSyncRestock();
+    if(typeof shopSubTab!=='undefined'&&shopSubTab==='restock'){shopRenderRestock();}else if(typeof shopRender==='function'){shopRender();}
+    return;
+  }
   content.style.display=''; // 確保不因 inline style 遮蔽內容
   // 待注意徽章：效期緊急/逾期 ∪ 補貨低於門檻 的聯集數
   const alertCnt=inventory.filter(i=>{
@@ -4876,6 +4887,8 @@ function shopSetSub(mode){
 
 // ── INIT ──────────────────────────────────────────────────
 loadData();renderAll();
+// 頁面從背景回到前景時重新確認同步
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&!_fbListening) loadData(); });
 // Init TW weekly on load
 setTimeout(()=>{twRender();document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'});},200);
 </script>
