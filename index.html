@@ -3151,10 +3151,22 @@ document.addEventListener('click',function(e){
 // ══════════════════════════════════════════════════════════
 let twWeekOffset=0,twOpenDays=new Set([todayStr]),twOpenDropDay=null,twDelayTarget=null;
 let twDropTab = 'task'; // 新增：記錄下拉選單目前停留在哪一個頁籤
+let twDropSearch = ''; // A: 搜尋關鍵字
 function twSetDropTab(tab, e) {
   e.stopPropagation();
   twDropTab = tab;
+  twDropSearch = ''; // 切換頁籤時清除搜尋
   twRender(); // 切換頁籤後重新渲染畫面
+}
+function twSetDropSearch(q, e) {
+  if(e) e.stopPropagation();
+  twDropSearch = q;
+  twRender();
+  requestAnimationFrame(() => {
+    if(!twOpenDropDay) return;
+    const inp = document.querySelector('#tw-adrop-' + twOpenDropDay + ' .tw-drop-search');
+    if(inp){ inp.focus(); const l = q.length; inp.setSelectionRange(l, l); }
+  });
 }
 let twDragHintShown=false,twProgMode='day';
 let twDrag={active:false,sid:null,ghost:null,overDate:null,startEl:null,longPressTimer:null,startX:0,startY:0};
@@ -3449,9 +3461,9 @@ function twRenderDay(d){
     ...housework.filter(h=>h.extraDates&&h.extraDates.includes(d)).map(h=>h.id)
   ]);
 
-  // 抓取「完整」的任務模板與家事清單
-  const allTaskTemplates = tasks.filter(t => !t.templateId); 
-  const allHw = housework;
+  // 抓取「完整」的任務模板與家事清單，並依注音字母排序 (B)
+  const allTaskTemplates = tasks.filter(t => !t.templateId).sort((a,b)=>a.title.localeCompare(b.title,'zh-TW'));
+  const allHw = [...housework].sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
 
   let dropHtml='';
   if(isDropOpen){
@@ -3462,30 +3474,39 @@ function twRenderDay(d){
         <button onclick="twSetDropTab('hw', event)" style="flex:1; justify-content:center; padding:10px 0; font-size:12px; font-weight:700; border:none; background:none; cursor:pointer; color:${twDropTab==='hw'?'#d97706':'var(--text-muted)'}; border-bottom:2px solid ${twDropTab==='hw'?'#d97706':'transparent'}">🏠 家事</button>
       </div>
     `;
+    // A: 搜尋框
+    const searchHtml = `<div style="padding:6px 8px;border-bottom:0.5px solid var(--border-light)" onclick="event.stopPropagation()"><div style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 10px"><span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted)">search</span><input class="tw-drop-search" type="text" value="${twDropSearch.replace(/"/g,'&quot;')}" placeholder="搜尋…" onclick="event.stopPropagation()" oninput="twSetDropSearch(this.value,event)" style="border:none;outline:none;background:transparent;flex:1;font-size:12px;color:var(--text-primary);font-family:'Noto Sans TC',sans-serif;min-width:0"></div></div>`;
 
+    const searchQ = twDropSearch.trim().toLowerCase();
     let inner = '';
     // 根據目前選取的頁籤顯示對應的完整列表
     if (twDropTab === 'task') {
-      if(allTaskTemplates.length){
-        allTaskTemplates.forEach(t=>{
+      const filtered = searchQ ? allTaskTemplates.filter(t=>t.title.toLowerCase().includes(searchQ)) : allTaskTemplates;
+      if(allTaskTemplates.length===0){
+        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">無任務可排</div>`;
+      }else if(filtered.length===0){
+        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">找不到符合項目</div>`;
+      }else{
+        filtered.forEach(t=>{
           const already = assignedTaskIds.has(t.id);
           inner+=`<button onclick="twAssignTask('${t.id}','${d}',event)" class="${already?'tw-alr':''}">${t.title}${already?'<span class="tw-anote">已排</span>':''}</button>`;
         });
-      }else{
-        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">無任務可排</div>`;
       }
     } else {
-      if(allHw.length){
-        allHw.forEach(h=>{
+      const filtered = searchQ ? allHw.filter(h=>h.name.toLowerCase().includes(searchQ)) : allHw;
+      if(allHw.length===0){
+        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">無家事可排</div>`;
+      }else if(filtered.length===0){
+        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">找不到符合項目</div>`;
+      }else{
+        filtered.forEach(h=>{
           const already = assignedHwIds.has(h.id);
           inner+=`<button onclick="twAssignHw('${h.id}','${d}',event)" class="tw-hwo ${already?'tw-alr':''}">${h.name}${already?'<span class="tw-anote">已排</span>':''}</button>`;
         });
-      }else{
-        inner+=`<div style="padding:16px 0; text-align:center; font-size:12px; color:var(--text-muted)">無家事可排</div>`;
       }
     }
 
-    dropHtml=`<div class="tw-adrop" id="tw-adrop-${d}" style="padding-top:0">${tabHtml}<div style="padding:4px 0">${inner}</div></div>`;
+    dropHtml=`<div class="tw-adrop" id="tw-adrop-${d}" style="padding-top:0">${tabHtml}${searchHtml}<div style="padding:4px 0">${inner}</div></div>`;
   }
   return`<div class="tw-dc ${isToday?'tw-today':''} ${isPast?'tw-past':''} ${hasOv?'tw-has-ov':''}" id="tw-dr-${d}" data-date="${d}">
     <div class="tw-dhdr" onclick="twToggleDay('${d}')">
@@ -3511,8 +3532,8 @@ function twRenderDay(d){
 // ── Actions ──
 function twToggleDay(d){if(twOpenDays.has(d))twOpenDays.delete(d);else twOpenDays.add(d);twOpenDropDay=null;twRender()}
 function twToggleDrop(d,e){
-  e.stopPropagation();twOpenDropDay=(twOpenDropDay===d)?null:d;twRender();
-  if(twOpenDropDay){requestAnimationFrame(()=>{const el=document.getElementById('tw-adrop-'+d);if(!el)return;if(el.getBoundingClientRect().bottom>window.innerHeight-100)el.classList.add('flip');});}
+  e.stopPropagation();twOpenDropDay=(twOpenDropDay===d)?null:d;twDropSearch='';twRender();
+  if(twOpenDropDay){requestAnimationFrame(()=>{const el=document.getElementById('tw-adrop-'+d);if(!el)return;if(el.getBoundingClientRect().bottom>window.innerHeight-100)el.classList.add('flip');const inp=el.querySelector('.tw-drop-search');if(inp)inp.focus();});}
 }
 function _isXDid(sid){return sid.includes('::extra::');}
 function _parseXDid(sid){const p=sid.split('::extra::');return{realId:p[0],date:p[1]};}
