@@ -4957,6 +4957,8 @@ async function invOpenScan() {
   document.getElementById('inv-scan-date-list').innerHTML = '';
   document.getElementById('inv-scan-status').textContent = '啟動相機中…';
   document.getElementById('inv-scan-capture-btn').disabled = false;
+  document.getElementById('inv-scan-manual').value = '';
+  document.getElementById('inv-scan-manual-preview').textContent = '';
   const noCam = document.getElementById('inv-scan-no-cam');
   if(noCam) noCam.style.display = 'flex';
 
@@ -5042,18 +5044,52 @@ function _invParseDates(text) {
   const p1 = /20(\d{2})[\s\/\-\.年](0?[1-9]|1[0-2])[\s\/\-\.月](0?[1-9]|[12]\d|3[01])日?/g;
   const p2 = /(?<!\d)(20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(?!\d)/g;
   const p3 = /(?<!\d)([2-3]\d)[\/\-\.](0?[1-9]|1[0-2])[\/\-\.](0?[1-9]|[12]\d|3[01])(?!\d)/g;
+  const p4 = /(?<!\d)(20\d{2})[\s\/\-\.年](0?[1-9]|1[0-2])月?(?![\s\/\-\.月\d])/g;
+  const p5 = /(?<!\d)(20\d{2})(0[1-9]|1[0-2])(?!\d)/g;
+  const p6 = /(?<!\d)([2-3]\d)[\/\-\.](0?[1-9]|1[0-2])(?![\s\/\-\.\d])/g;
   let m;
   while((m = p1.exec(text)) !== null) { const y='20'+m[1],mo=m[2].padStart(2,'0'),d=m[3].padStart(2,'0'); if(_invValidDate(y,mo,d)) found.add(`${y}-${mo}-${d}`); }
   while((m = p2.exec(text)) !== null) { const y=m[1],mo=m[2],d=m[3]; if(_invValidDate(y,mo,d)) found.add(`${y}-${mo}-${d}`); }
   while((m = p3.exec(text)) !== null) { const yy=parseInt(m[1]); if(yy>=25&&yy<=40){ const y='20'+m[1],mo=m[2].padStart(2,'0'),d=m[3].padStart(2,'0'); if(_invValidDate(y,mo,d)) found.add(`${y}-${mo}-${d}`); } }
+  while((m = p4.exec(text)) !== null) { const y=m[1],mo=m[2].padStart(2,'0'),d=String(_invLastDay(y,mo)).padStart(2,'0'); found.add(`${y}-${mo}-${d}`); }
+  while((m = p5.exec(text)) !== null) { const y=m[1],mo=m[2],d=String(_invLastDay(y,mo)).padStart(2,'0'); if(!found.has(`${y}-${mo}-`)) found.add(`${y}-${mo}-${d}`); }
+  while((m = p6.exec(text)) !== null) { const yy=parseInt(m[1]); if(yy>=25&&yy<=40){ const y='20'+m[1],mo=m[2].padStart(2,'0'),d=String(_invLastDay(y,mo)).padStart(2,'0'); found.add(`${y}-${mo}-${d}`); } }
   const nowY = new Date().getFullYear();
   return [...found].filter(dt=>{ const y=parseInt(dt); return y>=nowY-2&&y<=nowY+10; }).sort();
 }
 function _invValidDate(y,mo,d){ const date=new Date(`${y}-${mo}-${d}`); return date instanceof Date&&!isNaN(date)&&date.getDate()===+d; }
+function _invLastDay(y,mo){ return new Date(parseInt(y),parseInt(mo),0).getDate(); }
 function invPickScanDate(isoDate) {
   document.getElementById('inv-f-expiry').value = isoDate;
   invCloseScan();
   showToast('到期日已填入：' + isoDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3'), 'success');
+}
+function _invParseManualDate(val) {
+  const v = val.trim().replace(/[年月]/g,'\/').replace(/日/g,'').replace(/\s/g,'');
+  if(/^20\d{6}$/.test(v)){const y=v.slice(0,4),mo=v.slice(4,6),d=v.slice(6,8);if(_invValidDate(y,mo,d))return`${y}-${mo}-${d}`;}
+  if(/^20\d{4}$/.test(v)){const y=v.slice(0,4),mo=v.slice(4,6);if(+mo>=1&&+mo<=12){const d=String(_invLastDay(y,mo)).padStart(2,'0');return`${y}-${mo}-${d}`;}}
+  const m1=v.match(/^(20\d{2})[\/\-\.](0?[1-9]|1[0-2])[\/\-\.](0?[1-9]|[12]\d|3[01])$/);
+  if(m1){const y=m1[1],mo=m1[2].padStart(2,'0'),d=m1[3].padStart(2,'0');if(_invValidDate(y,mo,d))return`${y}-${mo}-${d}`;}
+  const m1b=v.match(/^(20\d{2})[\/\-\.](0?[1-9]|1[0-2])$/);
+  if(m1b){const y=m1b[1],mo=m1b[2].padStart(2,'0'),d=String(_invLastDay(y,mo)).padStart(2,'0');return`${y}-${mo}-${d}`;}
+  const m2=v.match(/^([2-3]\d)[\/\-\.](0?[1-9]|1[0-2])[\/\-\.](0?[1-9]|[12]\d|3[01])$/);
+  if(m2){const yy=parseInt(m2[1]);if(yy>=25&&yy<=40){const y='20'+m2[1],mo=m2[2].padStart(2,'0'),d=m2[3].padStart(2,'0');if(_invValidDate(y,mo,d))return`${y}-${mo}-${d}`;}}
+  const m2b=v.match(/^([2-3]\d)[\/\-\.](0?[1-9]|1[0-2])$/);
+  if(m2b){const yy=parseInt(m2b[1]);if(yy>=25&&yy<=40){const y='20'+m2b[1],mo=m2b[2].padStart(2,'0'),d=String(_invLastDay(y,mo)).padStart(2,'0');return`${y}-${mo}-${d}`;}}
+  return null;
+}
+function invManualPreview(val) {
+  const el = document.getElementById('inv-scan-manual-preview');
+  if(!val.trim()){el.textContent='';return;}
+  const parsed = _invParseManualDate(val);
+  if(parsed){el.style.color='var(--primary)';el.textContent='→ '+parsed.replace(/(\d{4})-(\d{2})-(\d{2})/,'$1 年 $2 月 $3 日');}
+  else{el.style.color='#ef4444';el.textContent='無法辨識，支援格式：20261015、2026/10/15、26/10/15';}
+}
+function invManualConfirm() {
+  const val = document.getElementById('inv-scan-manual').value;
+  const parsed = _invParseManualDate(val);
+  if(!parsed){showToast('無法辨識日期，請確認格式','error');return;}
+  invPickScanDate(parsed);
 }
 
 // Init TW weekly on load
@@ -5087,6 +5123,19 @@ setTimeout(()=>{twRender();document.getElementById('tw-dr-'+todayStr)?.scrollInt
       <div id="inv-scan-results" style="display:none;margin-top:14px">
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600">偵測到的日期（點選填入）：</div>
         <div id="inv-scan-date-list"></div>
+      </div>
+      <!-- 手動輸入備案 -->
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border-light)">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600">✏️ 掃描不到？直接輸入數字</div>
+        <div style="display:flex;gap:8px">
+          <input id="inv-scan-manual" type="text" inputmode="numeric" placeholder="如：20261015 或 2026/10/15"
+            oninput="invManualPreview(this.value)"
+            onkeydown="if(event.key==='Enter')invManualConfirm()"
+            style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary);transition:border-color .15s"
+            onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+          <button onclick="invManualConfirm()" style="padding:10px 14px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;white-space:nowrap">填入</button>
+        </div>
+        <div id="inv-scan-manual-preview" style="font-size:12px;margin-top:6px;min-height:18px;padding-left:2px"></div>
       </div>
     </div>
   </div>
