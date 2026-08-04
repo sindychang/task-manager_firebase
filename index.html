@@ -1264,7 +1264,7 @@
     <div class="form-group"><label>備註</label><input type="text" id="inv-f-note" placeholder="品牌、規格…（選填）"></div>
     <!-- 有效期限 -->
     <div class="icond" id="inv-g-expiry">
-      <div class="form-group"><label>到期日</label><input type="date" id="inv-f-expiry"></div>
+      <div class="form-group"><label>到期日</label><div style="display:flex;gap:8px;align-items:center"><input type="date" id="inv-f-expiry" style="flex:1"><button onclick="invOpenScan()" title="掃描辨識" style="flex-shrink:0;padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center" aria-label="掃描辨識到期日"><span class="material-symbols-outlined" style="font-size:20px;color:var(--primary)">document_scanner</span></button></div></div>
       <div class="form-group"><label>提醒時間</label>
         <select id="inv-f-remind-days" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary)">
           <option value="7">到期前 7 天</option>
@@ -4945,8 +4945,151 @@ function shopSetSub(mode){
 loadData();renderAll();
 // 頁面從背景回到前景時重新確認同步
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&!_fbListening) loadData(); });
+// ══════════════════════════════════════════════════════════
+// 掃描辨識到期日
+// ══════════════════════════════════════════════════════════
+let _scanStream = null;
+
+async function invOpenScan() {
+  const modal = document.getElementById('inv-scan-modal');
+  modal.style.display = 'flex';
+  document.getElementById('inv-scan-results').style.display = 'none';
+  document.getElementById('inv-scan-date-list').innerHTML = '';
+  document.getElementById('inv-scan-status').textContent = '啟動相機中…';
+  document.getElementById('inv-scan-capture-btn').disabled = false;
+  const noCam = document.getElementById('inv-scan-no-cam');
+  if(noCam) noCam.style.display = 'flex';
+
+  try {
+    _scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } }
+    });
+    const video = document.getElementById('inv-scan-video');
+    video.srcObject = _scanStream;
+    video.onloadedmetadata = () => { if(noCam) noCam.style.display = 'none'; };
+    document.getElementById('inv-scan-status').textContent = '將日期對準框內，按下擷取';
+  } catch(e) {
+    document.getElementById('inv-scan-status').textContent = '無法開啟相機：' + (e.message || e);
+    document.getElementById('inv-scan-capture-btn').disabled = true;
+  }
+}
+
+function invCloseScan() {
+  if(_scanStream){ _scanStream.getTracks().forEach(t => t.stop()); _scanStream = null; }
+  const video = document.getElementById('inv-scan-video');
+  if(video) video.srcObject = null;
+  document.getElementById('inv-scan-modal').style.display = 'none';
+}
+
+async function invCaptureScan() {
+  const video = document.getElementById('inv-scan-video');
+  const canvas = document.getElementById('inv-scan-canvas');
+  const btn = document.getElementById('inv-scan-capture-btn');
+  const statusEl = document.getElementById('inv-scan-status');
+  if(!video.videoWidth){ statusEl.textContent = '相機尚未就緒，請稍候'; return; }
+
+  btn.disabled = true;
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const cx = Math.round(vw * 0.08), cy = Math.round(vh * 0.28);
+  const cw = Math.round(vw * 0.84), ch = Math.round(vh * 0.44);
+  canvas.width = cw; canvas.height = ch;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, cx, cy, cw, ch, 0, 0, cw, ch);
+
+  const imgData = ctx.getImageData(0, 0, cw, ch);
+  const px = imgData.data;
+  const factor = (259 * (85 + 255)) / (255 * (259 - 85));
+  for(let i = 0; i < px.length; i += 4) {
+    const gray = 0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2];
+    const val = Math.min(255, Math.max(0, Math.round(factor * (gray - 128) + 128)));
+    px[i] = px[i+1] = px[i+2] = val;
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  if(!window.Tesseract) {
+    statusEl.textContent = '載入 OCR 引擎（首次約需 10 秒）…';
+    try {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
+        s.onload = res; s.onerror = () => rej(new Error('載入失敗，請確認網路連線'));
+        document.head.appendChild(s);
+      });
+    } catch(e) { statusEl.textContent = e.message; btn.disabled = false; return; }
+  }
+
+  statusEl.textContent = '辨識中…';
+  try {
+    const { data: { text } } = await Tesseract.recognize(canvas, 'eng', {
+      logger: m => { if(m.status === 'recognizing text') statusEl.textContent = `辨識中 ${Math.round(m.progress * 100)}%`; }
+    });
+    const dates = _invParseDates(text);
+    if(dates.length) {
+      statusEl.textContent = `找到 ${dates.length} 個日期，點選填入`;
+      document.getElementById('inv-scan-date-list').innerHTML = dates.map(dt =>
+        `<button onclick="invPickScanDate('${dt}')" style="display:block;width:100%;text-align:left;padding:11px 14px;margin-bottom:7px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--text-primary);transition:border-color .15s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">${dt.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1 年 $2 月 $3 日')}</button>`
+      ).join('');
+      document.getElementById('inv-scan-results').style.display = 'block';
+    } else {
+      statusEl.textContent = '未偵測到日期，請調整角度後重試';
+    }
+  } catch(e) { statusEl.textContent = '辨識失敗：' + (e.message || e); }
+  btn.disabled = false;
+}
+
+function _invParseDates(text) {
+  const found = new Set();
+  const p1 = /20(\d{2})[\s\/\-\.年](0?[1-9]|1[0-2])[\s\/\-\.月](0?[1-9]|[12]\d|3[01])日?/g;
+  const p2 = /(?<!\d)(20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(?!\d)/g;
+  const p3 = /(?<!\d)([2-3]\d)[\/\-\.](0?[1-9]|1[0-2])[\/\-\.](0?[1-9]|[12]\d|3[01])(?!\d)/g;
+  let m;
+  while((m = p1.exec(text)) !== null) { const y='20'+m[1],mo=m[2].padStart(2,'0'),d=m[3].padStart(2,'0'); if(_invValidDate(y,mo,d)) found.add(`${y}-${mo}-${d}`); }
+  while((m = p2.exec(text)) !== null) { const y=m[1],mo=m[2],d=m[3]; if(_invValidDate(y,mo,d)) found.add(`${y}-${mo}-${d}`); }
+  while((m = p3.exec(text)) !== null) { const yy=parseInt(m[1]); if(yy>=25&&yy<=40){ const y='20'+m[1],mo=m[2].padStart(2,'0'),d=m[3].padStart(2,'0'); if(_invValidDate(y,mo,d)) found.add(`${y}-${mo}-${d}`); } }
+  const nowY = new Date().getFullYear();
+  return [...found].filter(dt=>{ const y=parseInt(dt); return y>=nowY-2&&y<=nowY+10; }).sort();
+}
+function _invValidDate(y,mo,d){ const date=new Date(`${y}-${mo}-${d}`); return date instanceof Date&&!isNaN(date)&&date.getDate()===+d; }
+function invPickScanDate(isoDate) {
+  document.getElementById('inv-f-expiry').value = isoDate;
+  invCloseScan();
+  showToast('到期日已填入：' + isoDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3'), 'success');
+}
+
 // Init TW weekly on load
 setTimeout(()=>{twRender();document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'center'});},200);
 </script>
+
+<!-- ══ 掃描辨識到期日 Modal ══ -->
+<div id="inv-scan-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)invCloseScan()">
+  <div style="background:var(--surface);border-radius:16px;width:min(420px,100%);max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.4)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border-light)">
+      <span style="font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px"><span class="material-symbols-outlined" style="font-size:18px;color:var(--primary)">document_scanner</span>掃描辨識到期日</span>
+      <button onclick="invCloseScan()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);line-height:1;padding:4px">✕</button>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="position:relative;background:#111;border-radius:10px;overflow:hidden;aspect-ratio:4/3;margin-bottom:10px">
+        <video id="inv-scan-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
+        <div style="position:absolute;inset:0;pointer-events:none">
+          <div style="position:absolute;top:28%;left:8%;width:84%;height:44%;border:2px solid rgba(255,255,150,0.95);border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,0.38)"></div>
+          <div style="position:absolute;top:calc(28% - 22px);left:8%;font-size:11px;color:rgba(255,255,150,0.95);background:rgba(0,0,0,0.55);padding:2px 7px;border-radius:4px;font-weight:600">將日期對準此框</div>
+        </div>
+        <div id="inv-scan-no-cam" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#aaa;font-size:13px">
+          <span class="material-symbols-outlined" style="font-size:40px;color:#555">videocam_off</span>啟動相機中…
+        </div>
+      </div>
+      <canvas id="inv-scan-canvas" style="display:none"></canvas>
+      <div id="inv-scan-status" style="text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:10px;min-height:18px"></div>
+      <div style="display:flex;gap:8px">
+        <button id="inv-scan-capture-btn" onclick="invCaptureScan()" style="flex:1;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px"><span class="material-symbols-outlined" style="font-size:18px">photo_camera</span>擷取辨識</button>
+        <button onclick="invCloseScan()" style="padding:12px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:var(--text-muted)">取消</button>
+      </div>
+      <div id="inv-scan-results" style="display:none;margin-top:14px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600">偵測到的日期（點選填入）：</div>
+        <div id="inv-scan-date-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
