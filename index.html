@@ -4,7 +4,7 @@
   <link rel="apple-touch-icon" href="chiikawa_task.png">
   <link rel="icon" type="image/png" href="chiikawa_task.png">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="家務管理App">
@@ -2850,27 +2850,14 @@ function invRenderRow(it,showLoc=true,hideMissingChip=false){
   const locLine=showLoc?`<span class="inv-loc-label">${it.location}</span>`:'';
   const catLine=it.category&&it.category!=='其他'?`<span class="inv-loc-label">${it.category}</span>`:'';
   const subSep=locLine&&catLine?`<span style="color:var(--text-muted);font-size:10px;margin:0 1px">·</span>`:'';
-  // 🌟 滑動快速操作：依物品類型決定動作集
-  let swipeActs='';
-  if(it.restock){
-    swipeActs+=`<button class="swipe-act sw-amber" onclick="event.stopPropagation();invSwipeAct('${it.id}','dec')"><span class="material-symbols-outlined" style="font-size:18px">remove</span><span>-1</span></button>`;
-    swipeActs+=`<button class="swipe-act sw-green" onclick="event.stopPropagation();invSwipeAct('${it.id}','inc')"><span class="material-symbols-outlined" style="font-size:18px">add</span><span>+1</span></button>`;
-    swipeActs+=`<button class="swipe-act sw-red" onclick="event.stopPropagation();invSwipeAct('${it.id}','empty')"><span class="material-symbols-outlined" style="font-size:18px">close</span><span>用完</span></button>`;
-  }
-  if(it.type==='expiry'&&it.expiryDate){
-    swipeActs+=`<button class="swipe-act sw-blue" onclick="event.stopPropagation();invSwipeAct('${it.id}','postpone')"><span class="material-symbols-outlined" style="font-size:18px">event_repeat</span><span>+30天</span></button>`;
-  }
   return `<div class="inv-item-wrap">
-    <div class="inv-swipe-wrap" data-id="${it.id}">
-      ${swipeActs?`<div class="inv-row-actions">${swipeActs}</div>`:''}
-      <div class="inv-row ${rowCls}" onclick="invToggleDetail('${it.id}')">
-        <div class="inv-dot-item"></div>
-        <div class="inv-info">
-          <div class="inv-name">${it.name}</div>
-          <div class="inv-sub">${locLine}${subSep}${catLine}</div>
-        </div>
-        <div class="inv-right" onclick="event.stopPropagation()">${rightHtml}</div>
+    <div class="inv-row ${rowCls}" onclick="invToggleDetail('${it.id}')">
+      <div class="inv-dot-item"></div>
+      <div class="inv-info">
+        <div class="inv-name">${it.name}</div>
+        <div class="inv-sub">${locLine}${subSep}${catLine}</div>
       </div>
+      <div class="inv-right" onclick="event.stopPropagation()">${rightHtml}</div>
     </div>
     <div class="inv-detail ${rowCls}" id="inv-detail-${it.id}">${detailHtml}${warnBox}</div>
   </div>`;
@@ -4673,15 +4660,13 @@ function updateMemoTabBadges(){
 }
 // 依歸屬把清單分成「我的／共同／他的」區塊（尚未設定身份時不分組，回傳單一區塊）
 function memoOwnerGroups(list){
-  if(!appIdentity)return [{label:'',items:list}];
-  const other=appIdentity==='sindy'?'bf':'sindy';
-  const mine=list.filter(x=>(x.owner||'all')===appIdentity);
+  const bySindy=list.filter(x=>(x.owner||'all')==='sindy');
+  const byBf=list.filter(x=>(x.owner||'all')==='bf');
   const shared=list.filter(x=>(x.owner||'all')==='all');
-  const theirs=list.filter(x=>(x.owner||'all')===other);
   const groups=[];
-  if(mine.length)groups.push({label:'我的',items:mine});
+  if(bySindy.length)groups.push({label:'Sindy的',items:bySindy});
+  if(byBf.length)groups.push({label:'Jack的',items:byBf});
   if(shared.length)groups.push({label:'共同',items:shared});
-  if(theirs.length)groups.push({label:'他的',items:theirs});
   return groups.length?groups:[{label:'',items:list}];
 }
 
@@ -5081,7 +5066,8 @@ function shopRender(){
     el.innerHTML=groups.map((g,p)=>{
       if(!g.length)return '';
       const collapsed=!!shopPrioCollapsed[p];
-      const header=`<div class="${SHOP_PRIO_CLS[p]}" style="display:flex;align-items:center;justify-content:space-between;margin:${p===0?'0':'16px'} 0 8px;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;user-select:none" onclick="shopTogglePrioCollapse(${p})"><span>${SHOP_PRIO_ICON[p]} ${SHOP_PRIO_LABEL[p]}優先</span><span style="display:flex;align-items:center;gap:4px"><span style="opacity:.75;font-weight:600">${g.length} 項</span><span class="material-symbols-outlined" style="font-size:16px;transition:transform .15s;transform:rotate(${collapsed?-90:0}deg)">expand_more</span></span></div>`;
+      const prioColor=['#B4390F','#397487','#0F7A55'][p];
+      const header=`<div style="display:flex;align-items:center;justify-content:space-between;margin:${p===0?'0':'16px'} 0 8px;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;user-select:none;background:var(--border-light);color:${prioColor}" onclick="shopTogglePrioCollapse(${p})"><span>${SHOP_PRIO_ICON[p]} ${SHOP_PRIO_LABEL[p]}優先</span><span style="display:flex;align-items:center;gap:4px"><span style="opacity:.75;font-weight:600">${g.length} 項</span><span class="material-symbols-outlined" style="font-size:16px;transition:transform .15s;transform:rotate(${collapsed?-90:0}deg);color:${prioColor}">expand_more</span></span></div>`;
       return header+(collapsed?'':g.map(shopCardHtml).join(''));
     }).join('');
   } else {
