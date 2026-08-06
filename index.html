@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="家務管理App">
-  <meta name="theme-color" content="#5b52e8">
+  <meta name="theme-color" content="#4E9EB8">
   <title>家事與任務管理 App</title>
   <!-- Firebase SDK (compat version, no bundler needed) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -61,7 +61,7 @@
     /* ── SHOPPING LIST ── */
     .shop-sub-tabs{display:flex;margin:10px 14px 0;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px;max-width:640px;margin-left:auto;margin-right:auto}
     .shop-stab{flex:1;padding:7px 0;border-radius:6px;border:none;background:none;font-size:12px;font-weight:700;color:var(--text-muted);cursor:pointer;text-align:center;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
-    .shop-stab.on{background:var(--surface);color:var(--primary);box-shadow:0 1px 4px rgba(91,82,232,.1)}
+    .shop-stab.on{background:var(--surface);color:var(--primary);box-shadow:0 1px 4px rgba(40,177,222,.1)}
     .shop-body{padding:10px 14px;display:flex;flex-direction:column;gap:7px;max-width:640px;margin:0 auto}
     .shop-filter-box{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border-light)}
     .shop-filter-header{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer;user-select:none}
@@ -79,10 +79,10 @@
     .shop-cb.checked{background:var(--primary);border-color:var(--primary)}
     .shop-cb.checked::after{content:'';width:4px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg) translateY(-1px);display:block}
     .shop-cb.transit{background:#fff7ed;border-color:#f97316;color:#f97316;font-size:13px;user-select:none;line-height:1}
-    .shop-b-high{background:#fee2e2;color:#dc2626}
-    .shop-b-mid{background:#fef3c7;color:#b45309}
-    .shop-b-low{background:#d1fae5;color:#059669}
-    .shop-b-restock{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+    .shop-b-high{background:#FDEECF;color:#B4390F}
+    .shop-b-mid{background:#F0F8FF;color:#397487}
+    .shop-b-low{background:#DDFCF0;color:#0F7A55}
+    .shop-b-restock{background:#FDEECF;color:#B4390F;border:1px solid #F7CBA4}
     .shop-expand{border-top:1px solid var(--border-light);padding:10px 13px;display:none;flex-direction:column;gap:0}
     .shop-expand.open{display:flex}
     .shop-field-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)}
@@ -114,13 +114,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
   <style>
     :root{
-      --primary:#5b52e8;--primary-light:#ede9fe;--primary-dark:#4338ca;
-      --accent:#7c3aed;
+      --primary:#4E9EB8;--primary-light:#F0F8FF;--primary-dark:#397487;
+      --accent:#6CB5CC;
       --success:#10b981;--warning:#d97706;--danger:#dc2626;--danger-light:#fee2e2;
-      --surface:#fff;--bg:#f4f6fb;
-      --border:#e8edf5;--border-light:#f1f5f9;
-      --text-primary:#1e293b;--text-secondary:#475569;--text-muted:#94a3b8;
-      --shadow-sm:0 1px 4px rgba(0,0,0,.07);--shadow-lg:0 8px 32px rgba(0,0,0,.14);
+      --surface:#fff;--bg:#F3F0E9;
+      --border:#E7E2D8;--border-light:#EFEBE2;
+      --text-primary:#212127;--text-secondary:#5B564C;--text-muted:#8A8578;
+      --shadow-sm:none;--shadow-lg:0 8px 32px rgba(0,0,0,.14);
       --radius-sm:8px;--radius-md:14px;
     }
     *{font-family:'Noto Sans TC',sans-serif;-webkit-tap-highlight-color:transparent;box-sizing:border-box}
@@ -154,7 +154,7 @@
     .fp-item-name{font-size:13px;font-weight:600;color:var(--text-primary);flex:1}
     .fp-item-cnt{font-size:11px;color:var(--text-muted)}
     .subloc-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:var(--primary-light);color:var(--primary);cursor:pointer;border:none;font-family:'Noto Sans TC',sans-serif;transition:background .15s}
-    .subloc-tag:hover{background:#ddd6fe}
+    .subloc-tag:hover{background:#D6EFFA}
     .lmgr-tab-bar{display:flex;background:var(--border-light);border-radius:var(--radius-sm);padding:3px;gap:3px;margin-bottom:14px}
     .lmgr-tab{flex:1;padding:7px 4px;font-size:11px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--text-muted);border-radius:6px;transition:all .15s;font-family:'Noto Sans TC',sans-serif;text-align:center}
     .lmgr-tab.on{background:var(--surface);color:var(--text-primary);box-shadow:0 0 0 1px var(--border)}
@@ -179,7 +179,7 @@
     /* ── CARDS / BADGES ── */
     .card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border-light)}
     .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
-    .badge-urgent{background:#fee2e2;color:#dc2626}.badge-normal{background:#dbeafe;color:#2563eb}.badge-low{background:#d1fae5;color:#059669}
+    .badge-urgent{background:#FDEECF;color:#B4390F}.badge-normal{background:#F0F8FF;color:#397487}.badge-low{background:#DDFCF0;color:#0F7A55}
     .section-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
     .section-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .empty-state{text-align:center;padding:32px 16px;color:var(--text-muted)}
@@ -188,7 +188,7 @@
     /* ── FORMS ── */
     select,input[type="text"],input[type="number"],input[type="date"],textarea{
       width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;outline:none;background:var(--surface);font-family:'Noto Sans TC',sans-serif;color:var(--text-primary);transition:border-color .2s,box-shadow .2s}
-    select:focus,input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,82,232,.12)}
+    select:focus,input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,177,222,.12)}
     label{display:block;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
     .form-group{margin-bottom:16px}
     .btn-primary{background:var(--primary);color:#fff;padding:13px 24px;border-radius:var(--radius-sm);font-weight:700;border:none;cursor:pointer;font-size:15px;transition:background .15s,transform .1s}
@@ -221,7 +221,7 @@
     .hw-row .hw-date-col{text-align:right;justify-self:end}
     .hw-row .hw-area-col{justify-self:end}
     .date-tag{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;border:none;background:var(--border-light);color:#64748b;white-space:nowrap;min-width:78px;justify-content:center;transition:background .15s}
-    .date-tag:hover{background:#e2e8f0}.date-tag.overdue{background:#fee2e2;color:#dc2626}.date-tag.today-tag{background:var(--primary-light);color:var(--primary)}
+    .date-tag:hover{background:#E7E2D8}.date-tag.overdue{background:#FDEECF;color:#B4390F}.date-tag.today-tag{background:var(--primary-light);color:var(--primary)}
 
     /* ── SETTINGS CARD ── */
     .settings-card{background:var(--surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--border-light);padding:20px;margin-bottom:14px}
@@ -286,7 +286,7 @@
     .day-col-header.is-past .dow{color:#e2e8f0}
     .day-tasks-col{min-height:60px;padding:0 2px}
     .day-task-pill{background:var(--primary-light);border-left:3px solid var(--primary);border-radius:0 6px 6px 0;padding:4px 6px;margin-bottom:4px;cursor:pointer;transition:background .15s}
-    .day-task-pill.done-pill{background:#f1f5f9;border-left-color:#cbd5e1;opacity:.6}
+    .day-task-pill.done-pill{background:#EFEBE2;border-left-color:#cbd5e1;opacity:.6}
     .day-task-pill p{font-size:11px;font-weight:600;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
     .day-task-pill.done-pill p{color:var(--text-muted);text-decoration:line-through}
     .day-task-pill.overdue-pill{background:#fee2e2;border-left-color:#dc2626}
@@ -301,14 +301,14 @@
     .week-overdue-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#fff5f5;border:1px solid #fecaca;border-radius:var(--radius-sm);margin-bottom:10px;font-size:12px;color:#dc2626;font-weight:600}
     .task-db-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border-light)}
     .task-db-row:last-child{border-bottom:none}
-    .freq-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:#ede9fe;color:#7c3aed;white-space:nowrap}
+    .freq-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:#F0F8FF;color:#6CB5CC;white-space:nowrap}
 
     /* ── LEFT DRAWER ── */
     .drawer-scrim{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(1px)}
     .drawer-scrim.open{opacity:1;pointer-events:all}
     .drawer{position:fixed;top:0;left:0;bottom:0;width:min(300px,85vw);background:var(--surface);z-index:900;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg);overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,0px)}
     .drawer.open{transform:translateX(0)}
-    .drawer-header{background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:20px 18px 18px;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+    .drawer-header{background:linear-gradient(135deg,#4E9EB8 0%,#6CB5CC 100%);padding:20px 18px 18px;padding-top:calc(20px + env(safe-area-inset-top,0px))}
     .drawer-header h2{color:#fff;font-size:18px;font-weight:700}
     .drawer-header p{color:rgba(255,255,255,.65);font-size:12px;margin-top:2px}
     .drawer-section{padding:14px 18px 6px;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
@@ -361,8 +361,8 @@
     .inv-tool-btn:hover{border-color:#9ca3af;background:var(--bg)}
     .inv-tool-btn-primary{background:#fff7ed;border-color:#fed7aa;color:#d97706}
     .inv-tool-btn-primary:hover{background:#fef3c7}
-    .inv-tool-btn-purple{background:#f5f3ff;border-color:#c4b5fd;color:#7c3aed}
-    .inv-tool-btn-purple:hover{background:#ede9fe}
+    .inv-tool-btn-purple{background:#EAF7FC;border-color:#9FE0F5;color:#6CB5CC}
+    .inv-tool-btn-purple:hover{background:#F0F8FF}
     .shop-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:12px;padding:9px 12px;margin:8px 0 10px}
     .shop-bar-info{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
     .shop-bar-acts{display:flex;gap:6px;flex-shrink:0}
@@ -427,7 +427,7 @@
     .itype-opt{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s}
     .itype-opt.sel{border-color:var(--primary);background:var(--primary-light)}
     .itype-icon{width:28px;height:28px;border-radius:8px;background:var(--border-light);display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
-    .itype-opt.sel .itype-icon{background:rgba(91,82,232,.15)}
+    .itype-opt.sel .itype-icon{background:rgba(40,177,222,.15)}
     .itype-lbl{font-size:11px;font-weight:700;color:var(--text-secondary)}
     .itype-opt.sel .itype-lbl{color:var(--primary)}
     .icond{display:none}.icond.show{display:block}
@@ -454,7 +454,7 @@
     .tw-wnl{font-size:14px;font-weight:700;color:var(--text-primary)}
     .tw-wns{font-size:11px;color:var(--text-muted);margin-top:2px}
     /* Progress card — compact gradient style */
-    .tw-prog{background:linear-gradient(120deg,#ede9fe 0%,#ddd6fe 100%);border-radius:var(--radius-md);box-shadow:0 2px 10px rgba(91,82,232,.13);padding:8px 11px;margin-bottom:8px;display:flex;align-items:center;gap:10px;border:none}
+    .tw-prog{background:linear-gradient(120deg,#F0F8FF 0%,#D6EFFA 100%);border-radius:var(--radius-md);box-shadow:0 2px 10px rgba(40,177,222,.13);padding:8px 11px;margin-bottom:8px;display:flex;align-items:center;gap:10px;border:none}
     .tw-prog-ring{width:36px;height:36px;flex-shrink:0;position:relative}
     .tw-prog-ring svg{transform:rotate(-90deg)}
     .tw-prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--primary)}
@@ -483,7 +483,7 @@
     .tw-mp{display:inline-flex;align-items:center;gap:3px;padding:3px 8px 3px 5px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;border-left:2.5px solid transparent;line-height:1.3;cursor:grab;transition:opacity .15s,transform .15s;user-select:none;touch-action:none}
     .tw-mp.tw-task-p{background:var(--primary-light);color:var(--primary);border-left-color:var(--primary)}
     .tw-mp.tw-hw-p{background:#fffbeb;color:#d97706;border-left-color:#d97706}
-    .tw-mp.tw-done-p{background:#f1f5f9;color:var(--text-muted);border-left-color:#d1d5db;text-decoration:line-through;opacity:.55;cursor:default;touch-action:auto}
+    .tw-mp.tw-done-p{background:#EFEBE2;color:var(--text-muted);border-left-color:#d1d5db;text-decoration:line-through;opacity:.55;cursor:default;touch-action:auto}
     .tw-mp.tw-ov-p{background:var(--danger-light);color:var(--danger);border-left-color:var(--danger)}
     .tw-mp.tw-dragging{opacity:.35;transform:scale(.95)}
     .tw-morep{padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:var(--border-light);color:var(--text-muted)}
@@ -557,7 +557,7 @@
 
 <!-- ── LEFT DRAWER ── -->
 <!-- ── 重新連線畫面（登出房間後或首次使用） ── -->
-<div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);align-items:center;justify-content:center;flex-direction:column;padding:24px">
+<div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#4E9EB8 0%,#6CB5CC 100%);align-items:center;justify-content:center;flex-direction:column;padding:24px">
   <div style="width:100%;max-width:340px">
     <div style="text-align:center;margin-bottom:32px">
       <div style="width:64px;height:64px;background:rgba(255,255,255,.18);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
@@ -568,7 +568,7 @@
     </div>
     <div style="background:rgba(255,255,255,.12);border-radius:16px;padding:24px">
       <div id="lock-error" style="display:none;background:rgba(220,38,38,.25);border:1px solid rgba(220,38,38,.4);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:#fca5a5;font-weight:600;text-align:center"></div>
-      <button onclick="lockEnter()" style="width:100%;padding:14px;background:#fff;color:#5b52e8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
+      <button onclick="lockEnter()" style="width:100%;padding:14px;background:#fff;color:#4E9EB8;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">
         <span style="display:flex;align-items:center;justify-content:center;gap:8px">
           <span class="material-symbols-outlined" style="font-size:18px">cloud_sync</span>重新連線
         </span>
@@ -591,7 +591,7 @@
     <div style="display:flex;flex-direction:column;gap:10px">
       <button onclick="conflictChoose('local')" style="padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--bg);font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:'Noto Sans TC',sans-serif">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span class="material-symbols-outlined" style="font-size:16px;color:#5b52e8">smartphone</span>
+          <span class="material-symbols-outlined" style="font-size:16px;color:#4E9EB8">smartphone</span>
           <span style="color:#1e293b">使用這台裝置的資料</span>
         </div>
         <div id="conflict-local-info" style="font-size:11px;color:#64748b;padding-left:24px"></div>
@@ -632,7 +632,7 @@
     </button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     <button class="drawer-item" onclick="copyShareLink()">
-      <div class="di-icon" style="background:#f5f3ff"><span class="material-symbols-outlined" style="font-size:18px;color:#5b52e8">link</span></div>
+      <div class="di-icon" style="background:#EAF7FC"><span class="material-symbols-outlined" style="font-size:18px;color:#4E9EB8">link</span></div>
       <div><div class="di-label">複製分享連結</div><div class="di-sub">含所有資料</div></div>
     </button>
 
@@ -655,7 +655,7 @@
           <span id="drawer-data-source" style="font-size:12px;color:var(--text-muted)">-</span>
         </div>
       </div>
-      <button onclick="forceUpload()" style="background:var(--primary-light);border:1px solid rgba(91,82,232,.2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--primary);width:100%;font-family:'Noto Sans TC',sans-serif">
+      <button onclick="forceUpload()" style="background:var(--primary-light);border:1px solid rgba(40,177,222,.2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--primary);width:100%;font-family:'Noto Sans TC',sans-serif">
         <span class="material-symbols-outlined" style="font-size:16px">cloud_upload</span>強制上傳本機資料
       </button>
       <p style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:6px">將此裝置的資料覆蓋雲端</p>
@@ -663,7 +663,7 @@
     <div class="drawer-divider"></div>
     <div class="drawer-section">身份</div>
     <button class="drawer-item" onclick="document.getElementById('identityModal').style.display='flex'">
-      <div class="di-icon" style="background:#ede9fe"><span class="material-symbols-outlined" style="font-size:18px;color:#6d28d9">manage_accounts</span></div>
+      <div class="di-icon" style="background:#F0F8FF"><span class="material-symbols-outlined" style="font-size:18px;color:#397487">manage_accounts</span></div>
       <div><div class="di-label">切換身份</div><div class="di-sub" id="di-identity-sub">載入中</div></div>
     </button>
     <div class="drawer-divider"></div>
@@ -676,7 +676,7 @@
 </div>
 
 <!-- ── HEADER ── -->
-<header style="background:linear-gradient(135deg,#5b52e8 0%,#7c3aed 100%);padding:10px 14px 9px;padding-top:calc(10px + env(safe-area-inset-top,0px));box-shadow:0 2px 12px rgba(91,82,232,.2)">
+<header style="background:linear-gradient(135deg,#4E9EB8 0%,#6CB5CC 100%);padding:10px 14px 9px;padding-top:calc(10px + env(safe-area-inset-top,0px));box-shadow:0 2px 12px rgba(40,177,222,.2)">
   <div class="max-w-2xl mx-auto flex items-center justify-between">
     <div class="flex items-center gap-2">
       <button onclick="openDrawer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
@@ -714,20 +714,65 @@
 </header>
 
 <!-- ── PAGES ── -->
-<div id="page-todo" class="page active">
-  <div class="tw-pg">
-    <div class="tw-wnav">
-      <button class="tw-wnbtn" onclick="twShiftW(-1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_left</span></button>
-      <div class="tw-wnc" style="position:relative;cursor:pointer" title="點擊選擇日期">
-        <div class="tw-wnl" id="tw-wnl" style="display:flex;align-items:center;justify-content:center;gap:4px;pointer-events:none"></div>
-        <div class="tw-wns" id="tw-wns" style="pointer-events:none"></div>
-        <!-- 透明日曆選擇器覆蓋整個區塊，點擊可開啟 -->
-        <input type="date" id="tw-date-picker" style="position:absolute;opacity:0;top:0;left:0;width:100%;height:100%;cursor:pointer;border:none;padding:0;margin:0" onchange="twJumpToDate(this.value)">
+<div id="page-housework-hub" class="page active">
+  <div class="shop-sub-tabs" id="hw-hub-switch">
+    <button class="shop-stab on" id="hwhub-tab-week" onclick="hwViewSwitch('week')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">calendar_view_week</span> 本週</button>
+    <button class="shop-stab" id="hwhub-tab-list" onclick="hwViewSwitch('list')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">checklist</span> 清單</button>
+    <button class="shop-stab" id="hwhub-tab-db" onclick="hwViewSwitch('db')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">table_rows</span> 資料庫</button>
+  </div>
+
+  <div id="hw-view-week" class="hw-hub-view">
+    <div class="tw-pg">
+      <div class="tw-wnav">
+        <button class="tw-wnbtn" onclick="twShiftW(-1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_left</span></button>
+        <div class="tw-wnc" style="position:relative;cursor:pointer" title="點擊選擇日期">
+          <div class="tw-wnl" id="tw-wnl" style="display:flex;align-items:center;justify-content:center;gap:4px;pointer-events:none"></div>
+          <div class="tw-wns" id="tw-wns" style="pointer-events:none"></div>
+          <!-- 透明日曆選擇器覆蓋整個區塊，點擊可開啟 -->
+          <input type="date" id="tw-date-picker" style="position:absolute;opacity:0;top:0;left:0;width:100%;height:100%;cursor:pointer;border:none;padding:0;margin:0" onchange="twJumpToDate(this.value)">
+        </div>
+        <button class="tw-wnbtn" onclick="twShiftW(1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_right</span></button>
       </div>
-      <button class="tw-wnbtn" onclick="twShiftW(1)"><span class="material-symbols-outlined" style="font-size:20px;color:#64748b">chevron_right</span></button>
+      <div class="tw-prog" id="tw-prog"></div>
+      <div class="tw-wlist" id="tw-wlist"></div>
     </div>
-    <div class="tw-prog" id="tw-prog"></div>
-    <div class="tw-wlist" id="tw-wlist"></div>
+  </div>
+
+  <div id="hw-view-list" class="hw-hub-view" style="display:none">
+    <div class="max-w-2xl mx-auto px-4 py-3">
+      <div class="section-header mb-3">
+        <div class="section-icon" style="background:#fef3c7"><span class="material-symbols-outlined" style="color:#d97706">cleaning_services</span></div>
+        <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">家事管理</h2></div>
+        <button onclick="openHouseworkModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <span class="material-symbols-outlined" style="font-size:16px">add</span>新增家事
+        </button>
+      </div>
+      <div class="area-tab-bar" id="hw-area-tab-bar"></div>
+      <div id="hw-overdue-notice"></div>
+      <div class="card" style="overflow:hidden"><div id="housework-list"></div></div>
+    </div>
+  </div>
+
+  <div id="hw-view-db" class="hw-hub-view" style="display:none">
+    <div class="max-w-2xl mx-auto px-4 py-3">
+      <section>
+        <div class="section-header">
+          <div class="section-icon" style="background:#EAF7FC"><span class="material-symbols-outlined" style="color:#4E9EB8">table_rows</span></div>
+          <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">任務資料庫</h2></div>
+          <button onclick="openTaskModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px">
+            <span class="material-symbols-outlined" style="font-size:16px">add</span>新增
+          </button>
+        </div>
+        <div class="card" style="overflow:hidden">
+          <div style="display:flex;border-bottom:1px solid var(--border-light)">
+            <button id="db-tab-recurring" onclick="switchDbTab('recurring')" style="flex:1;padding:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--primary);color:var(--primary)">定期任務</button>
+            <button id="db-tab-once" onclick="switchDbTab('once')" style="flex:1;padding:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted)">一次性任務</button>
+          </div>
+          <div id="task-db-recurring" class="px-4 py-1"></div>
+          <div id="task-db-once" class="px-4 py-1" style="display:none"></div>
+        </div>
+      </section>
+    </div>
   </div>
 </div>
 <!-- TW Delay sheet -->
@@ -750,7 +795,7 @@
     <button class="tw-dlyopt" onclick="twApplyDelay(7)"><div class="tw-dn">7</div><div class="tw-du">天</div></button>
     <button class="tw-dlyopt" onclick="twToggleCustomDate()"><div class="tw-dn"><span class="material-symbols-outlined" style="font-size:20px;margin-top:2px">calendar_month</span></div><div class="tw-du">自選</div></button>
   </div>
-  
+
   <div class="delay-custom-section" id="twCustomDateSection">
     <label style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">選擇日期</label>
     <input type="date" id="twCustomDelayDate" style="width:100%; margin-bottom:10px;">
@@ -779,45 +824,10 @@
   </div>
   <button class="tw-dlycancel" onclick="twCloseNote()">取消</button>
 </div>
-
-<div id="page-tasks" class="page max-w-2xl mx-auto px-4 py-3">
-  <section>
-    <div class="section-header">
-      <div class="section-icon" style="background:#f5f3ff"><span class="material-symbols-outlined" style="color:#5b52e8">table_rows</span></div>
-      <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">任務資料庫</h2><p class="text-gray-400 text-xs">所有任務總覽</p></div>
-      <button onclick="openTaskModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px">
-        <span class="material-symbols-outlined" style="font-size:16px">add</span>新增
-      </button>
-    </div>
-    <div class="card" style="overflow:hidden">
-      <div style="display:flex;border-bottom:1px solid var(--border-light)">
-        <button id="db-tab-recurring" onclick="switchDbTab('recurring')" style="flex:1;padding:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid var(--primary);color:var(--primary)">定期任務</button>
-        <button id="db-tab-once" onclick="switchDbTab('once')" style="flex:1;padding:10px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted)">一次性任務</button>
-      </div>
-      <div id="task-db-recurring" class="px-4 py-1"></div>
-      <div id="task-db-once" class="px-4 py-1" style="display:none"></div>
-    </div>
-  </section>
-</div>
-
-<div id="page-housework" class="page max-w-2xl mx-auto px-4 py-3">
-  <div class="section-header mb-3">
-    <div class="section-icon" style="background:#fef3c7"><span class="material-symbols-outlined" style="color:#d97706">cleaning_services</span></div>
-    <div class="flex-1"><h2 class="text-lg font-bold text-gray-800">家事管理</h2><p style="color:var(--text-muted);font-size:11px">勾選可批次延後</p></div>
-    <button onclick="openHouseworkModal()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0">
-      <span class="material-symbols-outlined" style="font-size:16px">add</span>新增家事
-    </button>
-  </div>
-  <div class="area-tab-bar" id="hw-area-tab-bar"></div>
-  <div id="hw-overdue-notice"></div>
-  <div class="card" style="overflow:hidden"><div id="housework-list"></div></div>
-</div>
-
 <div id="page-inventory" class="page">
   <div class="inv-tab-bar">
     <button class="inv-tab active" onclick="invSwitchTab('alert',this)"><span class="material-symbols-outlined" style="font-size:13px">notifications_active</span>待注意<span class="tcnt" id="inv-cnt-alert"></span></button>
     <button class="inv-tab" id="inv-tab-location" onclick="invSwitchTab('location',this)"><span class="material-symbols-outlined" style="font-size:13px">place</span>位置<span class="tcnt" id="inv-cnt-loc"></span></button>
-    <button class="inv-tab" id="inv-tab-shopping" onclick="invSwitchTab('shopping',this)"><span class="material-symbols-outlined" style="font-size:13px">shopping_cart</span>購物清單<span class="tcnt" id="shop-restock-new-cnt" style="display:none"></span></button>
     <button class="inv-tab" onclick="invSwitchTab('locmgr',this)"><span class="material-symbols-outlined" style="font-size:13px">settings</span>管理</button>
   </div>
   <!-- 待注意子篩選列（只在 alert tab 時顯示） -->
@@ -852,6 +862,10 @@
       <span class="material-symbols-outlined inv-filter-arrow" id="inv-filter-arrow">expand_more</span>
     </button>
     <div class="inv-filter-body" id="inv-filter-body">
+      <div style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;margin-bottom:8px">
+        <span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted)">search</span>
+        <input type="text" id="inv-alert-search-input" placeholder="搜尋物品名稱…" oninput="renderInventoryPage()" style="flex:1;border:none;outline:none;font-size:12px;color:var(--text-primary);background:none;font-family:'Noto Sans TC',sans-serif">
+      </div>
       <div class="inv-filter-row" id="inv-filter-loc-row"><span class="inv-filter-row-label">位置</span></div>
       <div class="inv-filter-row" id="inv-filter-cat-row"><span class="inv-filter-row-label">類別</span></div>
       <div class="inv-filter-row" id="inv-filter-third-row"><span class="inv-filter-row-label">來源</span></div>
@@ -879,8 +893,11 @@
   </div>
   </div>
   <div class="inv-content" id="inv-content"></div>
+</div>
+
+<div id="page-shopping" class="page">
 <!-- ── SHOPPING LIST PANEL ── -->
-<div id="inv-shopping-panel" style="display:none">
+<div id="inv-shopping-panel">
   <div class="shop-sub-tabs">
     <button class="shop-stab on" id="shop-st-buy" onclick="shopSetSub('buy')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">shopping_cart</span> 待購買</button>
     <button class="shop-stab" id="shop-st-done" onclick="shopSetSub('done')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">task_alt</span> 已購買</button>
@@ -980,6 +997,18 @@
   </div>
 </div>
 <div id="shop-global-dd"></div>
+</div>
+<div id="page-memo" class="page">
+  <div class="shop-sub-tabs" id="memo-sub-tabs">
+    <button class="shop-stab on" id="memotab-notes" onclick="memoSwitchSub('notes')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">sticky_note_2</span> 筆記<span id="memo-notes-count" style="display:none;font-size:9px;background:rgba(0,0,0,.08);color:inherit;opacity:.65;padding:0 5px;border-radius:999px;margin-left:4px;font-weight:600"></span><span id="memo-notes-dot" style="display:none;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-left:3px;vertical-align:2px"></span></button>
+    <button class="shop-stab" id="memotab-trackers" onclick="memoSwitchSub('trackers')"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:-2px">timeline</span> 追蹤提醒<span id="memo-trackers-count" style="display:none;font-size:9px;background:rgba(0,0,0,.08);color:inherit;opacity:.65;padding:0 5px;border-radius:999px;margin-left:4px;font-weight:600"></span><span id="memo-trackers-dot" style="display:none;width:6px;height:6px;border-radius:50%;background:#ef4444;margin-left:3px;vertical-align:2px"></span></button>
+  </div>
+  <div id="memo-notes-panel" class="shop-body">
+    <div id="memo-notes-list"></div>
+  </div>
+  <div id="memo-trackers-panel" class="shop-body" style="display:none">
+    <div id="memo-trackers-list"></div>
+  </div>
 </div>
 
 
@@ -1098,7 +1127,7 @@
 </div>
 
 <!-- ── NAV ── -->
-<nav class="safe-bottom" style="position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);border-top:1px solid #e8edf5;z-index:100;backdrop-filter:blur(12px)">
+<nav class="safe-bottom" style="position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);border-top:1px solid #E7E2D8;z-index:100;backdrop-filter:blur(12px)">
 
 <!-- ── GLOBAL TOAST ── -->
 <div id="app-toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e293b;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;z-index:3000;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
@@ -1117,38 +1146,60 @@
     </div>
     <p id="app-confirm-msg" style="font-size:13px;color:#64748b;margin-bottom:20px;padding-left:52px"></p>
     <div style="display:flex;gap:10px">
-      <button onclick="appConfirmCancel()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#f1f5f9;color:#475569;font-size:14px;font-weight:600;cursor:pointer">取消</button>
+      <button onclick="appConfirmCancel()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#EFEBE2;color:#475569;font-size:14px;font-weight:600;cursor:pointer">取消</button>
       <button id="app-confirm-ok" onclick="appConfirmOk()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#dc2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer">確定</button>
     </div>
   </div>
 </div>
 
-<!-- ── INPUT MODAL ── -->
+  <div class="max-w-2xl mx-auto flex">
+    <button class="nav-item active flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('housework-hub',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">checklist</span><span class="nav-label text-xs">本週</span>
+    </button>
+    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('shopping',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">shopping_cart</span><span class="nav-label text-xs">採購</span>
+    </button>
+    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('inventory',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">inventory_2</span><span class="nav-label text-xs">物品庫</span>
+    </button>
+    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('memo',this)">
+      <span class="material-symbols-outlined nav-icon" style="font-size:24px">sticky_note_2</span><span class="nav-label text-xs">備忘</span>
+    </button>
+  </div>
+</nav>
+<!-- ── INPUT MODAL（移到 nav 外，避免被 nav 的 backdrop-filter 影響 fixed 定位基準） ── -->
 <div id="app-input-overlay" style="display:none;position:fixed;inset:0;z-index:2500;pointer-events:none">
-  <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 48px);max-width:340px;background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 12px 48px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);pointer-events:all">
+  <div style="position:fixed;top:12%;left:50%;transform:translateX(-50%);max-height:70vh;overflow-y:auto;width:calc(100vw - 48px);max-width:340px;background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 12px 48px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);pointer-events:all">
     <h3 id="app-input-title" style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:12px"></h3>
     <input id="app-input-field" type="number" min="0" style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none;font-family:inherit;color:#1e293b;margin-bottom:16px">
     <div style="display:flex;gap:10px">
-      <button onclick="appInputCancel()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#f1f5f9;color:#475569;font-size:14px;font-weight:600;cursor:pointer">取消</button>
+      <button onclick="appInputCancel()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#EFEBE2;color:#475569;font-size:14px;font-weight:600;cursor:pointer">取消</button>
       <button onclick="appInputOk()" style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:700;cursor:pointer">確定</button>
     </div>
   </div>
 </div>
-  <div class="max-w-2xl mx-auto flex">
-    <button class="nav-item active flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('todo',this)">
-      <span class="material-symbols-outlined nav-icon" style="font-size:24px">checklist</span><span class="nav-label text-xs">To Do</span>
-    </button>
-    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('tasks',this)">
-      <span class="material-symbols-outlined nav-icon" style="font-size:24px">assignment</span><span class="nav-label text-xs">任務</span>
-    </button>
-    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('housework',this)">
-      <span class="material-symbols-outlined nav-icon" style="font-size:24px">cottage</span><span class="nav-label text-xs">家事</span>
-    </button>
-    <button class="nav-item flex-1 flex flex-col items-center py-2.5 gap-0.5" onclick="switchPage('inventory',this)">
-      <span class="material-symbols-outlined nav-icon" style="font-size:24px">inventory_2</span><span class="nav-label text-xs">物品</span>
-    </button>
+<!-- ── IDENTITY MODAL（原始檔案就有 setIdentity()/matchOwner()/ownerBadge() 等身份與歸屬篩選邏輯，
+     但找不到任何地方真的把 #identityModal 這個畫面元素建出來，導致使用者永遠沒辦法真的
+     設定身份，appIdentity 永遠是空字串，matchOwner() 因此永遠回傳 true、完全沒有在篩選——
+     這裡補上缺少的畫面，讓既有的身份/歸屬功能真正能被使用者操作到 ── -->
+<div id="identityModal" style="display:none;position:fixed;inset:0;z-index:2600;pointer-events:none">
+  <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100vw - 48px);max-width:320px;background:#fff;border-radius:20px;padding:26px 22px;box-shadow:0 12px 48px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);pointer-events:all;text-align:center">
+    <button onclick="document.getElementById('identityModal').style.display='none'" style="position:absolute;top:12px;right:12px;background:var(--border-light);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:16px;color:#64748b">close</span></button>
+    <div style="font-size:30px;margin-bottom:6px">👋</div>
+    <h3 style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:4px">你是誰？</h3>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:18px">之後可以在左上角選單「切換身份」重新選擇</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="setIdentity('sindy')" style="flex:1;padding:14px 8px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit">
+        <div style="font-size:26px;margin-bottom:6px">👧🏻</div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b">Sindy</div>
+      </button>
+      <button onclick="setIdentity('bf')" style="flex:1;padding:14px 8px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit">
+        <div style="font-size:26px;margin-bottom:6px">🎅🏻</div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b">Jack</div>
+      </button>
+    </div>
   </div>
-</nav>
+</div>
 
 <!-- ── TASK MODAL ── -->
 <div class="modal-overlay" id="taskModal">
@@ -1188,13 +1239,90 @@
     <div class="form-group" id="hw-custom-area-group" style="display:none"><label>自訂區域名稱</label><input type="text" id="hw-custom-area" placeholder="輸入區域名稱"></div>
     <div class="form-group"><label>頻率（天數）</label><input type="number" id="hw-frequency" placeholder="例：7" min="1" max="365"></div>
     <div class="form-group"><label>上次完成日期</label><input type="date" id="hw-last-date" onchange="autoCalcReminder()"></div>
-    <div class="form-group"><label style="display:flex;align-items:center;gap:6px">提醒日期<span style="font-size:11px;color:#5b52e8;font-weight:400">(自動計算，可手動改)</span></label><input type="date" id="hw-reminder"></div>
+    <div class="form-group"><label style="display:flex;align-items:center;gap:6px">提醒日期<span style="font-size:11px;color:#4E9EB8;font-weight:400">(自動計算，可手動改)</span></label><input type="date" id="hw-reminder"></div>
     <div class="form-group"><label>備註</label><textarea id="hw-notes" placeholder="選填" rows="2" style="resize:none"></textarea></div>
     <div class="weekend-row" id="hw-weekend-row">
       <div><p style="font-size:14px;font-weight:600;color:var(--text-primary)">週末執行模式</p><p style="font-size:11px;color:var(--text-muted);margin-top:2px">提醒日自動對齊到最近的週六或週日</p></div>
       <button class="toggle" id="hw-weekend-toggle" onclick="toggleWeekendRow(this)"></button>
     </div>
     <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('houseworkModal')">取消</button><button class="btn-primary flex-1" style="background:#d97706" onclick="saveHousework()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ── NOTE MODAL ── -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-5">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="noteModalTitle">新增備忘</h2>
+      <button onclick="closeModal('noteModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="note-edit-id">
+    <div class="form-group"><label>標題（選填）</label><input type="text" id="note-title" placeholder="有填標題才會顯示標題列與收合"></div>
+    <div class="form-group">
+      <label>格式</label>
+      <div class="lmgr-tab-bar" style="margin-bottom:0">
+        <button type="button" id="note-fmt-text" class="lmgr-tab on" onclick="memoNoteSetFmt('text')">文字</button>
+        <button type="button" id="note-fmt-checklist" class="lmgr-tab" onclick="memoNoteSetFmt('checklist')">清單勾選</button>
+      </div>
+    </div>
+    <div class="form-group"><label>內容<span id="note-fmt-hint" style="font-weight:400;color:var(--text-muted);margin-left:4px"></span></label><textarea id="note-text" placeholder="輸入內容…" rows="4" style="resize:none"></textarea></div>
+    <div class="form-group"><label>截止日期（選填，到期當天會有提醒）</label><input type="date" id="note-due"></div>
+    <div class="form-group"><label>歸屬</label>
+      <div class="shop-prio-seg" id="note-owner-seg">
+        <button onclick="noteSetOwner('sindy',this)">👧🏻 我的</button>
+        <button class="on" onclick="noteSetOwner('all',this)">👥 共同</button>
+        <button onclick="noteSetOwner('bf',this)">🎅🏻 他的</button>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4">
+      <button id="note-delete-btn" onclick="noteDeleteFromModal()" style="display:none;flex:0 0 auto;padding:0 14px;border-radius:10px;border:1.5px solid var(--danger-light);background:var(--danger-light);color:var(--danger);cursor:pointer"><span class="material-symbols-outlined" style="font-size:19px;vertical-align:middle">delete</span></button>
+      <button class="btn-secondary flex-1" onclick="closeModal('noteModal')">取消</button>
+      <button class="btn-primary flex-1" onclick="saveNote()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TRACKER MODAL ── -->
+<div class="modal-overlay" id="trackerModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center justify-between mb-5">
+      <h2 style="font-size:17px;font-weight:700;color:#1e293b" id="trackerModalTitle">新增追蹤提醒</h2>
+      <button onclick="closeModal('trackerModal')" style="background:var(--border-light);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b">close</span></button>
+    </div>
+    <input type="hidden" id="tracker-edit-id">
+    <div class="form-group"><label>名稱 *</label><input type="text" id="tracker-name" placeholder="例：機油"></div>
+    <div class="form-group"><label>單位</label><input type="text" id="tracker-unit" placeholder="例：公里、天、次"></div>
+    <div class="form-group"><label>上次記錄數值</label><input type="number" id="tracker-lastvalue" placeholder="例：14126"></div>
+    <div class="form-group"><label>上次記錄日期</label><input type="date" id="tracker-lastdate"></div>
+    <div class="form-group"><label>數值提醒門檻（選填，例：+1000）</label><input type="number" id="tracker-valueinterval" placeholder="達到「上次數值 + 這個數字」時提醒"></div>
+    <div class="form-group"><label>天數提醒門檻（選填，例：180）</label><input type="number" id="tracker-dayinterval" placeholder="距離上次記錄超過幾天後提醒"></div>
+    <p style="font-size:11px;color:var(--text-muted);margin:-6px 0 12px">兩種門檻都可以填，哪個先到就會提醒。</p>
+    <div class="form-group"><label>歸屬</label>
+      <div class="shop-prio-seg" id="tracker-owner-seg">
+        <button onclick="trackerSetOwner('sindy',this)">👧🏻 我的</button>
+        <button class="on" onclick="trackerSetOwner('all',this)">👥 共同</button>
+        <button onclick="trackerSetOwner('bf',this)">🎅🏻 他的</button>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4">
+      <button id="tracker-delete-btn" onclick="trackerDeleteFromModal()" style="display:none;flex:0 0 auto;padding:0 14px;border-radius:10px;border:1.5px solid var(--danger-light);background:var(--danger-light);color:var(--danger);cursor:pointer"><span class="material-symbols-outlined" style="font-size:19px;vertical-align:middle">delete</span></button>
+      <button class="btn-secondary flex-1" onclick="closeModal('trackerModal')">取消</button>
+      <button class="btn-primary flex-1" onclick="saveTracker()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TRACKER COMPLETE MODAL ── -->
+<div class="modal-overlay" id="trackerCompleteModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="flex items-center gap-3 mb-1">
+      <div style="width:36px;height:36px;background:var(--primary-light);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="color:var(--primary);font-size:20px">check_circle</span></div>
+      <div><h2 style="font-size:17px;font-weight:700;color:#1e293b">完成並記錄</h2><p style="color:#94a3b8;font-size:13px" id="tracker-complete-name"></p></div>
+    </div>
+    <input type="hidden" id="tracker-complete-id">
+    <div class="form-group" style="margin-top:16px"><label>新的數值（<span id="tracker-complete-unit-label"></span>）</label><input type="number" id="tracker-complete-value"></div>
+    <div class="form-group"><label>日期</label><input type="date" id="tracker-complete-date"></div>
+    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('trackerCompleteModal')">取消</button><button class="btn-primary flex-1" onclick="trackerSaveComplete()">確認</button></div>
   </div>
 </div>
 
@@ -1392,7 +1520,10 @@
         <div style="flex:1"><div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">自訂高 (px)</div><input type="number" class="coord-inp" id="loc-sub-h" value="80" min="20" max="380" oninput="locSubSyncSizeBtns()" style="width:100%"></div>
       </div>
     </div>
-    <div class="flex gap-3 mt-4"><button class="btn-secondary flex-1" onclick="closeModal('locSubModal')">取消</button><button class="btn-primary flex-1" onclick="locSaveSubLoc()">儲存</button></div>
+    <div class="flex gap-3 mt-4">
+      <button id="loc-sub-delete-btn" onclick="locDeleteSublocFromModal()" style="display:none;flex:0 0 auto;padding:0 14px;border-radius:10px;border:1.5px solid var(--danger-light);background:var(--danger-light);color:var(--danger);cursor:pointer"><span class="material-symbols-outlined" style="font-size:19px;vertical-align:middle">delete</span></button>
+      <button class="btn-secondary flex-1" onclick="closeModal('locSubModal')">取消</button><button class="btn-primary flex-1" onclick="locSaveSubLoc()">儲存</button>
+    </div>
   </div>
 </div>
 
@@ -1563,11 +1694,14 @@ function loadData(){
   const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
   const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
   const s=localStorage.getItem('app_shoplist');
+  const nt=localStorage.getItem('app_notes'),tr=localStorage.getItem('app_trackers');
   tasks    = t ? JSON.parse(t) : [];
   housework= h ? JSON.parse(h) : [];
   inventory= i ? JSON.parse(i) : [];
   locations= (l ? JSON.parse(l) : JSON.parse(JSON.stringify(DL))).map(r=>({...r,subLocations:r.subLocations||[]}));
   if(typeof shopList !== 'undefined') shopList = s ? JSON.parse(s) : [];
+  if(typeof notes !== 'undefined') notes = nt ? JSON.parse(nt) : [];
+  if(typeof trackers !== 'undefined') trackers = tr ? JSON.parse(tr) : [];
   _localSnapshot = t ? true : false;
   renderAll();
 
@@ -1588,6 +1722,8 @@ function loadData(){
         fbSave('inventory', inventory);
         fbSave('locations', locations);
         if(typeof shopList !== 'undefined') fbSave('shoplist', shopList);
+        if(typeof notes !== 'undefined') fbSave('notes', notes);
+        if(typeof trackers !== 'undefined') fbSave('trackers', trackers);
       }
       return;
     }
@@ -1616,16 +1752,21 @@ function applyRemoteData(d){
   if(d.inventory) inventory = d.inventory;
   if(d.locations) locations = d.locations.map(r=>({...r,subLocations:r.subLocations||[]}));
   if(d.shoplist && typeof shopList !== 'undefined') shopList = d.shoplist;
+  if(d.notes && typeof notes !== 'undefined') notes = d.notes;
+  if(d.trackers && typeof trackers !== 'undefined') trackers = d.trackers;
   localStorage.setItem('app_tasks',     JSON.stringify(tasks));
   localStorage.setItem('app_housework', JSON.stringify(housework));
   localStorage.setItem('app_inventory', JSON.stringify(inventory));
   localStorage.setItem('app_locations', JSON.stringify(locations));
   if(typeof shopList !== 'undefined') localStorage.setItem('app_shoplist', JSON.stringify(shopList));
+  if(typeof notes !== 'undefined') localStorage.setItem('app_notes', JSON.stringify(notes));
+  if(typeof trackers !== 'undefined') localStorage.setItem('app_trackers', JSON.stringify(trackers));
   const now = Date.now();
   localStorage.setItem('app_updatedAt', String(d.meta?.updatedAt || now));
   renderAll();
   if(typeof renderInventoryPage === 'function') renderInventoryPage();
-  if(typeof shopRender === 'function') shopRender();
+  if(typeof renderShoppingPage === 'function') renderShoppingPage();
+  if(typeof renderMemoPage === 'function') renderMemoPage();
   fbSetStatus('online');
   updateSyncTimeUI(d.meta?.updatedAt || now, '雲端同步');
 }
@@ -1747,12 +1888,15 @@ function openDrawer(){
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawer-scrim').classList.remove('open')}
 
 // ── NAV / PAGE SWITCH ─────────────────────────────────────
-let currentPage='todo';
+let currentPage='housework-hub';
+let hwHubView='week';
 const PT={
-  todo:{title:'To Do List',sub:'管理您的每日任務'},
+  'housework-hub':{title:'To Do List',sub:'管理您的每日任務'},
   tasks:{title:'任務清單',sub:'檢視所有任務資料'},
   housework:{title:'家事管理',sub:'管理家事項目與頻率'},
-  inventory:{title:'物品庫存',sub:'家中物品 · 庫存追蹤 · 補貨提醒'},
+  inventory:{title:'物品庫',sub:'家中物品 · 庫存追蹤 · 補貨提醒'},
+  shopping:{title:'採購清單',sub:'待購買 · 已購買 · 補貨追蹤'},
+  memo:{title:'備忘',sub:'筆記與追蹤提醒'},
 };
 function _syncInvHeaderBtns(){
   // 依目前 sub-tab 顯示對應的 header icon 按鈕
@@ -1775,20 +1919,16 @@ function switchPage(p,b){
   // 先全隱 contextual 按鈕
   if(icsBtn)icsBtn.style.setProperty('display','none','important');
   if(shopBtn)shopBtn.style.setProperty('display','none','important');
-  if(p==='tasks'){
+  if(p==='housework-hub'){
     if(addBtn)addBtn.style.setProperty('display','none','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
-    if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
-  } else if(p==='housework'){
-    if(addBtn)addBtn.style.setProperty('display','none','important');
-    if(importBtn)importBtn.style.setProperty('display','none','important');
-    if(iphoneBtn)iphoneBtn.style.setProperty('display','flex','important');
+    if(iphoneBtn)iphoneBtn.style.setProperty('display',hwHubView==='list'?'flex':'none','important');
   } else if(p==='inventory'){
     if(addBtn)addBtn.style.setProperty('display','flex','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
-  } else if(p==='todo'){
-    if(addBtn)addBtn.style.setProperty('display','none','important');
+  } else if(p==='shopping'){
+    if(addBtn)addBtn.style.setProperty('display','flex','important');
     if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   } else {
@@ -1796,7 +1936,7 @@ function switchPage(p,b){
     if(importBtn)importBtn.style.setProperty('display','none','important');
     if(iphoneBtn)iphoneBtn.style.setProperty('display','none','important');
   }
-  if(hwSelected.size>0&&p!=='housework')clearSelection();
+  if(hwSelected.size>0&&p!=='housework-hub')clearSelection();
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
@@ -1807,15 +1947,48 @@ function switchPage(p,b){
   const _sub=document.getElementById('pageSubtitle');if(_sub)_sub.textContent=pg.sub;
   closeAllPopups();
   if(p==='inventory')renderInventoryPage();
-  else if(p==='todo'){twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
+  else if(p==='shopping')renderShoppingPage();
+  else if(p==='memo')renderMemoPage();
+  else if(p==='housework-hub'){renderAll();twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
   else renderAll();
 }
+
+// ── 家務中心（本週／清單／資料庫）子視圖切換 ───────────────
+function hwViewSwitch(view){
+  hwHubView=view;
+  if(hwSelected.size>0&&view!=='list')clearSelection();
+  document.querySelectorAll('#hw-hub-switch .shop-stab').forEach(bt=>bt.classList.remove('on'));
+  document.getElementById('hwhub-tab-'+view)?.classList.add('on');
+  const weekEl=document.getElementById('hw-view-week'),listEl=document.getElementById('hw-view-list'),dbEl=document.getElementById('hw-view-db');
+  if(weekEl)weekEl.style.display=view==='week'?'block':'none';
+  if(listEl)listEl.style.display=view==='list'?'block':'none';
+  if(dbEl)dbEl.style.display=view==='db'?'block':'none';
+  const titleMap={week:PT['housework-hub'],list:PT.housework,db:PT.tasks};
+  const pg=titleMap[view];
+  const titleEl=document.getElementById('pageTitle');if(titleEl&&pg)titleEl.textContent=pg.title;
+  const subEl=document.getElementById('pageSubtitle');if(subEl&&pg)subEl.textContent=pg.sub;
+  const iphoneBtn=document.getElementById('global-iphone-btn');
+  if(iphoneBtn)iphoneBtn.style.setProperty('display',view==='list'?'flex':'none','important');
+  if(view==='week'){twRender();setTimeout(()=>document.getElementById('tw-dr-'+todayStr)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);}
+  else renderAll();
+}
+
+// ── 採購清單頁 render（原巢狀於物品庫的購物清單，現為獨立頁）──
+function renderShoppingPage(){
+  shopSyncRestock();
+  if(typeof shopSubTab!=='undefined'&&shopSubTab==='restock'){shopRenderRestock();}
+  else if(typeof shopRender==='function'){shopRender();}
+}
 function openAddModal(){
-  if(currentPage==='housework')openHouseworkModal();
+  if(currentPage==='housework-hub'&&hwHubView==='list')openHouseworkModal();
+  else if(currentPage==='housework-hub'&&hwHubView==='db')openTaskModal();
+  else if(currentPage==='housework-hub'){twOpenDropDay=todayStr;twRender();}
   else if(currentPage==='inventory'){
     _invAddDropdown();
   }
-  else if(currentPage==='todo'){twOpenDropDay=todayStr;twRender();}
+  else if(currentPage==='shopping'){shopOpenAdd();}
+  else if(currentPage==='memo'&&memoTab==='trackers'){trackerOpenModal(null);}
+  else if(currentPage==='memo'){noteOpenModal(null);}
   else openTaskModal();
 }
 function _invAddDropdown(){
@@ -1974,18 +2147,17 @@ function togglePopup(id,e){
     const rect=btn.getBoundingClientRect();
     el.style.position='fixed';
     el.style.right=(window.innerWidth-rect.right)+'px';
-    el.style.top='';el.style.bottom='';
     const navH=80;
     const spaceBelow=window.innerHeight-rect.bottom-navH;
-    if(spaceBelow<130){el.style.bottom=(window.innerHeight-rect.top)+'px';}
-    else{el.style.top=(rect.bottom+4)+'px';}
+    if(spaceBelow<130){el.style.top='auto';el.style.bottom=(window.innerHeight-rect.top)+'px';}
+    else{el.style.bottom='auto';el.style.top=(rect.bottom+4)+'px';}
   }
   el.classList.add('show');
 }
 
 // ── HELPERS ───────────────────────────────────────────────
 function priorityBadge(p){return `<span class="badge ${p==='緊急'?'badge-urgent':p==='低'?'badge-low':'badge-normal'}">${p}</span>`}
-function areaColor(a){const m={'臥室':{bg:'#f5f3ff',dot:'#8b5cf6',icon:'🛏'},'所有空間':{bg:'#eff6ff',dot:'#3b82f6',icon:'🏠'},'浴室':{bg:'#ecfeff',dot:'#06b6d4',icon:'🚿'},'廚房':{bg:'#fffbeb',dot:'#f59e0b',icon:'🍳'}};return m[a]||{bg:'#f1f5f9',dot:'#6b7280',icon:'📍'}}
+function areaColor(a){const m={'臥室':{bg:'#f5f3ff',dot:'#8b5cf6',icon:'🛏'},'所有空間':{bg:'#eff6ff',dot:'#3b82f6',icon:'🏠'},'浴室':{bg:'#ecfeff',dot:'#06b6d4',icon:'🚿'},'廚房':{bg:'#fffbeb',dot:'#f59e0b',icon:'🍳'}};return m[a]||{bg:'#EFEBE2',dot:'#6b7280',icon:'📍'}}
 function emptyS(m){return `<div class="empty-state"><span class="material-symbols-outlined">inbox</span><p>${m}</p></div>`}
 function freqLabel(t){if(!t||t.freqType==='none'||!t.freqVal)return '';return t.freqType==='days'?`每${t.freqVal}天`:`每月${t.freqVal}號`}
 
@@ -2036,7 +2208,7 @@ function switchDbTab(tab){
 }
 function renderDbRow(t){
   const fl=freqLabel(t);
-  const pc={'緊急':'#dc2626','普通':'#2563eb','低':'#5b52e8'}[t.priority]||'#6b7280';
+  const pc={'緊急':'#dc2626','普通':'#2563eb','低':'#4E9EB8'}[t.priority]||'#6b7280';
   return `<div class="task-db-row">
     <div style="min-width:0">
       <div style="display:flex;align-items:center;gap:6px"><p style="font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.title}</p>${ownerBadge(t)}</div>
@@ -2099,7 +2271,7 @@ function renderTasksPage(){
 // ── HOUSEWORK BATCH ───────────────────────────────────────
 function toggleHwSelect(id,e){if(e)e.stopPropagation();if(hwSelected.has(id))hwSelected.delete(id);else hwSelected.add(id);updateFloatBar();const cb=document.getElementById('hwcb-'+id);if(cb)cb.classList.toggle('checked',hwSelected.has(id));}
 function clearSelection(){hwSelected.clear();updateFloatBar();document.querySelectorAll('.hw-cb').forEach(cb=>cb.classList.remove('checked'));}
-function updateFloatBar(){const bar=document.getElementById('float-batch-bar'),label=document.getElementById('batch-count-label');if(!bar)return;if(hwSelected.size>0){bar.classList.add('show');if(label)label.textContent=`已選 ${hwSelected.size}`;}else{bar.classList.remove('show');}}
+function updateFloatBar(){const bar=document.getElementById('float-batch-bar'),label=document.getElementById('batch-count-label');if(!bar)return;const wasShown=bar.classList.contains('show');if(hwSelected.size>0){bar.classList.add('show');if(label)label.textContent=`已選 ${hwSelected.size}`;}else{bar.classList.remove('show');}const hwListEl=document.getElementById('housework-list');if(hwListEl)hwListEl.style.paddingBottom=hwSelected.size>0?'72px':'';if(hwSelected.size>0&&!wasShown){requestAnimationFrame(()=>{const barH=bar.offsetHeight||64;const barRect=bar.getBoundingClientRect();const rows=hwListEl?Array.from(hwListEl.querySelectorAll('.hw-compact-row')):[];let need=0;rows.forEach(row=>{const r=row.getBoundingClientRect();if(r.bottom>barRect.top&&r.top<window.innerHeight){const overlap=r.bottom-barRect.top;if(overlap>need)need=overlap;}});if(need>0)window.scrollBy({top:need+8,behavior:'smooth'});});}}
 function batchDelay(days){housework=housework.map(h=>hwSelected.has(h.id)?{...h,reminderDate:addD(h.reminderDate||todayStr,days)}:h);saveData();clearSelection();renderHouseworkPage();}
 function batchToWeekend(){const target=nextWeekend(todayStr);housework=housework.map(h=>hwSelected.has(h.id)?{...h,reminderDate:target}:h);saveData();clearSelection();renderHouseworkPage();}
 function showBatchCustomDate(){const sub=document.getElementById('batch-date-subtitle');if(sub)sub.textContent=`將 ${hwSelected.size} 個項目延後到指定日期`;const inp=document.getElementById('batch-custom-date-input');if(inp){inp.value=nextWeekend(todayStr);inp.min=todayStr;}document.getElementById('batchDateModal').classList.add('open');}
@@ -2136,7 +2308,7 @@ function renderHouseworkRow(h){
         <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8">more_vert</span>
       </button>
       <div class="popup-menu" id="popup-${h.id}">
-        <button onclick="openHouseworkModal('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#5b52e8">edit</span>修改</button>
+        <button onclick="openHouseworkModal('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#4E9EB8">edit</span>修改</button>
         <button onclick="markHouseworkDone('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#10b981">check_circle</span>標為完成</button>
         <button onclick="openDelayModal('hw','${h.id}')"><span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b">schedule</span>延後</button>
         <button class="danger" onclick="deleteHousework('${h.id}')"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>
@@ -2296,7 +2468,7 @@ function invToggleLocFilters(){
   document.getElementById('inv-loc-filter-body').classList.toggle('open',invLocFilterOpen);
   document.getElementById('inv-loc-filter-arrow').classList.toggle('open',invLocFilterOpen);
 }
-function invClearFilters(){invLocFilter=null;invCatFilter=null;invSrcFilter=null;invDateFrom=null;invDateTo=null;renderInventoryPage()}
+function invClearFilters(){invLocFilter=null;invCatFilter=null;invSrcFilter=null;invDateFrom=null;invDateTo=null;const _as=document.getElementById('inv-alert-search-input');if(_as)_as.value='';renderInventoryPage()}
 function invSetLoc(l){invLocFilter=l;renderInventoryPage()}
 function invSetCat(c){invCatFilter=c;renderInventoryPage()}
 function invSetSrc(s){invSrcFilter=s;renderInventoryPage()}
@@ -2351,6 +2523,8 @@ function invRenderFilterPanel(){
   if(invCatFilter)active.push(invCatFilter);
   if(invSrcFilter)active.push(invSrcIcon(invSrcFilter)+invSrcFilter);
   if(invDateFrom||invDateTo)active.push((invDateFrom?fmtDateFull(invDateFrom):'…')+' ~ '+(invDateTo?fmtDateFull(invDateTo):'…'));
+  const _alertSearchVal=(document.getElementById('inv-alert-search-input')?.value||'').trim();
+  if(_alertSearchVal)active.push('"'+_alertSearchVal+'"');
   const summary=document.getElementById('inv-filter-summary');
   const clearBtn=document.getElementById('inv-filter-clear-btn');
   if(summary)summary.textContent=active.length?active.join(' · '):'';
@@ -2387,6 +2561,8 @@ function invFilterPool(){
   if(invSrcFilter)pool=pool.filter(it=>it.source===invSrcFilter);
   if(invDateFrom)pool=pool.filter(it=>it.expiryDate&&it.expiryDate>=invDateFrom);
   if(invDateTo)pool=pool.filter(it=>it.expiryDate&&it.expiryDate<=invDateTo);
+  const alertSearchQ=(document.getElementById('inv-alert-search-input')?.value||'').trim().toLowerCase();
+  if(alertSearchQ)pool=pool.filter(it=>it.name.toLowerCase().includes(alertSearchQ)||(it.note||'').toLowerCase().includes(alertSearchQ));
   return pool;
 }
 
@@ -2437,6 +2613,7 @@ function renderInventoryPage(){
     const locActive=[];if(invLocFilter)locActive.push(invLocFilter);if(invCatFilter)locActive.push(invCatFilter);
     if(locSummary)locSummary.textContent=locActive.length?locActive.join(' · '):'';
     let pool=inventory.filter(it=>(!invLocFilter||it.location===invLocFilter)&&(!invCatFilter||(it.category||'其他')===invCatFilter)&&(q===''||it.name.toLowerCase().includes(q)||it.note?.toLowerCase().includes(q)));
+    pool=pool.sort((a,b)=>(a.name||'').localeCompare((b.name||''),'zh-Hant'));
     let html='';
     if(invLocFilter){html=`<div class="inv-list">${pool.map(it=>invRenderRow(it,false)).join('')}</div>`;}
     else{locs.forEach(loc=>{const grp=pool.filter(it=>it.location===loc);if(!grp.length)return;const m=lm(loc);html+=`<div class="inv-loc-group-head"><span style="font-size:16px">${m.icon}</span><span style="font-size:13px;font-weight:700;color:var(--text-secondary)">${loc}</span><span style="font-size:11px;color:var(--text-muted);margin-left:auto">${grp.length} 件</span></div><div class="inv-list">${grp.map(it=>invRenderRow(it,false)).join('')}</div>`;});}
@@ -3377,8 +3554,8 @@ function twGetSchedule(){
 }
 
 function twRenderAll(){
-  const el=document.getElementById('page-todo');
-  if(!el||!el.classList.contains('active'))return;
+  const el=document.getElementById('page-housework-hub');
+  if(!el||!el.classList.contains('active')||hwHubView!=='week')return;
   twRender();
 }
 
@@ -3409,8 +3586,12 @@ function twRenderProg(days){
   const r=13,circ=2*Math.PI*r,col=pct===100?'#10b981':'var(--primary)';
   const highShop=typeof shopList!=='undefined'?shopList.filter(s=>!s.done&&s.prio===0).length:0;
   const expUrgent=inventory.filter(it=>it.expiryDate&&invExpiryStatus(it)?.urgent).length;
-  const expChip=expUrgent>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(4)');switchPage('inventory',nb);setTimeout(()=>{const t=document.querySelector('.inv-tab');if(t){invSwitchTab('alert',t);}invAlertSubMode='expiry';_syncAlertSubBtns();renderInventoryPage();},80)" style="display:flex;align-items:center;gap:3px;background:#fff7ed;border:1px solid #fed7aa;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:#ea580c;cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">event</span>${expUrgent}</button>`:'';
-  const shopChip=highShop>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(4)');switchPage('inventory',nb);setTimeout(()=>{const t=document.getElementById('inv-tab-shopping');if(t)invSwitchTab('shopping',t);},80)" style="display:flex;align-items:center;gap:3px;background:#fef2f2;border:1px solid #fecaca;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:#dc2626;cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">shopping_cart</span>${highShop}</button>`:'';
+  const expChip=expUrgent>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(3)');switchPage('inventory',nb);setTimeout(()=>{const t=document.querySelector('.inv-tab');if(t){invSwitchTab('alert',t);}invAlertSubMode='expiry';_syncAlertSubBtns();renderInventoryPage();},80)" style="display:flex;align-items:center;gap:3px;background:#fff7ed;border:1px solid #fed7aa;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:#ea580c;cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">event</span>${expUrgent}</button>`:'';
+  const shopChip=highShop>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(2)');switchPage('shopping',nb)" style="display:flex;align-items:center;gap:3px;background:#fef2f2;border:1px solid #fecaca;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:#dc2626;cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">shopping_cart</span>${highShop}</button>`:'';
+  const memoNotesDue=(typeof notes!=='undefined'&&typeof matchOwner==='function')?notes.filter(matchOwner).filter(n=>n.dueDate&&n.dueDate<=todayStr).length:0;
+  const memoTrackersDue=(typeof trackers!=='undefined'&&typeof matchOwner==='function'&&typeof trackerStatus==='function')?trackers.filter(matchOwner).filter(t=>trackerStatus(t).overdue).length:0;
+  const memoDueCnt=memoNotesDue+memoTrackersDue;
+  const memoChip=memoDueCnt>0?`<button onclick="const nb=document.querySelector('.nav-item:nth-child(4)');switchPage('memo',nb)" style="display:flex;align-items:center;gap:3px;background:var(--danger-light);border:none;border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--danger);cursor:pointer;font-family:'Noto Sans TC',sans-serif;flex-shrink:0"><span class=\"material-symbols-outlined\" style=\"font-size:12px\">sticky_note_2</span>${memoDueCnt}</button>`:'';
   const dash=circ*pct/100,gap=circ-dash;
   // 右側資訊：done/total ＋ 逾期 chip（只在有逾期時才出現）
   const countTxt=total>0?`<span style="font-size:12px;font-weight:700;color:var(--text-primary)">${done}<span style="font-weight:400;color:var(--text-muted)">/${total}</span></span>`:`<span style="font-size:11px;color:var(--text-muted)">尚未安排</span>`;
@@ -3420,7 +3601,7 @@ function twRenderProg(days){
   el.innerHTML=`
     <div class="tw-prog-ring">
       <svg width="36" height="36" viewBox="0 0 36 36">
-        <circle cx="18" cy="18" r="${r}" fill="none" stroke="rgba(91,82,232,.18)" stroke-width="3.5"/>
+        <circle cx="18" cy="18" r="${r}" fill="none" stroke="rgba(40,177,222,.18)" stroke-width="3.5"/>
         <circle cx="18" cy="18" r="${r}" fill="none" stroke="${col}" stroke-width="3.5" stroke-dasharray="${dash} ${gap}" stroke-linecap="round"/>
       </svg>
       <div class="tw-prog-pct">${pct}%</div>
@@ -3430,7 +3611,7 @@ function twRenderProg(days){
         <button onclick="twProgMode='day';twRender()" style="padding:2px 8px;border-radius:5px;border:none;background:${twProgMode==='day'?'#fff':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='day'?'var(--primary)':'#7c6fd0'};cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:${twProgMode==='day'?'0 1px 3px rgba(0,0,0,.1)':'none'}">今日</button>
         <button onclick="twProgMode='week';twRender()" style="padding:2px 8px;border-radius:5px;border:none;background:${twProgMode==='week'?'#fff':'transparent'};font-size:10px;font-weight:700;color:${twProgMode==='week'?'var(--primary)':'#7c6fd0'};cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:${twProgMode==='week'?'0 1px 3px rgba(0,0,0,.1)':'none'}">本週</button>
       </div>
-      ${countTxt}${ovChip}${doneChip}${expChip}${shopChip}
+      ${countTxt}${ovChip}${doneChip}${expChip}${shopChip}${memoChip}
     </div>`;
 }
 
@@ -3462,7 +3643,7 @@ function twRenderDay(d){
     detHtml=items.map(s=>{
       const isDone=s.status==='done',isOv=!isDone&&isPast;
       // 月定期任務徽章
-      const recurBadge=s.isMonthly?`<span style="font-size:9px;background:#ede9fe;color:#7c3aed;padding:1px 6px;border-radius:999px;font-weight:700;flex-shrink:0" title="${s.freqHint||'定期任務'}">♻ 定期</span>`:'';
+      const recurBadge=s.isMonthly?`<span style="font-size:9px;background:#F0F8FF;color:#6CB5CC;padding:1px 6px;border-radius:999px;font-weight:700;flex-shrink:0" title="${s.freqHint||'定期任務'}">♻ 定期</span>`:'';
       // 本次備註
       const note=twGetOccurrenceNote(s.id,s.type,d);
       const noteRow=note?`<div class="tw-occ-note">📝 ${note}</div>`:'';
@@ -4260,9 +4441,16 @@ function locOpenSubModal(sublocId){
     document.getElementById('loc-sub-x').value=sl?sl.x:30;
     document.getElementById('loc-sub-y').value=sl?sl.y:30;
   }
+  const delBtn=document.getElementById('loc-sub-delete-btn');if(delBtn)delBtn.style.display=sublocId?'':'none';
   document.getElementById('locSubModal').classList.add('open');
   // 初始化色票高亮
   setTimeout(()=>{locSubSyncSwatches(initColor);locSubSyncSizeBtns();},10);
+}
+function locDeleteSublocFromModal(){
+  const id=document.getElementById('loc-sub-edit-id').value;
+  if(!id)return;
+  closeModal('locSubModal');
+  locDeleteSubloc(id);
 }
 function locAutoPosition(roomId){
   const room=locations.find(r=>r.id===roomId);
@@ -4433,12 +4621,15 @@ function fpEndDrag() {
 
 // ══ SHOPPING LIST ════════════════════════════════════════════════════════
 let shopList=[];
+let notes=[],trackers=[],memoTab='notes';
+let _memoNoteOpen={};
+let shopPrioCollapsed={};
 let shopSubTab='buy',shopSortMode='prio',shopFilterPrio='all',shopFilterCat='all',shopDoneSearch='',shopDoneCat='all',shopDoneDateFrom='',shopDoneDateTo='';
 let shopOpenCardId=null,shopOpenDotId=null;
 let shopActiveDdId=null,shopActiveDdField=null;
 let appIdentity=localStorage.getItem('app_identity')||'';
 let viewMode=localStorage.getItem('app_viewMode')||'mine';
-let taskOwnerForm='all',shopOwnerForm='all';
+let taskOwnerForm='all',shopOwnerForm='all',noteOwnerForm='all',trackerOwnerForm='all';
 let shopEditingId=null,shopFormPrio=1,shopFormSrc='全聯',shopFormLinks=[],shopEditStar=0;
 let shopFilterOpen=false,shopReviewStar=3;
 const SHOP_CATS=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
@@ -4450,6 +4641,307 @@ const SHOP_PRIO_CLS=['shop-b-high','shop-b-mid','shop-b-low'];
 
 function saveShopList(){fbSave('shoplist',shopList);}
 function loadShopList(){const s=localStorage.getItem('app_shoplist');shopList=s?JSON.parse(s):[];}
+
+// ══ 備忘（筆記 ＋ 追蹤提醒） ═══════════════════════════════════════════════
+function saveNotes(){fbSave('notes',notes);}
+function saveTrackers(){fbSave('trackers',trackers);}
+
+function renderMemoPage(){
+  renderNotesList();
+  renderTrackersList();
+  updateMemoTabBadges();
+}
+function memoSwitchSub(tab){
+  memoTab=tab;
+  document.querySelectorAll('#memo-sub-tabs .shop-stab').forEach(bt=>bt.classList.remove('on'));
+  document.getElementById('memotab-'+tab)?.classList.add('on');
+  const notesEl=document.getElementById('memo-notes-panel'),trkEl=document.getElementById('memo-trackers-panel');
+  if(notesEl)notesEl.style.display=tab==='notes'?'block':'none';
+  if(trkEl)trkEl.style.display=tab==='trackers'?'block':'none';
+  renderMemoPage();
+}
+// 筆記/追蹤提醒 分頁上的數量徽章（不搶眼的灰底小數字）＋ 有到期/逾期項目時的小紅點
+function updateMemoTabBadges(){
+  const nVisible=notes.filter(matchOwner);
+  const nCnt=document.getElementById('memo-notes-count'),nDot=document.getElementById('memo-notes-dot');
+  if(nCnt){nCnt.textContent=nVisible.length;nCnt.style.display=nVisible.length?'inline':'none';}
+  if(nDot){const nDue=nVisible.some(n=>n.dueDate&&dtCls(n.dueDate));nDot.style.display=nDue?'inline-block':'none';}
+  const tVisible=trackers.filter(matchOwner);
+  const tCnt=document.getElementById('memo-trackers-count'),tDot=document.getElementById('memo-trackers-dot');
+  if(tCnt){tCnt.textContent=tVisible.length;tCnt.style.display=tVisible.length?'inline':'none';}
+  if(tDot){const tDue=tVisible.some(t=>trackerStatus(t).overdue);tDot.style.display=tDue?'inline-block':'none';}
+}
+// 依歸屬把清單分成「我的／共同／他的」區塊（尚未設定身份時不分組，回傳單一區塊）
+function memoOwnerGroups(list){
+  if(!appIdentity)return [{label:'',items:list}];
+  const other=appIdentity==='sindy'?'bf':'sindy';
+  const mine=list.filter(x=>(x.owner||'all')===appIdentity);
+  const shared=list.filter(x=>(x.owner||'all')==='all');
+  const theirs=list.filter(x=>(x.owner||'all')===other);
+  const groups=[];
+  if(mine.length)groups.push({label:'我的',items:mine});
+  if(shared.length)groups.push({label:'共同',items:shared});
+  if(theirs.length)groups.push({label:'他的',items:theirs});
+  return groups.length?groups:[{label:'',items:list}];
+}
+
+// ── 一般筆記 ──────────────────────────────────────────────
+function renderNoteRow(n,border){
+  const hasTitle=!!(n.title&&n.title.trim());
+  const isOpen=_memoNoteOpen[n.id]===true;
+  // 到期日徽章改放右側（原本跟標題擠在一起，現在獨立靠右對齊，比較好一眼看到期限）
+  const dueBadge=n.dueDate?`<span class="date-tag ${dtCls(n.dueDate)}" style="cursor:default;min-width:0;font-size:10px;padding:3px 8px;flex-shrink:0">${dtLbl(n.dueDate)}</span>`:'';
+  let countBadge='';
+  if(n.format==='checklist'&&n.items&&n.items.length){
+    const done=n.items.filter(i=>i.d).length;
+    countBadge=`<span style="font-size:11px;background:var(--border-light);color:var(--text-muted);padding:1px 7px;border-radius:999px;margin-left:6px;font-weight:400">${done}/${n.items.length}</span>`;
+  }
+  const contentHtml=n.format==='checklist'
+    ?`<div style="font-size:13px">${renderNoteChecklistItems(n)}</div>`
+    :`<div style="font-size:13px;color:var(--text-secondary);white-space:pre-wrap;line-height:1.65">${n.text||''}</div>`;
+  if(hasTitle){
+    return `<div style="${border}" data-nid="${n.id}">
+      <div style="display:flex;align-items:center;gap:6px;padding:10px 12px">
+        <span onclick="noteToggleOpen('${n.id}')" style="cursor:pointer;color:var(--text-muted);flex-shrink:0;display:inline-flex;transition:transform .18s;transform:rotate(${isOpen?90:0}deg)"><span class="material-symbols-outlined" style="font-size:14px">chevron_right</span></span>
+        <span style="flex:1;font-weight:700;font-size:14px;color:var(--text-primary);cursor:pointer;word-break:break-word;min-width:0" onclick="noteToggleOpen('${n.id}')">${n.title}${countBadge}</span>
+        ${dueBadge}
+        <button onclick="event.stopPropagation();noteOpenModal('${n.id}')" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text-muted);flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px">edit</span></button>
+      </div>
+      ${isOpen?`<div style="padding:0 12px 10px 32px">${contentHtml}</div>`:''}
+    </div>`;
+  }
+  return `<div style="${border};display:flex;gap:9px;align-items:flex-start;padding:10px 12px" data-nid="${n.id}">
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="noteOpenModal('${n.id}')">${contentHtml}</div>
+    ${dueBadge}
+    <button onclick="event.stopPropagation();noteOpenModal('${n.id}')" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text-muted);flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px">edit</span></button>
+  </div>`;
+}
+function renderNotesList(){
+  const el=document.getElementById('memo-notes-list');if(!el)return;
+  const visible=notes.filter(matchOwner);
+  if(!visible.length){el.innerHTML=emptyS(notes.length?'目前視角下沒有備忘':'尚無備忘，點右上角新增');return;}
+  const sorted=[...visible].sort((a,b)=>(a.dueDate||'9999-99-99')<(b.dueDate||'9999-99-99')?-1:1);
+  // 依歸屬分成「我的／共同／他的」區塊顯示，各自獨立一個卡片
+  const groups=memoOwnerGroups(sorted);
+  el.innerHTML=groups.map((g,gi)=>{
+    const head=g.label?`<div style="display:flex;align-items:center;gap:6px;margin:${gi===0?'0':'18px'} 0 8px"><span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.03em">${g.label} · ${g.items.length}</span><div style="flex:1;height:1px;background:var(--border-light)"></div></div>`:'';
+    const card=`<div class="card" style="overflow:hidden">${g.items.map((n,idx)=>renderNoteRow(n,idx<g.items.length-1?'border-bottom:1px solid var(--border-light)':'')).join('')}</div>`;
+    return head+card;
+  }).join('');
+}
+function renderNoteChecklistItems(n){
+  if(!n.items||!n.items.length)return '';
+  return n.items.map((it,i)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+    <span onclick="event.stopPropagation();toggleNoteCheckItem('${n.id}',${i})" style="width:18px;height:18px;border:2px solid ${it.d?'var(--success)':'#cbd5e1'};border-radius:5px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:${it.d?'var(--success)':'var(--surface)'};flex-shrink:0">${it.d?'<span style="color:#fff;font-size:11px">✓</span>':''}</span>
+    <span style="font-size:13px;${it.d?'text-decoration:line-through;color:var(--text-muted)':'color:var(--text-secondary)'}">${it.t}</span>
+  </div>`).join('');
+}
+function toggleNoteCheckItem(id,idx){
+  const n=notes.find(x=>x.id===id);if(!n||!n.items)return;
+  n.items[idx].d=!n.items[idx].d;
+  saveNotes();renderMemoPage();
+}
+function noteToggleOpen(id){_memoNoteOpen[id]=_memoNoteOpen[id]!==true;renderMemoPage();}
+let _noteFmt='text';
+function memoNoteSetFmt(fmt){
+  _noteFmt=fmt;
+  const tb=document.getElementById('note-fmt-text'),cb=document.getElementById('note-fmt-checklist');
+  if(tb)tb.classList.toggle('on',fmt==='text');
+  if(cb)cb.classList.toggle('on',fmt==='checklist');
+  const ta=document.getElementById('note-text');if(ta)ta.placeholder=fmt==='checklist'?'每行一個項目…':'輸入內容…';
+  const hint=document.getElementById('note-fmt-hint');if(hint)hint.textContent=fmt==='checklist'?'（每行一項）':'';
+}
+function noteOpenModal(id){
+  const n=(id&&notes.find(x=>x.id===id))||null;
+  document.getElementById('note-edit-id').value=id||'';
+  document.getElementById('noteModalTitle').textContent=id?'編輯備忘':'新增備忘';
+  document.getElementById('note-title').value=n?n.title||'':'';
+  const fmt=n?n.format||'text':'text';
+  memoNoteSetFmt(fmt);
+  document.getElementById('note-text').value=(n&&fmt==='checklist'&&n.items)?n.items.map(it=>it.t).join('\n'):(n?n.text||'':'');
+  document.getElementById('note-due').value=n?n.dueDate||'':'';
+  noteOwnerForm=n?n.owner||'all':appIdentity||'all';syncOwnerSeg('note-owner-seg',noteOwnerForm);
+  const delBtn=document.getElementById('note-delete-btn');if(delBtn)delBtn.style.display=id?'':'none';
+  document.getElementById('noteModal').classList.add('open');
+}
+function noteSetOwner(v,btn){
+  noteOwnerForm=v;
+  document.querySelectorAll('#note-owner-seg button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function saveNote(){
+  const text=document.getElementById('note-text').value.trim();
+  if(!text){showToast('請輸入內容','error');return;}
+  const id=document.getElementById('note-edit-id').value;
+  const title=document.getElementById('note-title').value.trim();
+  const dueDate=document.getElementById('note-due').value;
+  const format=_noteFmt;
+  const existing=id?notes.find(x=>x.id===id):null;
+  const obj={title,format,dueDate,owner:noteOwnerForm,updatedAt:Date.now()};
+  if(format==='checklist'){
+    const oldItems=(existing&&existing.items)||[];
+    const newLines=text.split('\n').filter(Boolean);
+    obj.items=newLines.map(t=>{const old=oldItems.find(e=>e.t===t);return old||{t,d:false};});
+    obj.text='';
+  } else {
+    obj.text=text;obj.items=[];
+  }
+  if(id){ notes=notes.map(x=>x.id===id?{...x,...obj}:x); }
+  else{ obj.id='note-'+Date.now();obj.createdAt=Date.now();notes.push(obj); }
+  saveNotes();closeModal('noteModal');renderMemoPage();showToast('已儲存');
+}
+function deleteNote(id){
+  appConfirm('刪除備忘','確定要刪除這筆備忘嗎？',()=>{
+    notes=notes.filter(x=>x.id!==id);saveNotes();renderMemoPage();showToast('已刪除');
+  });
+}
+function noteDeleteFromModal(){
+  const id=document.getElementById('note-edit-id').value;
+  if(!id)return;
+  closeModal('noteModal');
+  deleteNote(id);
+}
+
+// ── 追蹤提醒（數值累積 ／ 天數間隔，雙門檻哪個先到算哪個） ──────────────
+function trackerStatus(t){
+  let dayDue=null,daysLeft=null,dayOverdue=false;
+  if(t.dayInterval){
+    dayDue=addD(t.lastDate||todayStr,t.dayInterval);
+    daysLeft=daysBetween(todayStr,dayDue);
+    dayOverdue=todayStr>=dayDue;
+  }
+  let valueLeft=null,valueOverdue=false;
+  if(t.valueInterval){
+    const threshold=(t.lastValue||0)+t.valueInterval;
+    if(t.currentValue!=null){ valueLeft=threshold-t.currentValue; valueOverdue=valueLeft<=0; }
+  }
+  return {overdue:dayOverdue||valueOverdue,dayDue,daysLeft,dayOverdue,valueLeft,valueOverdue};
+}
+function renderTrackerCard(t){
+  const st=trackerStatus(t);
+  const unit=t.unit||'';
+  const parts=[];
+  if(t.dayInterval){
+    const urgent=st.dayOverdue;
+    parts.push(`<span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:700;color:${urgent?'var(--danger)':'var(--text-primary)'}"><span class="material-symbols-outlined" style="font-size:14px">event</span>${urgent?'已逾期':`還有 ${st.daysLeft} 天`}</span>`);
+  }
+  if(t.valueInterval){
+    if(t.currentValue==null){
+      parts.push(`<span style="font-size:12px;color:var(--text-muted)">尚未回報數值</span>`);
+    }else{
+      const urgent=st.valueOverdue;
+      parts.push(`<span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:700;color:${urgent?'var(--danger)':'var(--text-primary)'}"><span class="material-symbols-outlined" style="font-size:14px">speed</span>${urgent?'已達門檻':`還差 ${st.valueLeft}${unit}`}</span>`);
+    }
+  }
+  const summary=parts.length?`<div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">${parts.join('<span style="color:var(--border);font-size:11px">·</span>')}</div>`:'';
+  // 標題改用主色＋icon＋較粗字重，跟一般筆記標題（深灰）做出區隔，更顯眼
+  return `<div class="card" style="padding:12px 14px" data-tid="${t.id}">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="flex:1;display:flex;align-items:center;gap:5px;min-width:0">
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--primary);flex-shrink:0">track_changes</span>
+        <span style="font-weight:800;font-size:15px;color:var(--primary);word-break:break-word">${t.name}</span>
+      </span>
+      ${st.overdue?`<span class="badge" style="background:var(--danger-light);color:var(--danger);font-size:10px;flex-shrink:0">待處理</span>`:''}
+      <button onclick="trackerOpenModal('${t.id}')" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text-muted);flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px">edit</span></button>
+    </div>
+    ${summary}
+    <div style="font-size:10px;color:var(--text-muted);margin-top:6px">上次記錄 ${fmtDateFull(t.lastDate)}・${t.lastValue}${unit}</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      ${t.valueInterval?`<button onclick="trackerPromptUpdateCurrent('${t.id}')" style="flex:1;font-size:12px;font-weight:600;color:var(--primary);background:var(--primary-light);border:none;border-radius:8px;padding:8px;cursor:pointer">更新目前數值</button>`:''}
+      <button onclick="trackerOpenComplete('${t.id}')" style="flex:1;font-size:12px;font-weight:600;color:#fff;background:var(--primary);border:none;border-radius:8px;padding:8px;cursor:pointer">完成並記錄</button>
+    </div>
+  </div>`;
+}
+function renderTrackersList(){
+  const el=document.getElementById('memo-trackers-list');if(!el)return;
+  const visible=trackers.filter(matchOwner);
+  if(!visible.length){el.innerHTML=emptyS(trackers.length?'目前視角下沒有追蹤提醒':'尚無追蹤提醒，點右上角新增');return;}
+  const sorted=[...visible].sort((a,b)=>{
+    const sa=trackerStatus(a),sb=trackerStatus(b);
+    if(sa.overdue!==sb.overdue)return sa.overdue?-1:1;
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  // 依歸屬分成「我的／共同／他的」區塊顯示
+  const groups=memoOwnerGroups(sorted);
+  el.innerHTML=groups.map((g,gi)=>{
+    const head=g.label?`<div style="display:flex;align-items:center;gap:6px;margin:${gi===0?'0':'18px'} 0 8px"><span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.03em">${g.label} · ${g.items.length}</span><div style="flex:1;height:1px;background:var(--border-light)"></div></div>`:'';
+    return head+g.items.map(renderTrackerCard).join('');
+  }).join('');
+}
+function trackerOpenModal(id){
+  const t=(id&&trackers.find(x=>x.id===id))||null;
+  document.getElementById('tracker-edit-id').value=id||'';
+  document.getElementById('trackerModalTitle').textContent=id?'編輯追蹤提醒':'新增追蹤提醒';
+  document.getElementById('tracker-name').value=t?t.name||'':'';
+  document.getElementById('tracker-unit').value=t?t.unit||'':'';
+  document.getElementById('tracker-lastvalue').value=t?(t.lastValue??''):'';
+  document.getElementById('tracker-lastdate').value=t?(t.lastDate||todayStr):todayStr;
+  document.getElementById('tracker-valueinterval').value=t?(t.valueInterval??''):'';
+  document.getElementById('tracker-dayinterval').value=t?(t.dayInterval??''):'';
+  trackerOwnerForm=t?t.owner||'all':appIdentity||'all';syncOwnerSeg('tracker-owner-seg',trackerOwnerForm);
+  const delBtn=document.getElementById('tracker-delete-btn');if(delBtn)delBtn.style.display=id?'':'none';
+  document.getElementById('trackerModal').classList.add('open');
+}
+function trackerSetOwner(v,btn){
+  trackerOwnerForm=v;
+  document.querySelectorAll('#tracker-owner-seg button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function saveTracker(){
+  const name=document.getElementById('tracker-name').value.trim();
+  if(!name){showToast('請輸入名稱','error');return;}
+  const unit=document.getElementById('tracker-unit').value.trim();
+  const lastValue=parseFloat(document.getElementById('tracker-lastvalue').value)||0;
+  const lastDate=document.getElementById('tracker-lastdate').value||todayStr;
+  const viRaw=document.getElementById('tracker-valueinterval').value;
+  const diRaw=document.getElementById('tracker-dayinterval').value;
+  const valueInterval=viRaw?parseFloat(viRaw):null;
+  const dayInterval=diRaw?parseInt(diRaw):null;
+  if(!valueInterval&&!dayInterval){showToast('請至少設定一種提醒門檻','error');return;}
+  const id=document.getElementById('tracker-edit-id').value;
+  const obj={name,unit,lastValue,lastDate,valueInterval,dayInterval,owner:trackerOwnerForm,updatedAt:Date.now()};
+  if(id){ trackers=trackers.map(x=>x.id===id?{...x,...obj}:x); }
+  else{ obj.id='tracker-'+Date.now();obj.createdAt=Date.now();obj.currentValue=null;trackers.push(obj); }
+  saveTrackers();closeModal('trackerModal');renderMemoPage();showToast('已儲存');
+}
+function deleteTracker(id){
+  appConfirm('刪除追蹤提醒','確定要刪除這筆追蹤提醒嗎？',()=>{
+    trackers=trackers.filter(x=>x.id!==id);saveTrackers();renderMemoPage();showToast('已刪除');
+  });
+}
+function trackerDeleteFromModal(){
+  const id=document.getElementById('tracker-edit-id').value;
+  if(!id)return;
+  closeModal('trackerModal');
+  deleteTracker(id);
+}
+function trackerPromptUpdateCurrent(id){
+  const t=trackers.find(x=>x.id===id);if(!t)return;
+  appPrompt('更新目前數值（'+(t.unit||'')+'）',t.currentValue??t.lastValue,val=>trackerUpdateCurrent(id,val));
+}
+function trackerUpdateCurrent(id,val){
+  const v=parseFloat(val);
+  if(isNaN(v)){showToast('請輸入數字','error');return;}
+  trackers=trackers.map(x=>x.id===id?{...x,currentValue:v,currentValueUpdatedAt:Date.now()}:x);
+  saveTrackers();renderMemoPage();showToast('已更新目前數值');
+}
+function trackerOpenComplete(id){
+  const t=trackers.find(x=>x.id===id);if(!t)return;
+  document.getElementById('tracker-complete-id').value=id;
+  document.getElementById('tracker-complete-name').textContent=t.name;
+  document.getElementById('tracker-complete-value').value=t.currentValue??t.lastValue??'';
+  document.getElementById('tracker-complete-date').value=todayStr;
+  document.getElementById('tracker-complete-unit-label').textContent=t.unit||'';
+  document.getElementById('trackerCompleteModal').classList.add('open');
+}
+function trackerSaveComplete(){
+  const id=document.getElementById('tracker-complete-id').value;
+  const val=parseFloat(document.getElementById('tracker-complete-value').value);
+  const date=document.getElementById('tracker-complete-date').value||todayStr;
+  if(isNaN(val)){showToast('請輸入數字','error');return;}
+  trackers=trackers.map(x=>x.id===id?{...x,lastValue:val,lastDate:date,currentValue:null,currentValueUpdatedAt:null,updatedAt:Date.now()}:x);
+  saveTrackers();closeModal('trackerCompleteModal');renderMemoPage();showToast('已記錄，下次提醒已重新計算');
+}
 
 function shopSyncRestock(){
   const restockItems=inventory.filter(it=>{
@@ -4478,7 +4970,7 @@ function shopRenderRestock(){
   }
   el.innerHTML=restockItems.map(inv=>{
     const already=shopList.some(s=>s.restockId===inv.id&&!s.done);
-    const col=areaColor(inv.area||'')||{bg:'#f1f5f9',dot:'#6b7280',icon:'📦'};
+    const col=areaColor(inv.area||'')||{bg:'#EFEBE2',dot:'#6b7280',icon:'📦'};
     const qty=inv.qtyMode==='ratio'?`${inv.ratio??100}%`:`${inv.qty??0} 件`;
     return `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;margin:0 14px 7px;background:var(--surface);border-radius:12px;border:1px solid var(--border-light)">
       <span style="font-size:20px">${col.icon}</span>
@@ -4533,7 +5025,7 @@ function shopRender(){
   const el=document.getElementById(isDone?'shop-done-list':'shop-buy-list');
   if(!el)return;
   if(!list.length){el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:13px">${isDone?'還沒有購買紀錄！':'清單空空的，點右上角新增吧！'}</div>`;return;}
-  el.innerHTML=list.map(it=>{
+  const shopCardHtml=it=>{
     const open=shopOpenCardId===it.id;
     const dotOpen=shopOpenDotId===it.id;
     const subline=[it.store||'',it.price?'$'+it.price:''].filter(Boolean).join('・');
@@ -4552,7 +5044,6 @@ function shopRender(){
         <div style="display:flex;align-items:center;gap:3px">
           ${it.shopStatus==='transit'&&!it.done?'<span class="badge" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;font-size:9px;font-weight:700">🚚 途中</span>':''}
           ${it.restock?'<span class="badge shop-b-restock" style="font-size:9px">📦補貨</span>':''}
-          <span class="badge ${SHOP_PRIO_CLS[it.prio]}" style="font-size:9px">${SHOP_PRIO_LABEL[it.prio]}</span>
           <button class="shop-dot-btn" onclick="shopToggleDot('${it.id}',event)"><span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8">more_vert</span></button>
         </div>
       </div>
@@ -4584,7 +5075,18 @@ function shopRender(){
         <button onclick="shopDelete('${it.id}')"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>
       </div>
     </div>`;
-  }).join('');
+  };
+  if(!isDone&&shopFilterPrio==='all'){
+    const groups=[0,1,2].map(p=>list.filter(i=>i.prio===p));
+    el.innerHTML=groups.map((g,p)=>{
+      if(!g.length)return '';
+      const collapsed=!!shopPrioCollapsed[p];
+      const header=`<div class="${SHOP_PRIO_CLS[p]}" style="display:flex;align-items:center;justify-content:space-between;margin:${p===0?'0':'16px'} 0 8px;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;user-select:none" onclick="shopTogglePrioCollapse(${p})"><span>${SHOP_PRIO_ICON[p]} ${SHOP_PRIO_LABEL[p]}優先</span><span style="display:flex;align-items:center;gap:4px"><span style="opacity:.75;font-weight:600">${g.length} 項</span><span class="material-symbols-outlined" style="font-size:16px;transition:transform .15s;transform:rotate(${collapsed?-90:0}deg)">expand_more</span></span></div>`;
+      return header+(collapsed?'':g.map(shopCardHtml).join(''));
+    }).join('');
+  } else {
+    el.innerHTML=list.map(shopCardHtml).join('');
+  }
 }
 
 function shopToggleCard(id,e){
@@ -4686,14 +5188,14 @@ function setIdentity(id){
   appIdentity=id;localStorage.setItem('app_identity',id);
   const m=document.getElementById('identityModal');if(m)m.style.display='none';
   viewMode='mine';localStorage.setItem('app_viewMode','mine');
-  updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();
+  updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();if(typeof renderMemoPage==='function')renderMemoPage();
   showToast('已設定為 '+(id==='sindy'?'Sindy':'Jack')+' 的視角');
 }
 function cycleViewMode(){
   const modes=['mine','all','theirs'];
   viewMode=modes[(modes.indexOf(viewMode)+1)%3];
   localStorage.setItem('app_viewMode',viewMode);
-  updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();
+  updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();if(typeof renderMemoPage==='function')renderMemoPage();
 }
 function updateViewBtn(){
   const btn=document.getElementById('view-mode-btn');
@@ -4725,7 +5227,7 @@ function ownerBadge(item){
   const owner=item.owner||'all';
   if(owner==='all'||viewMode!=='all')return '';
   const isSindy=owner==='sindy';
-  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#ede9fe':'#dbeafe'};color:${isSindy?'#6d28d9':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👧🏻 Sindy':'🎅🏻 Jack'}</span>`;
+  return `<span style="font-size:10px;padding:1px 6px;border-radius:99px;background:${isSindy?'#F0F8FF':'#dbeafe'};color:${isSindy?'#397487':'#1d4ed8'};font-weight:600;flex-shrink:0">${isSindy?'👧🏻 Sindy':'🎅🏻 Jack'}</span>`;
 }
 function taskSetOwner(v,btn){
   taskOwnerForm=v;
@@ -4915,6 +5417,7 @@ function shopSetFilter(type,val,btn){
   btn.classList.add('on'); shopRender();
 }
 function shopSetSort(m,btn){shopSortMode=m;document.querySelectorAll('#shop-sort-chips .shop-chip').forEach(c=>c.classList.remove('on'));btn.classList.add('on');shopRender();}
+function shopTogglePrioCollapse(p){shopPrioCollapsed[p]=!shopPrioCollapsed[p];shopRender();}
 function shopToggleDoneFilter(){
   const body=document.getElementById('shop-done-filter-body');
   const arrow=document.getElementById('shop-done-filter-arrow');
@@ -4942,7 +5445,7 @@ function shopSetSub(mode){
 // ══ END SHOPPING LIST ═══════════════════════════════════════════════════
 
 // ── INIT ──────────────────────────────────────────────────
-loadData();renderAll();
+loadData();renderAll();initIdentity();
 // 頁面從背景回到前景時重新確認同步
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&!_fbListening) loadData(); });
 // ══════════════════════════════════════════════════════════
