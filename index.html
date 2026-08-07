@@ -4610,6 +4610,7 @@ function fpEndDrag() {
 let shopList=[];
 let notes=[],trackers=[],memoTab='notes';
 let _memoNoteOpen={};
+let _trackerHistOpen={};
 let shopPrioCollapsed={};
 let shopSubTab='buy',shopSortMode='prio',shopFilterPrio='all',shopFilterCat='all',shopDoneSearch='',shopDoneCat='all',shopDoneDateFrom='',shopDoneDateTo='';
 let shopOpenCardId=null,shopOpenDotId=null;
@@ -4802,6 +4803,50 @@ function trackerStatus(t){
   }
   return {overdue:dayOverdue||valueOverdue,dayDue,daysLeft,dayOverdue,valueLeft,valueOverdue};
 }
+// 🌟 歷史紀錄陣列：舊資料若尚無 records（升級前建立的追蹤項目），
+// 以既有的 lastDate/lastValue 回推出第一筆，純讀取用、不寫回資料，不影響 Firebase 同步邏輯。
+function trackerRecords(t){
+  if(t.records&&t.records.length)return t.records;
+  return [{date:t.lastDate||todayStr,value:t.lastValue??0}];
+}
+function trackerToggleHist(id){_trackerHistOpen[id]=_trackerHistOpen[id]!==true;renderMemoPage();}
+function trackerHistoryHtml(t){
+  const unit=t.unit||'';
+  const recs=[...trackerRecords(t)].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const isOpen=_trackerHistOpen[t.id]===true;
+  const toggleRow=`<div style="display:flex;align-items:center;gap:5px;margin-top:8px;cursor:pointer;user-select:none" onclick="trackerToggleHist('${t.id}')">
+    <span style="color:var(--text-muted);display:inline-flex;transition:transform .18s;transform:rotate(${isOpen?90:0}deg)"><span class="material-symbols-outlined" style="font-size:14px">chevron_right</span></span>
+    <span style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.03em">歷史紀錄（${recs.length}）</span>
+  </div>`;
+  if(!isOpen)return toggleRow;
+  const rows=recs.map((r,i)=>{
+    const isLatest=i===0;
+    const older=recs[i+1]; // recs 為新到舊排序，i+1 是比 r 更早的一筆
+    let diffHtml='';
+    if(older){
+      const dDays=daysBetween(older.date||todayStr,r.date||todayStr);
+      const hasNums=typeof r.value==='number'&&typeof older.value==='number';
+      const dVal=hasNums?(r.value-older.value):null;
+      const bits=[];
+      if(dVal!=null)bits.push(`${dVal>=0?'+':''}${dVal}${unit}`);
+      bits.push(`${dDays} 天`);
+      diffHtml=`<div style="font-size:10px;color:var(--text-muted);margin-top:2px">距上次 ${bits.join('・')}</div>`;
+    }
+    return `<div style="display:flex;gap:8px;align-items:flex-start;position:relative;padding:0 0 ${i<recs.length-1?'12px':'0'} 16px">
+      <div style="position:absolute;left:0;top:4px;width:8px;height:8px;border-radius:50%;background:${isLatest?'var(--primary)':'var(--border)'};box-shadow:${isLatest?'0 0 0 3px var(--primary-light)':'none'};flex-shrink:0"></div>
+      ${i<recs.length-1?`<div style="position:absolute;left:3.25px;top:12px;bottom:0;width:1.5px;background:var(--border-light)"></div>`:''}
+      <div style="flex:1;min-width:0;opacity:${isLatest?'1':'.55'}">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:${isLatest?'800':'600'};color:${isLatest?'var(--primary)':'var(--text-secondary)'}">${fmtDateFull(r.date)}</span>
+          <span style="font-size:12px;font-weight:${isLatest?'800':'600'};color:${isLatest?'var(--text-primary)':'var(--text-secondary)'}">${r.value}${unit}</span>
+          ${isLatest?`<span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:9px">最新</span>`:''}
+        </div>
+        ${diffHtml}
+      </div>
+    </div>`;
+  }).join('');
+  return toggleRow+`<div style="margin-top:8px;padding:10px 8px 0 4px;border-top:1px dashed var(--border-light)">${rows}</div>`;
+}
 function renderTrackerCard(t){
   const st=trackerStatus(t);
   const unit=t.unit||'';
@@ -4831,6 +4876,7 @@ function renderTrackerCard(t){
     </div>
     ${summary}
     <div style="font-size:10px;color:var(--text-muted);margin-top:6px">上次記錄 ${fmtDateFull(t.lastDate)}・${t.lastValue}${unit}</div>
+    ${trackerHistoryHtml(t)}
     <div style="display:flex;gap:8px;margin-top:10px">
       ${t.valueInterval?`<button onclick="trackerPromptUpdateCurrent('${t.id}')" style="flex:1;font-size:12px;font-weight:600;color:var(--primary);background:var(--primary-light);border:none;border-radius:8px;padding:8px;cursor:pointer">更新目前數值</button>`:''}
       <button onclick="trackerOpenComplete('${t.id}')" style="flex:1;font-size:12px;font-weight:600;color:#fff;background:var(--primary);border:none;border-radius:8px;padding:8px;cursor:pointer">完成並記錄</button>
@@ -4886,7 +4932,7 @@ function saveTracker(){
   const id=document.getElementById('tracker-edit-id').value;
   const obj={name,unit,lastValue,lastDate,valueInterval,dayInterval,owner:trackerOwnerForm,updatedAt:Date.now()};
   if(id){ trackers=trackers.map(x=>x.id===id?{...x,...obj}:x); }
-  else{ obj.id='tracker-'+Date.now();obj.createdAt=Date.now();obj.currentValue=null;trackers.push(obj); }
+  else{ obj.id='tracker-'+Date.now();obj.createdAt=Date.now();obj.currentValue=null;obj.records=[{date:lastDate,value:lastValue}];trackers.push(obj); }
   saveTrackers();closeModal('trackerModal');renderMemoPage();showToast('已儲存');
 }
 function deleteTracker(id){
@@ -4924,7 +4970,12 @@ function trackerSaveComplete(){
   const val=parseFloat(document.getElementById('tracker-complete-value').value);
   const date=document.getElementById('tracker-complete-date').value||todayStr;
   if(isNaN(val)){showToast('請輸入數字','error');return;}
-  trackers=trackers.map(x=>x.id===id?{...x,lastValue:val,lastDate:date,currentValue:null,currentValueUpdatedAt:null,updatedAt:Date.now()}:x);
+  // 🌟 新增一筆歷史紀錄：沿用（或補回）既有 records，push 進最新一筆，並用它重新計算下次提醒
+  trackers=trackers.map(x=>{
+    if(x.id!==id)return x;
+    const records=[...trackerRecords(x),{date,value:val}];
+    return {...x,lastValue:val,lastDate:date,currentValue:null,currentValueUpdatedAt:null,updatedAt:Date.now(),records};
+  });
   saveTrackers();closeModal('trackerCompleteModal');renderMemoPage();showToast('已記錄，下次提醒已重新計算');
 }
 
