@@ -913,12 +913,16 @@
       </div>
       <div class="shop-filter-body" id="shop-filter-body">
         <div class="shop-filter-row">
-          <span class="shop-filter-row-label">優先度</span>
-          <div class="shop-chips-wrap" id="shop-prio-filter-chips">
-            <button class="shop-chip on" onclick="shopSetFilter('prio','all',this)">全部</button>
-            <button class="shop-chip" onclick="shopSetFilter('prio',0,this)">🔴 高</button>
-            <button class="shop-chip" onclick="shopSetFilter('prio',1,this)">🟡 中</button>
-            <button class="shop-chip" onclick="shopSetFilter('prio',2,this)">🟢 低</button>
+          <span class="shop-filter-row-label">購買來源</span>
+          <div class="shop-chips-wrap" id="shop-src-filter-chips">
+            <button class="shop-chip on" onclick="shopSetSrcFilter('all',this)">全部</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('全聯',this)">全聯</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('蝦皮',this)">蝦皮</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('酷彭',this)">酷彭</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('屈臣氏',this)">屈臣氏</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('MOMO',this)">MOMO</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('淘寶',this)">淘寶</button>
+            <button class="shop-chip" onclick="shopSetSrcFilter('其他',this)">其他</button>
           </div>
         </div>
         <div class="shop-filter-row" style="align-items:center">
@@ -1036,6 +1040,7 @@
         <button class="shop-chip" onclick="shopSetFormSrc(this)">酷彭</button>
         <button class="shop-chip" onclick="shopSetFormSrc(this)">屈臣氏</button>
         <button class="shop-chip" onclick="shopSetFormSrc(this)">MOMO</button>
+        <button class="shop-chip" onclick="shopSetFormSrc(this)">淘寶</button>
         <button class="shop-chip" onclick="shopSetFormSrc(this)">實體店</button>
         <button class="shop-chip" onclick="shopSetFormSrc(this)">其他</button>
       </div>
@@ -1588,7 +1593,7 @@ function lockEnter(){
 function lockSubmit(){ lockEnter(); }
 function lockLogout(){
   const keysToRemove = ['app_tasks','app_housework','app_inventory','app_locations','app_shoplist','app_updatedAt'];
-  keysToRemove.forEach(k => localStorage.removeItem(k));
+  keysToRemove.forEach(k => safeRemoveItem(k));
   _fbListening = false;
   if(db && _roomToken) { try{ db.ref('rooms/'+_roomToken).off(); }catch(e){} }
   closeDrawer();
@@ -1599,7 +1604,7 @@ function lockLogout(){
 function forceUpload(){
   appConfirm('強制上傳', '確定要以此裝置的資料覆蓋雲端嗎？另一台裝置的資料將被覆蓋。', ()=>{
     const now = Date.now();
-    localStorage.setItem('app_updatedAt', String(now));
+    safeSetItem('app_updatedAt', String(now));
     Promise.all([
       fbSave('tasks', tasks),
       fbSave('housework', housework),
@@ -1648,12 +1653,39 @@ function fbSetStatus(state){
   if(fb)fb.title='點擊查看 · '+m.tip;
 }
 
+// ── localStorage 安全存取（容量爆滿時不擋住畫面渲染/雲端同步）──────────
+function safeSetItem(key, value){
+  try{
+    localStorage.setItem(key, value);
+    return true;
+  }catch(e){
+    console.warn('localStorage 寫入失敗（可能已達容量上限），本次跳過本機快取：', key, e);
+    fbSetStatus('error');
+    return false;
+  }
+}
+function safeGetItem(key){
+  try{
+    return localStorage.getItem(key);
+  }catch(e){
+    console.warn('localStorage 讀取失敗：', key, e);
+    return null;
+  }
+}
+function safeRemoveItem(key){
+  try{
+    localStorage.removeItem(key);
+  }catch(e){
+    console.warn('localStorage 刪除失敗：', key, e);
+  }
+}
+
 // ── Firebase 讀寫封裝 ─────────────────────────────────────────
 function fbSave(key, data){
   fbSetStatus('saving');
   const now = Date.now();
-  localStorage.setItem('app_'+key, JSON.stringify(data));
-  localStorage.setItem('app_updatedAt', String(now));
+  safeSetItem('app_'+key, JSON.stringify(data));
+  safeSetItem('app_updatedAt', String(now));
   if(!db||!_roomToken){ fbSetStatus('offline'); return Promise.resolve(); }
   db.ref('rooms/'+_roomToken+'/meta/updatedAt').set(now).catch(()=>{});
   return db.ref('rooms/'+_roomToken+'/'+key).set(data)
@@ -1665,9 +1697,9 @@ function fbSave(key, data){
 function saveData(){
   // 一次性寫入 tasks + housework，避免兩次分開寫入導致中間狀態觸發 listener 覆蓋資料
   const now = Date.now();
-  localStorage.setItem('app_tasks',     JSON.stringify(tasks));
-  localStorage.setItem('app_housework', JSON.stringify(housework));
-  localStorage.setItem('app_updatedAt', String(now));
+  safeSetItem('app_tasks',     JSON.stringify(tasks));
+  safeSetItem('app_housework', JSON.stringify(housework));
+  safeSetItem('app_updatedAt', String(now));
   fbSetStatus('saving');
   if(!db||!_roomToken){ fbSetStatus('offline'); return; }
   db.ref('rooms/'+_roomToken).update({
@@ -1691,10 +1723,10 @@ let _localSnapshot = null;
 let _remoteSnapshot = null;
 
 function loadData(){
-  const t=localStorage.getItem('app_tasks'),h=localStorage.getItem('app_housework');
-  const i=localStorage.getItem('app_inventory'),l=localStorage.getItem('app_locations');
-  const s=localStorage.getItem('app_shoplist');
-  const nt=localStorage.getItem('app_notes'),tr=localStorage.getItem('app_trackers');
+  const t=safeGetItem('app_tasks'),h=safeGetItem('app_housework');
+  const i=safeGetItem('app_inventory'),l=safeGetItem('app_locations');
+  const s=safeGetItem('app_shoplist');
+  const nt=safeGetItem('app_notes'),tr=safeGetItem('app_trackers');
   tasks    = t ? JSON.parse(t) : [];
   housework= h ? JSON.parse(h) : [];
   inventory= i ? JSON.parse(i) : [];
@@ -1729,7 +1761,7 @@ function loadData(){
     }
     if(_firstLoad && _localSnapshot){
       const remoteUpdated = d.meta?.updatedAt || 0;
-      const localUpdated  = parseInt(localStorage.getItem('app_updatedAt')||'0');
+      const localUpdated  = parseInt(safeGetItem('app_updatedAt')||'0');
       _firstLoad = false;
       if(localUpdated > 0 && remoteUpdated > 0 && Math.abs(localUpdated - remoteUpdated) > 10000){
         _remoteSnapshot = d;
@@ -1754,15 +1786,15 @@ function applyRemoteData(d){
   if(d.shoplist && typeof shopList !== 'undefined') shopList = d.shoplist;
   if(d.notes && typeof notes !== 'undefined') notes = d.notes;
   if(d.trackers && typeof trackers !== 'undefined') trackers = d.trackers;
-  localStorage.setItem('app_tasks',     JSON.stringify(tasks));
-  localStorage.setItem('app_housework', JSON.stringify(housework));
-  localStorage.setItem('app_inventory', JSON.stringify(inventory));
-  localStorage.setItem('app_locations', JSON.stringify(locations));
-  if(typeof shopList !== 'undefined') localStorage.setItem('app_shoplist', JSON.stringify(shopList));
-  if(typeof notes !== 'undefined') localStorage.setItem('app_notes', JSON.stringify(notes));
-  if(typeof trackers !== 'undefined') localStorage.setItem('app_trackers', JSON.stringify(trackers));
+  safeSetItem('app_tasks',     JSON.stringify(tasks));
+  safeSetItem('app_housework', JSON.stringify(housework));
+  safeSetItem('app_inventory', JSON.stringify(inventory));
+  safeSetItem('app_locations', JSON.stringify(locations));
+  if(typeof shopList !== 'undefined') safeSetItem('app_shoplist', JSON.stringify(shopList));
+  if(typeof notes !== 'undefined') safeSetItem('app_notes', JSON.stringify(notes));
+  if(typeof trackers !== 'undefined') safeSetItem('app_trackers', JSON.stringify(trackers));
   const now = Date.now();
-  localStorage.setItem('app_updatedAt', String(d.meta?.updatedAt || now));
+  safeSetItem('app_updatedAt', String(d.meta?.updatedAt || now));
   renderAll();
   if(typeof renderInventoryPage === 'function') renderInventoryPage();
   if(typeof renderShoppingPage === 'function') renderShoppingPage();
@@ -1786,7 +1818,7 @@ function conflictChoose(choice){
   if(cs) cs.style.display='none';
   if(choice==='local'){
     const now = Date.now();
-    localStorage.setItem('app_updatedAt', String(now));
+    safeSetItem('app_updatedAt', String(now));
     fbSave('tasks', tasks);
     fbSave('housework', housework);
     fbSave('inventory', inventory);
@@ -2388,26 +2420,15 @@ function invSwitchTab(tab,btn){
   // 待注意子篩選列只在 alert tab 時顯示
   const alertBar=document.getElementById('inv-alert-sub-bar');
   if(alertBar)alertBar.style.display=tab==='alert'?'block':'none';
-  // 購物清單 panel 只在 shopping tab 時顯示
-  const shopPanel=document.getElementById('inv-shopping-panel');
+  // 🌟 註：這裡曾經有處理 tab==='shopping' 的舊分支（購物清單以前是物品庫底下的子頁籤）。
+  // 改版後「採購」已升級成獨立的頂層頁面，物品庫的分頁已不再有 shopping 這個選項（見上方
+  // .inv-tab 按鈕只剩 alert/location/locmgr），但舊分支殘留的
+  // `document.getElementById('inv-shopping-panel').style.display='none'` 卻會誤刪到
+  // 現在「採購」頂層頁面自己的內容容器（id 相同，只是現在掛在 #page-shopping 底下），
+  // 造成「先點物品庫的『位置』或『管理』分頁，再切到採購」時採購頁面整個變空白、
+  // 要重新整理才會恢復。這裡已移除該死碼與其副作用，只保留物品庫自己分頁需要的邏輯。
   const invContent=document.getElementById('inv-content');
-  const invFilterPanel=document.getElementById('inv-filter-panel');
-  const invLocFilterPanel=document.getElementById('inv-loc-filter-panel');
-  const invAlertStrip=document.getElementById('inv-alert-strip');
-  if(tab==='shopping'){
-    if(shopPanel)shopPanel.style.display='block';
-    if(invContent)invContent.style.display='none';
-    if(invFilterPanel)invFilterPanel.style.display='none';
-    if(invLocFilterPanel)invLocFilterPanel.style.display='none';
-    if(invAlertStrip)invAlertStrip.style.display='none';
-    // 同步待補貨並渲染
-    shopSyncRestock();
-    if(shopSubTab==='restock'){shopRenderRestock();}else{shopRender();}
-    return;
-  } else {
-    if(shopPanel)shopPanel.style.display='none';
-    if(invContent)invContent.style.display='';
-  }
+  if(invContent)invContent.style.display='';
   if(tab==='alert'){
     invAlertSubMode='all'; // 預設全部（效期＋補貨追蹤低庫存合併顯示）
     _syncAlertSubBtns();
@@ -2570,15 +2591,10 @@ function invFilterPool(){
 function renderInventoryPage(){
   const strip=document.getElementById('inv-alert-strip'),content=document.getElementById('inv-content');
   if(!strip||!content)return;
-  // 購物清單 tab：只刷新購物清單，不動 inv-content 顯示狀態（避免 Firebase 回呼覆蓋）
-  if(invCurrentTab==='shopping'){
-    const _sp=document.getElementById('inv-shopping-panel');
-    if(_sp)_sp.style.display='block';
-    content.style.display='none';
-    shopSyncRestock();
-    if(typeof shopSubTab!=='undefined'&&shopSubTab==='restock'){shopRenderRestock();}else if(typeof shopRender==='function'){shopRender();}
-    return;
-  }
+  // 🌟 舊版「購物清單掛在物品庫底下的 shopping 子頁籤」分支已移除：
+  // invCurrentTab 現在不會再是 'shopping'（見 invSwitchTab 的說明），
+  // 且 #inv-shopping-panel 這個 id 現在屬於獨立頂層頁面「採購」自己的內容容器，
+  // 留著這段死碼容易誤導未來維護者、也曾經是造成採購頁面被清空的根源之一。
   content.style.display=''; // 確保不因 inline style 遮蔽內容
   // 待注意徽章：效期緊急/逾期 ∪ 補貨低於門檻 的聯集數
   const alertCnt=inventory.filter(i=>{
@@ -3247,9 +3263,9 @@ function invConfirmImport(){
 }
 
 // ── SETTINGS ─────────────────────────────────────────────
-let appSettings=JSON.parse(localStorage.getItem('app_settings')||'{}');
-function saveSetting(key,val){appSettings[key]=val;localStorage.setItem('app_settings',JSON.stringify(appSettings))}
-function toggleSetting(key,btn){appSettings[key]=!appSettings[key];btn.classList.toggle('on',appSettings[key]);localStorage.setItem('app_settings',JSON.stringify(appSettings));renderAll()}
+let appSettings=JSON.parse(safeGetItem('app_settings')||'{}');
+function saveSetting(key,val){appSettings[key]=val;safeSetItem('app_settings',JSON.stringify(appSettings))}
+function toggleSetting(key,btn){appSettings[key]=!appSettings[key];btn.classList.toggle('on',appSettings[key]);safeSetItem('app_settings',JSON.stringify(appSettings));renderAll()}
 function renderSettingsPage(){
   const sn=document.getElementById('set-name'),se=document.getElementById('set-email');
   const sdf=document.getElementById('set-default-filter'),to=document.getElementById('tog-overdue');
@@ -4612,23 +4628,23 @@ let notes=[],trackers=[],memoTab='notes';
 let _memoNoteOpen={};
 let _trackerHistOpen={};
 let shopPrioCollapsed={};
-let shopSubTab='buy',shopSortMode='prio',shopFilterPrio='all',shopFilterCat='all',shopDoneSearch='',shopDoneCat='all',shopDoneDateFrom='',shopDoneDateTo='';
+let shopSubTab='buy',shopSortMode='prio',shopFilterPrio='all',shopFilterCat='all',shopFilterSrc='all',shopDoneSearch='',shopDoneCat='all',shopDoneDateFrom='',shopDoneDateTo='';
 let shopOpenCardId=null,shopOpenDotId=null;
 let shopActiveDdId=null,shopActiveDdField=null;
-let appIdentity=localStorage.getItem('app_identity')||'';
-let viewMode=localStorage.getItem('app_viewMode')||'mine';
+let appIdentity=safeGetItem('app_identity')||'';
+let viewMode=safeGetItem('app_viewMode')||'mine';
 let taskOwnerForm='all',shopOwnerForm='all',noteOwnerForm='all',trackerOwnerForm='all';
 let shopEditingId=null,shopFormPrio=1,shopFormSrc='全聯',shopFormLinks=[],shopEditStar=0;
 let shopFilterOpen=false,shopReviewStar=3;
 const SHOP_CATS=['日常用品','保養品','化妝品','糧食/飲品','藥品保健','清潔用品','文具工具','調味料','其他'];
-const SHOP_SRCS=['全聯','蝦皮','酷彭','屈臣氏','MOMO','實體店','其他'];
+const SHOP_SRCS=['全聯','蝦皮','酷彭','屈臣氏','MOMO','淘寶','實體店','其他'];
 let _shopDdVals=[];
 const SHOP_PRIO_LABEL=['高','中','低'];
 const SHOP_PRIO_ICON=['🔴','🟡','🟢'];
 const SHOP_PRIO_CLS=['shop-b-high','shop-b-mid','shop-b-low'];
 
 function saveShopList(){fbSave('shoplist',shopList);}
-function loadShopList(){const s=localStorage.getItem('app_shoplist');shopList=s?JSON.parse(s):[];}
+function loadShopList(){const s=safeGetItem('app_shoplist');shopList=s?JSON.parse(s):[];}
 
 // ══ 備忘（筆記 ＋ 追蹤提醒） ═══════════════════════════════════════════════
 function saveNotes(){fbSave('notes',notes);}
@@ -5027,7 +5043,7 @@ function shopAddFromRestock(invId){
   if(!inv)return;
   if(shopList.some(s=>s.restockId===invId&&!s.done)){showToast('已在購物清單中');return;}
   shopList.push({id:'shop-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),
-    name:inv.name,prio:1,cat:inv.category||'日常用品',src:inv.source||'',price:'',link:'',note:'',
+    name:inv.name||'(未命名物品)',prio:1,cat:inv.category||'日常用品',src:inv.source||'',price:'',link:'',note:'',
     done:false,restock:true,restockId:invId,
     date:todayStr,stars:0,reviewNote:'',reviewPrice:''});
   saveShopList();
@@ -5042,15 +5058,18 @@ function shopRender(){
   const isDone=shopSubTab==='done';
   let list=shopList.filter(i=>i.done===isDone&&matchOwner(i));
   if(!isDone){
-    if(shopFilterPrio!=='all') list=list.filter(i=>i.prio===shopFilterPrio);
     if(shopFilterCat!=='all') list=list.filter(i=>i.cat===shopFilterCat);
+    if(shopFilterSrc!=='all'){
+      if(shopFilterSrc==='其他') list=list.filter(i=>!i.src||i.src==='其他'||i.src==='實體店');
+      else list=list.filter(i=>i.src===shopFilterSrc);
+    }
     if(shopSortMode==='prio') list.sort((a,b)=>a.prio-b.prio);
     else if(shopSortMode==='price-asc') list.sort((a,b)=>shopParsePrice(a.price)-shopParsePrice(b.price));
     else if(shopSortMode==='price-desc') list.sort((a,b)=>shopParsePrice(b.price)-shopParsePrice(a.price));
     // 待取貨永遠置頂（穩定排序）
     list.sort((a,b)=>(a.shopStatus==='transit'?0:1)-(b.shopStatus==='transit'?0:1));
   } else {
-    if(shopDoneSearch){const q=shopDoneSearch.toLowerCase();list=list.filter(i=>i.name.toLowerCase().includes(q)||i.note?.toLowerCase().includes(q));}
+    if(shopDoneSearch){const q=shopDoneSearch.toLowerCase();list=list.filter(i=>(i.name||'').toLowerCase().includes(q)||(i.note||'').toLowerCase().includes(q));}
     if(shopDoneCat!=='all') list=list.filter(i=>i.cat===shopDoneCat);
     const dfFrom=document.getElementById('shop-done-date-from')?.value||'';
     const dfTo=document.getElementById('shop-done-date-to')?.value||'';
@@ -5061,18 +5080,22 @@ function shopRender(){
   const el=document.getElementById(isDone?'shop-done-list':'shop-buy-list');
   if(!el)return;
   if(!list.length){el.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:13px">${isDone?'還沒有購買紀錄！':'清單空空的，點右上角新增吧！'}</div>`;return;}
-  const shopCardHtml=it=>{
+  // 🌟 防呆：單一項目資料格式異常時（例如舊資料裡 stars/buyDate/name 型別不對），
+  // 不能讓 map() 整個中斷、導致清單畫面完全沒更新（看起來像「跳頁後版面壞掉」）。
+  // 用 try/catch 包住單一項目的渲染，異常時跳過該項目並在 console 留下警告，其餘項目正常顯示。
+  const shopCardHtmlRaw=it=>{
     const open=shopOpenCardId===it.id;
     const dotOpen=shopOpenDotId===it.id;
-    const subline=[it.store||'',it.price?'$'+it.price:''].filter(Boolean).join('・');
-    const starsHtml=it.stars?'⭐'.repeat(it.stars):'';
+    const subline=[it.store||it.src||'',it.price?'$'+it.price:''].filter(Boolean).join('・');
+    const safeStars=Math.max(0,Math.min(5,Math.round(Number(it.stars)||0)));
+    const starsHtml=safeStars>0?'⭐'.repeat(safeStars):'';
     return `<div class="shop-card" id="shop-card-${it.id}">
       <div class="shop-card-top" onclick="shopToggleCard('${it.id}',event)">
         <div class="shop-cb ${it.done?'checked':(it.shopStatus==='transit'?'transit':'')}" onclick="shopAdvanceStatus('${it.id}',event)">${it.shopStatus==='transit'&&!it.done?'🚚':''}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
-            <span style="font-size:14px;font-weight:600;color:${it.done?'var(--text-muted)':'var(--text-primary)'};${it.done?'text-decoration:line-through;':''}">${it.name}</span>
-            ${it.done&&it.buyDate?`<span style="font-size:10px;color:var(--text-muted);font-weight:400">${it.buyDate.slice(5).replace('-','/')}</span>`:''}
+            <span style="font-size:14px;font-weight:600;color:${it.done?'var(--text-muted)':'var(--text-primary)'};${it.done?'text-decoration:line-through;':''}">${it.name||'(未命名項目)'}</span>
+            ${it.done&&typeof it.buyDate==='string'&&it.buyDate?`<span style="font-size:10px;color:var(--text-muted);font-weight:400">${it.buyDate.slice(5).replace('-','/')}</span>`:''}
             ${ownerBadge(it)}
           </div>
           ${subline?`<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${subline}</div>`:''}
@@ -5111,6 +5134,10 @@ function shopRender(){
         <button onclick="shopDelete('${it.id}')"><span class="material-symbols-outlined" style="font-size:16px">delete</span>刪除</button>
       </div>
     </div>`;
+  };
+  const shopCardHtml=it=>{
+    try{ return shopCardHtmlRaw(it); }
+    catch(e){ console.warn('採購項目渲染失敗，已跳過此筆資料（不影響其他項目）：',it&&it.id,e); return ''; }
   };
   if(!isDone&&shopFilterPrio==='all'){
     const groups=[0,1,2].map(p=>list.filter(i=>i.prio===p));
@@ -5222,16 +5249,16 @@ function initIdentity(){
   }
 }
 function setIdentity(id){
-  appIdentity=id;localStorage.setItem('app_identity',id);
+  appIdentity=id;safeSetItem('app_identity',id);
   const m=document.getElementById('identityModal');if(m)m.style.display='none';
-  viewMode='mine';localStorage.setItem('app_viewMode','mine');
+  viewMode='mine';safeSetItem('app_viewMode','mine');
   updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();if(typeof renderMemoPage==='function')renderMemoPage();
   showToast('已設定為 '+(id==='sindy'?'Sindy':'Jack')+' 的視角');
 }
 function cycleViewMode(){
   const modes=['mine','all','theirs'];
   viewMode=modes[(modes.indexOf(viewMode)+1)%3];
-  localStorage.setItem('app_viewMode',viewMode);
+  safeSetItem('app_viewMode',viewMode);
   updateViewBtn();renderAll();if(typeof shopRender==='function')shopRender();if(typeof renderMemoPage==='function')renderMemoPage();
 }
 function updateViewBtn(){
@@ -5448,9 +5475,9 @@ function shopSetCatDd(val){
   document.getElementById('shop-cat-all-btn').classList.remove('on');
   shopRender();
 }
-function shopSetFilter(type,val,btn){
-  if(type==='prio'){shopFilterPrio=val;document.querySelectorAll('#shop-prio-filter-chips .shop-chip').forEach(c=>c.classList.remove('on'));}
-  else{shopFilterCat=val;document.querySelectorAll('#shop-cat-filter-chips .shop-chip').forEach(c=>c.classList.remove('on'));}
+function shopSetSrcFilter(val,btn){
+  shopFilterSrc=val;
+  document.querySelectorAll('#shop-src-filter-chips .shop-chip').forEach(c=>c.classList.remove('on'));
   btn.classList.add('on'); shopRender();
 }
 function shopSetSort(m,btn){shopSortMode=m;document.querySelectorAll('#shop-sort-chips .shop-chip').forEach(c=>c.classList.remove('on'));btn.classList.add('on');shopRender();}
