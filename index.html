@@ -2123,7 +2123,11 @@ function saveHousework(){
   const weekendMode=document.getElementById('hw-weekend-toggle').classList.contains('on');
   let reminderDate=document.getElementById('hw-reminder').value;
   if(weekendMode&&reminderDate)reminderDate=nextWeekend(reminderDate);
-  const obj={id:id||Date.now().toString(),name,area,frequency:parseInt(document.getElementById('hw-frequency').value)||0,lastCompleted:document.getElementById('hw-last-date').value,reminderDate,notes:document.getElementById('hw-notes').value.trim(),weekendMode};
+  // 🌟 修改既有家事時，之前少了保留 history / extraDates / occurrenceNotes 這幾個欄位，
+  // 導致「修改」一筆已經有完成紀錄的家事，會把它的完成歷史整個清空、額外排程日也一併消失。
+  // 這裡改成先取出既有資料再覆蓋表單欄位，新增時 existing 為 undefined 則沿用原本行為。
+  const existing=id?housework.find(x=>x.id==id):null;
+  const obj={...(existing||{}),id:id||Date.now().toString(),name,area,frequency:parseInt(document.getElementById('hw-frequency').value)||0,lastCompleted:document.getElementById('hw-last-date').value,reminderDate,notes:document.getElementById('hw-notes').value.trim(),weekendMode};
   if(id)housework=housework.map(x=>x.id==id?obj:x);else housework.push(obj);
   saveData();closeModal('houseworkModal');renderAll();
 }
@@ -3529,16 +3533,23 @@ function twGetSchedule(){
   // ── 家事排程（維持原本邏輯）────────────────────────────────
   housework.forEach(h=>{
     if(!matchOwner(h))return;
+    // 🌟 防重複：同一家事項目在同一天最多只會出現一筆（不論來源是主日期／歷史紀錄／額外排程日）。
+    // 曾發生使用者回報「家事項目完成後變成兩筆一樣的」，追查後懷疑是雲端同步時序或歷史紀錄
+    // 中混入重複日期字串所致；這裡加上這層保護，確保無論資料如何產生，畫面上同一天同一項目
+    // 一定只會渲染一次。
+    const _seenDates=new Set();
     if(h.reminderDate){
       const _hist=h.history||[];
       const _rdDone=_hist.includes(h.reminderDate);
       sched.push({id:h.id,type:'hw',title:h.name,date:h.reminderDate,
         status:_rdDone?'done':'pending',isHw:true});
+      _seenDates.add(h.reminderDate);
     }
     if(h.history&&h.history.length>0){
       h.history.forEach(d=>{
-        if(d!==h.reminderDate){
+        if(!_seenDates.has(d)){
           sched.push({id:h.id,type:'hw',title:h.name,date:d,status:'done',isHw:true});
+          _seenDates.add(d);
         }
       });
     }
@@ -3546,10 +3557,11 @@ function twGetSchedule(){
     if(h.extraDates&&h.extraDates.length){
       const hist=h.history||[];
       h.extraDates.forEach(ed=>{
-        if(ed===h.reminderDate)return; // 已由主日期顯示
+        if(_seenDates.has(ed))return; // 已由主日期或歷史紀錄顯示，或本身重複
         const edSt=hist.includes(ed)?'done':'pending';
         sched.push({id:h.id+'::extra::'+ed,type:'hw',title:h.name,date:ed,
           status:edSt,isHw:true});
+        _seenDates.add(ed);
       });
     }
   });
@@ -3862,23 +3874,22 @@ function twToggleDone(sid, stype, dateStr){
     const hw = housework.find(h => h.id === sid);
     if(!hw) return;
     const hist = hw.history || [];
-    
+
+    // 🌟 改為不可變寫法（housework=housework.map(...)），取代直接修改 hw 物件本身。
+    // 舊寫法直接 mutate 找到的物件參考，若與雲端同步的即時回寫（applyRemoteData 會整個
+    // 重新指定 housework 陣列）時間點重疊，容易讓畫面顯示與實際資料不同步、甚至讓同一
+    // 項目在畫面上短暫出現不一致的重複筆數。改成跟其他地方一致的 .map() 寫法較安全。
     if(hist.includes(dateStr)){
       // 取消完成：從歷史紀錄移除，並將提醒日退回這一天
-      hw.history = hist.filter(x => x !== dateStr);
-      hw.reminderDate = dateStr;
+      housework=housework.map(h=>h.id!==sid?h:{...h,history:hist.filter(x=>x!==dateStr),reminderDate:dateStr});
       showToast('已取消完成');
     } else {
       // 勾選完成：加入歷史紀錄，並計算下一次提醒日
-      hw.history = [...hist, dateStr];
-      
       // 🌟 修正重點 1：下一次提醒日，從「該日曆日期 (dateStr)」加上頻率來計算
       let nr = hw.frequency > 0 ? addD(dateStr, hw.frequency) : hw.reminderDate;
       if(hw.weekendMode && nr) nr = nextWeekend(nr);
-      
       // 🌟 修正重點 2：上次完成日，記錄為「該日曆日期 (dateStr)」而不是現實的今天
-      hw.lastCompleted = dateStr;
-      hw.reminderDate = nr;
+      housework=housework.map(h=>h.id!==sid?h:{...h,history:[...hist,dateStr],lastCompleted:dateStr,reminderDate:nr});
       showToast('家事已完成');
     }
     saveData();
