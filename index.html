@@ -4833,13 +4833,25 @@ function trackerStatus(t){
 // 🌟 歷史紀錄陣列：舊資料若尚無 records（升級前建立的追蹤項目），
 // 以既有的 lastDate/lastValue 回推出第一筆，純讀取用、不寫回資料，不影響 Firebase 同步邏輯。
 function trackerRecords(t){
-  if(t.records&&t.records.length)return t.records;
-  return [{date:t.lastDate||todayStr,value:t.lastValue??0}];
+  const base=(t.records&&t.records.length)?t.records:[{date:t.lastDate||todayStr,value:t.lastValue??0}];
+  // 🌟 相容舊資料：以前「更新目前數值」只改 currentValue、沒寫進 records。
+  // 若目前數值尚未出現在軌跡最後一筆，讀取時補出一筆「更新」紀錄（純讀取，下次寫入時才會一併存進資料）。
+  if(t.currentValue!=null){
+    const last=base[base.length-1];
+    if(!(last&&last.type==='update'&&last.value===t.currentValue)){
+      const d=t.currentValueUpdatedAt?toLD(new Date(t.currentValueUpdatedAt)):todayStr;
+      return [...base,{date:d,value:t.currentValue,type:'update'}];
+    }
+  }
+  return base;
 }
+// 追蹤數值顯示用：加千分位逗號（保留最多 10 位小數，同時消除 0.1+0.2 這類浮點誤差）
+function trackerFmt(n){return typeof n==='number'&&isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:10}):n;}
 function trackerToggleHist(id){_trackerHistOpen[id]=_trackerHistOpen[id]!==true;renderMemoPage();}
 function trackerHistoryHtml(t){
   const unit=t.unit||'';
-  const recs=[...trackerRecords(t)].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  // 同一天可能有多筆（例如先「更新數值」再「完成並記錄」），日期相同時以寫入順序為準（後寫入的在上）
+  const recs=trackerRecords(t).map((r,i)=>({...r,_i:i})).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b._i-a._i);
   const isOpen=_trackerHistOpen[t.id]===true;
   const toggleRow=`<div style="display:flex;align-items:center;gap:5px;margin-top:8px;cursor:pointer;user-select:none" onclick="trackerToggleHist('${t.id}')">
     <span style="color:var(--text-muted);display:inline-flex;transition:transform .18s;transform:rotate(${isOpen?90:0}deg)"><span class="material-symbols-outlined" style="font-size:14px">chevron_right</span></span>
@@ -4855,7 +4867,7 @@ function trackerHistoryHtml(t){
       const hasNums=typeof r.value==='number'&&typeof older.value==='number';
       const dVal=hasNums?(r.value-older.value):null;
       const bits=[];
-      if(dVal!=null)bits.push(`${dVal>=0?'+':''}${dVal}${unit}`);
+      if(dVal!=null)bits.push(`${dVal>=0?'+':''}${trackerFmt(dVal)}${unit}`);
       bits.push(`${dDays} 天`);
       diffHtml=`<div style="font-size:10px;color:var(--text-muted);margin-top:2px">距上次 ${bits.join('・')}</div>`;
     }
@@ -4865,8 +4877,8 @@ function trackerHistoryHtml(t){
       <div style="flex:1;min-width:0;opacity:${isLatest?'1':'.55'}">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:12px;font-weight:${isLatest?'800':'600'};color:${isLatest?'var(--primary)':'var(--text-secondary)'}">${fmtDateFull(r.date)}</span>
-          <span style="font-size:12px;font-weight:${isLatest?'800':'600'};color:${isLatest?'var(--text-primary)':'var(--text-secondary)'}">${r.value}${unit}</span>
-          ${isLatest?`<span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:9px">最新</span>`:''}
+          <span style="font-size:12px;font-weight:${isLatest?'800':'600'};color:${isLatest?'var(--text-primary)':'var(--text-secondary)'}">${trackerFmt(r.value)}${unit}</span>
+          ${r.type!=='update'?`<span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:9px;margin-left:4px">完成</span>`:''}
         </div>
         ${diffHtml}
       </div>
@@ -4887,7 +4899,7 @@ function renderTrackerCard(t){
       parts.push(`<span style="font-size:12px;color:var(--text-muted)">尚未回報數值</span>`);
     }else{
       const urgent=st.valueOverdue;
-      parts.push(`<span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:700;color:${urgent?'var(--danger)':'var(--text-primary)'}"><span class="material-symbols-outlined" style="font-size:14px">speed</span>${urgent?'已達門檻':`還差 ${st.valueLeft}${unit}`}</span>`);
+      parts.push(`<span style="display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:700;color:${urgent?'var(--danger)':'var(--text-primary)'}"><span class="material-symbols-outlined" style="font-size:14px">speed</span>${urgent?'已達門檻':`還差 ${trackerFmt(st.valueLeft)}${unit}`}</span>`);
     }
   }
   const summary=parts.length?`<div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">${parts.join('<span style="color:var(--border);font-size:11px">·</span>')}</div>`:'';
@@ -4902,7 +4914,6 @@ function renderTrackerCard(t){
       <button onclick="trackerOpenModal('${t.id}')" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text-muted);flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px">edit</span></button>
     </div>
     ${summary}
-    <div style="font-size:10px;color:var(--text-muted);margin-top:6px">上次記錄 ${fmtDateFull(t.lastDate)}・${t.lastValue}${unit}</div>
     ${trackerHistoryHtml(t)}
     <div style="display:flex;gap:8px;margin-top:10px">
       ${t.valueInterval?`<button onclick="trackerPromptUpdateCurrent('${t.id}')" style="flex:1;font-size:12px;font-weight:600;color:var(--primary);background:var(--primary-light);border:none;border-radius:8px;padding:8px;cursor:pointer">更新目前數值</button>`:''}
@@ -4980,8 +4991,18 @@ function trackerPromptUpdateCurrent(id){
 function trackerUpdateCurrent(id,val){
   const v=parseFloat(val);
   if(isNaN(v)){showToast('請輸入數字','error');return;}
-  trackers=trackers.map(x=>x.id===id?{...x,currentValue:v,currentValueUpdatedAt:Date.now()}:x);
-  saveTrackers();renderMemoPage();showToast('已更新目前數值');
+  // 🌟 隨時更新目前數值時，同步在歷史紀錄留一筆（type:'update'）。
+  // 只改 currentValue 與 records，不動 lastValue/lastDate，所以不會重置「下次提醒」的計算基準；
+  // 該基準只有「完成並記錄」才會重新設定。同一天重複更新時，覆蓋當天上一筆更新（避免同日一堆雜訊、也方便更正輸入錯誤）。
+  trackers=trackers.map(x=>{
+    if(x.id!==id)return x;
+    const records=[...trackerRecords(x)];
+    const last=records[records.length-1];
+    if(last&&last.type==='update'&&last.date===todayStr)records.pop();
+    records.push({date:todayStr,value:v,type:'update'});
+    return {...x,currentValue:v,currentValueUpdatedAt:Date.now(),records};
+  });
+  saveTrackers();renderMemoPage();showToast('已更新目前數值，並記入歷史紀錄');
 }
 function trackerOpenComplete(id){
   const t=trackers.find(x=>x.id===id);if(!t)return;
@@ -5000,7 +5021,7 @@ function trackerSaveComplete(){
   // 🌟 新增一筆歷史紀錄：沿用（或補回）既有 records，push 進最新一筆，並用它重新計算下次提醒
   trackers=trackers.map(x=>{
     if(x.id!==id)return x;
-    const records=[...trackerRecords(x),{date,value:val}];
+    const records=[...trackerRecords(x),{date,value:val,type:'complete'}];
     return {...x,lastValue:val,lastDate:date,currentValue:null,currentValueUpdatedAt:null,updatedAt:Date.now(),records};
   });
   saveTrackers();closeModal('trackerCompleteModal');renderMemoPage();showToast('已記錄，下次提醒已重新計算');
